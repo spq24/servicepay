@@ -1,0 +1,63 @@
+<div id="login-full-wrapper">
+  <div class="container">
+    <div class="row">
+      <div class="col-xs-12">
+        <div id="login-box">
+          <div id="login-box-holder">
+            <div class="row">
+              <div class="col-xs-12">
+                <header id="login-header">
+                  <div id="login-logo">
+                    <%= image_tag "logo.png" %>
+                  </div>
+                </header>
+                <div id="login-box-inner">
+                  <%= render 'shared/messages' %>
+                  <%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
+                    <div class="input-group">
+                      <span class="input-group-addon"><i class="fa fa-user"></i></span>
+                      <%= f.email_field :email, placeholder: 'Email Address', autofocus: true, class: "form-control" %>
+                    </div>
+                    <div class="input-group">
+                      <span class="input-group-addon"><i class="fa fa-key"></i></span>
+                      <%= f.password_field :password, autocomplete: "off", class: "form-control", placeholder: "Password" %>
+                    </div>
+                      <% if devise_mapping.rememberable? -%>
+                        <div id="remember-me-wrapper">
+                          <div class="row">
+                            <div class="col-xs-6">
+                              <div class="checkbox-nice">
+                                <%= f.check_box :remember_me, id: "remember-me", checked: true %>
+                                <label for="remember-me">
+                                  Remember me
+                                </label>
+                              </div>
+                            </div>
+                            <%= link_to "Forgot password?", new_user_password_path, id: "login-forget-link", class: "col-xs-6" %>
+                          </div>
+                        </div>
+                      <% end -%>
+                    <div class="row">
+                      <div class="col-xs-12">
+                        <%= submit_tag "Login", class: "btn btn-success col-xs-12" %>
+                      </div>
+                    </div>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div id="login-box-footer">
+            <div class="row">
+              <div class="col-xs-12">
+                Do not have an account? 
+                <%= link_to "Register Now", root_path %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

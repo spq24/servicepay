@@ -1,0 +1,39 @@
+<div id="login-full-wrapper" class="reset-password-wrapper">
+  <div class="container">
+    <div class="row">
+      <div class="col-xs-12">
+        <div id="login-box">
+          <div id="login-box-holder">
+            <div class="row">
+              <div class="col-xs-12">
+                <header id="login-header">
+                  <div id="login-logo">
+                    <%= image_tag "logo.png" %>
+                  </div>
+                </header>
+                <div id="login-box-inner" class="with-heading">
+                  <%= render 'shared/messages' %>
+                  <h4>Enter Your New Password</h4>
+                    <%= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :put }) do |f| %>
+                      <%= devise_error_messages! %>
+                      <%= f.hidden_field :reset_password_token %>
+                    <div class="input-group reset-pass-input">
+                      <span class="input-group-addon"><i class="fa fa-user"></i></span>
+                      <%= f.password_field :password, autofocus: true, autocomplete: "off", class: "form-control", placeholder: "Enter Your New Password" %>
+                    </div>
+                    <div class="row">
+                      <div class="col-xs-12">
+                        <%= submit_tag "Reset Password", class: "btn btn-success col-xs-12" %>
+                      </div>
+                    </div>
+
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

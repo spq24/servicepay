@@ -1,0 +1,46 @@
+<div id="login-full-wrapper" class="reset-password-wrapper">
+	<div class="container">
+		<div class="row">
+			<div class="col-xs-12">
+				<div id="login-box">
+					<div id="login-box-holder">
+						<div class="row">
+							<div class="col-xs-12">
+								<header id="login-header">
+									<div id="login-logo">
+										<%= image_tag "logo.png" %>
+									</div>
+								</header>
+								<div id="login-box-inner" class="with-heading">
+									<%= render 'shared/messages' %>
+									<h4>Forgot your password?</h4>
+									<p>
+										Enter your email address and we'll send instructions.
+									</p>
+
+									<%= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :post }) do |f| %>
+  										<%= devise_error_messages! %>
+										<div class="input-group reset-pass-input">
+											<span class="input-group-addon"><i class="fa fa-user"></i></span>
+											<%= f.email_field :email, autofocus: true, placeholder: "joe@example.com", class: "form-control" %>
+										</div>
+										<div class="row">
+											<div class="col-xs-12">
+												<button type="submit" class="btn btn-success col-xs-12">Send Reset Instructions</button>
+											</div>
+											<div class="col-xs-12">
+												<br/>
+												<%= link_to "Back to login", new_user_session_path, id: "login-forget-link", class: "forgot-link col-xs-12" %>
+											</div>
+										</div>
+
+									<% end %>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
