@@ -6,6 +6,6 @@ class ApplicationController < ActionController::Base
 
   def after_sign_in_path_for(resource)
   	@company = current_user.company
-  	company_path(@company)
+  	company_path(current_user.company)
   end
 end

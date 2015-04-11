@@ -171,7 +171,7 @@
                                                 <!-- Signup Button -->
                                                 <%= f.submit "Get Started", class: "btn-front btn-color" %>                                            
                                             <% end %>
-                                            <%= link_to image_tag('stripe-connect-3.png'), user_omniauth_authorize_path(:stripe_connect, scope: "read_write", redirect_uri: "https://servicepay-217072.use1.nitrousbox.com/companies/stripe_connected") %>
+                                            <%= link_to image_tag('stripe-connect-3.png'), user_omniauth_authorize_path(:stripe_connect, scope: "read_write") %>
                                         </div><!-- /End Fast-Reg -->
                                     </div><!-- /End Col -->
                               <% end %>

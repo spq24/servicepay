@@ -21,11 +21,6 @@ Devise.setup do |config|
   # available as additional gems.
   require 'devise/orm/active_record'
 
-  config.omniauth :stripe_connect,
-      ENV["STRIPE_CONNECT_CLIENT_ID"],
-      ENV["STRIPE_SECRET"],
-      :scope => 'read_write',
-      :stripe_landing => 'register'
 
   # ==> Configuration for any authentication mechanism
   # Configure which keys are used when authenticating a user. The default is
@@ -262,4 +257,7 @@ Devise.setup do |config|
   # When using omniauth, Devise cannot automatically set Omniauth path,
   # so you need to do it manually. For the users scope, it would be:
   # config.omniauth_path_prefix = '/my_engine/users/auth'
+
+    config.omniauth :stripe_connect, ENV["STRIPE_CONNECT_CLIENT_ID"], ENV["STRIPE_SECRET"], :scope => 'read_write', :stripe_landing => 'register'
+
 end
