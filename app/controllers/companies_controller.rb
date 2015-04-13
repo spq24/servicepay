@@ -1,5 +1,5 @@
 class CompaniesController < ApplicationController
-  before_action :authenticate_user!, only: [:edit, :show, :destroy, :index]
+  before_action :authenticate_user!, if: :user_signed_in?
 
   def new
     @company = Company.new
@@ -40,9 +40,6 @@ class CompaniesController < ApplicationController
     end
   end
   
-
-  def stripe_connected
-  end
   
   def show
     @user = current_user

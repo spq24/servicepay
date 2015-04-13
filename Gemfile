@@ -26,6 +26,7 @@ gem 'aws-sdk'
 gem 'figaro'
 gem 'kaminari'
 gem 'omniauth-stripe-connect'
+gem 'activeadmin', github: 'activeadmin'
 
 # Use jquery as the JavaScript library
 gem 'jquery-rails'
