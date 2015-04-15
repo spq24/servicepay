@@ -5,5 +5,6 @@ class User < ActiveRecord::Base
          :recoverable, :rememberable, :trackable, :validatable, :omniauthable
   
   belongs_to :company
+  has_many :payments
   
 end

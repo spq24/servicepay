@@ -1,0 +1,65 @@
+<script type="text/javascript" src="https://js.stripe.com/v2/"></script>
+
+<script type="text/javascript">
+  // This identifies your website in the createToken call below
+  Stripe.setPublishableKey('<%= @user.publishable_key %>');
+  // ...
+</script>
+
+
+<%= javascript_include_tag 'payment' %>
+
+
+<div id="login-full-wrapper">
+  <div class="container">
+    <div class="row">
+      <div class="col-xs-12">
+          <div class="col-lg-12">
+            <div class="main-box thanks-form">
+              <h1>Thank you For Your Business From <%= @company.company_name.titleize %></h1>
+            </div>
+          </div>
+        <div id="login-box">
+          <div class="row">
+            <div class="col-xs-12">
+              <header id="login-header">
+                <div id="login-logo">
+                  <%= image_tag "logo.png" %>
+                </div>
+              </header>
+              <div id="login-box-inner">
+                <%= render 'shared/messages' %>
+                <%= form_for @payment, html: {id: "payment-form"} do |f| %>
+                    <div class="input-group">
+                      <span class="input-group-addon"><i class="fa fa-user"></i></span>
+                      <%= f.text_field :amount, autofocus: true, placeholder: "Amount", class: "form-control" %>
+                    </div>
+                    <div class="input-group">
+                      <span class="input-group-addon"><i class="fa fa-user"></i></span>
+                      <input class="form-control" data-stripe="number" maxlength="20" placeholder="Credit Card Number" type="text"></input>
+                    </div>
+                    <div class="input-group">
+                      <span class="input-group-addon"><i class="fa fa-user"></i></span>
+                      <input class="form-control" data-stripe="cvc" size="10" placeholder="Security Number" type="text"></input>
+                    </div>
+          					<div class="input-group">
+          						<center><p>Expiration Date:</p></center>
+          						<ul class="dates">
+          							<li><%= select_month(Date.today, {add_month_numbers: true},  class: 'form-control', data: {stripe: "exp-month"}, style: "height: 46px;") %></li>
+          							<li><%= select_year(Date.today.year, {start_year: Date.today.year, end_year: Date.today.year + 4}, class: 'form-control', data: {stripe: "exp-year"}, style: "height: 46px;") %></li>
+          						</ul>
+          					</div>
+                  <div class="row">
+                    <div class="col-xs-12">
+                      <%= f.submit "Submit Payment", class: "btn btn-success col-xs-12" %>
+                    </div>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -8,11 +8,14 @@ Rails.application.routes.draw do
 
   resources :companies
   resources :users, only: [:index, :show]
+  resources :payments
 
   # You can have the root of your site routed with "root"
    root 'companies#new'
 
-   get '/companies/stripe_connected' => 'companies#stripe_connected'
+   get '/companies/:id/payment' => 'payments#new', as: 'payment_form'
+
+   mount StripeEvent::Engine => '/stripe_events'
 
   # Example of regular route:
   #   get 'products/:id' => 'catalog#view'

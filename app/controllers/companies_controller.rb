@@ -48,9 +48,6 @@ class CompaniesController < ApplicationController
   
   def destroy
   end
-
-  def index
-  end
   
   private
   

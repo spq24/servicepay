@@ -1,0 +1,7 @@
+<script type="text/javascript" src="https://js.stripe.com/v2/"></script>
+
+<script>
+  Stripe.setPublishableKey("<%= @user.publishable_key %>")
+</script>
+
+<%= javascript_include_tag 'payment' %>
