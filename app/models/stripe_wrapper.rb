@@ -16,7 +16,7 @@ module StripeWrapper
 					description: "test charge",
 					application_fee: 123
 				}, 
-					{stripe_account: options[:stripe_uid]}
+					{stripe_account: options[:uid]}
 				)
 				new(response: charge)
 			rescue Stripe::CardError => e
@@ -44,7 +44,7 @@ module StripeWrapper
 				email: options[:customer_email],
 				description: "Service Pay"
 				},
-			    {stripe_account: options[:stripe_uid]}
+			    {stripe_account: options[:uid]}
 			)
 			new(response: customer)
 			rescue Stripe::CardError => e

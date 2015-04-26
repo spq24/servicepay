@@ -8,7 +8,7 @@ class PaymentsController < ApplicationController
 	end
 
 	def create
-		@result = StripeWrapper::Customer.create(source: params[:stripeToken])
+		@result = StripeWrapper::Charge.create(source: params[:stripeToken], uid: current_user.uid)
 	    if @result.present?
 		  @payment = Payment.create(payment_params)
 	      flash[:success] = "Thank you for your payment"
