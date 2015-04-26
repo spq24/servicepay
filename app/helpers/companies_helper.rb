@@ -1,5 +1,15 @@
 module CompaniesHelper
 
+	  def payment_chart_data
+	  	(8.weeks.ago.to_date..Date.today).map do |date|
+	      {
+	        created_at: date,
+	        payments: @payments.where("date(payments.created_at) = ?", date).count(:id),
+        	amounts: @payments.where("date(payments.created_at) = ?", date).sum(:amount)
+	      }
+	    end
+	  end
+
 	def us_states
 		[
 	      ['Alabama', 'AL'],

@@ -15,13 +15,12 @@
 						<div class="col-lg-3 col-md-4 col-sm-4">
 							<div class="main-box clearfix">
 								<header class="main-box-header clearfix">
-									<h2><%= @company.company_name %></h2>
+									<center><h2><%= @company.company_name %></h2></center>
 								</header>
 								
 								<div class="main-box-body clearfix">
-									<p>put profile completeness bar</p>
 									<div class="profile-since">
-										User since: <%= @company.created_at.strftime("%b %Y") %>
+										Service Pay Company since: <%= @company.created_at.strftime("%b %Y") %>
 									</div>
 								</div>
 								
@@ -45,6 +44,11 @@
 
 														<%= f.label :phonenumber %>
 														<%= f.text_field :phonenumber, class: "form-control", id: "company_phonenumber maskedPhone" %><br />
+
+														<%= f.label :logo %>
+														<%= f.file_field :logo, class: "form-control" %><br />
+
+														<%= image_tag(@company.logo) if @company.logo.present? %>
 													</div>
 													<div class="col-md-6">
 														<%= f.label :address_one %>

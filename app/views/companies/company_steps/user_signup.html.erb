@@ -1,0 +1,83 @@
+<div id="login-full-wrapper">
+  <div class="container">
+    <div class="row">
+      <div class="col-xs-12">
+        <div id="signup-box">
+          <div class="row">
+            <div class="col-xs-12">
+              <header id="signup-header">
+                <div id="signup-logo">
+                  <%= image_tag "logo.png" %>
+                </div>
+              </header>
+              <div id="signup-box-inner">
+                <%= render 'shared/messages' %>
+                <h1>Your Info</h1>
+                  <div id="myWizard" class="wizard">
+                    <div class="wizard-inner">
+                      <ul class="steps">
+                        <li data-target="#step1"><span class="badge">1</span>Company Info<span class="chevron"></span></li>
+                        <li data-target="#step2" class="active"><span class="badge  badge-primary">2</span>Your Info<span class="chevron"></span></li>
+                      </ul>
+                    </div>
+                  </div><br /><br />
+                  <%= form_for(User.new, url: registration_path(User)) do |f| %>
+                    <%= f.hidden_field :company_id, value: Company.last.id %>
+                    <div class="col-sm-6">
+                      <div class="input-group">
+                        <span class="input-group-addon"><i class="fa fa-user"></i></span>
+                        <%= f.text_field :first_name, autofocus: true, placeholder: "First Name", class: "form-control", required: true %>
+                      </div>
+                      <div class="input-group">
+                        <span class="input-group-addon"><i class="fa fa-user"></i></span>
+                        <%= f.text_field :last_name, placeholder: "Last Name", class: "form-control", required: true %>
+                      </div>
+                      <div class="input-group">
+                        <span class="input-group-addon"><i class="fa fa-user"></i></span>
+                        <%= f.email_field :email, class: "form-control input-lg", placeholder: "Your Email", required: true %>
+                      </div>
+                    </div>
+                    <div class="col-sm-6">
+                      <div class="input-group">
+                        <span class="input-group-addon"><i class="fa fa-envelope"></i></span>
+                        <%= f.password_field :password, autocomplete: "off", class: "form-control input-lg", placeholder: "Password (8 characters minimum)", required: true %>
+                      </div>
+                      <div id="remember-me-wrapper" class="pull-right">
+                        <div class="row">
+                          <div class="col-xs-12">
+                            <div class="checkbox-nice">
+                              <input type="checkbox" id="terms-cond" checked="checked" />
+                              <label for="terms-cond">
+                                I accept terms and conditions
+                              </label>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-xs-12">
+                        <%= f.submit "Create Company", class: "btn btn-success col-xs-3 pull-right" %>
+                      </div>
+                    </div>
+                  <% end %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- this page specific inline scripts -->
+<script>
+$(function () {
+  $('#myWizard').wizard();
+  
+  //masked inputs
+  $("#maskedDate").mask("99/99/9999");
+  $("#maskedPhone").mask("(999) 999-9999");
+  $("#maskedPhoneExt").mask("(999) 999-9999? x99999");
+});
+</script>

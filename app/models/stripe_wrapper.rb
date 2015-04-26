@@ -9,19 +9,23 @@ module StripeWrapper
 
 		def self.create(options={})
 			begin
-				response = Stripe::Charge.create({
+				charge = Stripe::Charge.create({
 					amount: 1000,
-					currency: 'usd',
-					source: token,
-				}, stripe_account: current_user.uid)
-				new(response: response)
+					currency: "usd",
+					source: options[:source],
+					description: "test charge",
+					application_fee: 123
+				}, 
+					{stripe_account: options[:stripe_uid]}
+				)
+				new(response: charge)
 			rescue Stripe::CardError => e
 				new(error_message: e.message)
 			end
 		end
 
 		def successful?
-			response.present?
+			charge.present?
 		end
 	end
 
@@ -35,24 +39,25 @@ module StripeWrapper
 
 		def self.create(options={})
 			begin
-			response = Stripe::Customer.create(
-				card: options[:card],
-				email: options[:user_email],
-				description: "TrackLocal Customer #{options[:company_id]}",
-				plan: "2"
-				)
-			new(response: response)
+			customer = Stripe::Customer.create({
+				source: options[:source],
+				email: options[:customer_email],
+				description: "Service Pay"
+				},
+			    {stripe_account: options[:stripe_uid]}
+			)
+			new(response: customer)
 			rescue Stripe::CardError => e
 			  new(error_message: e.message)
 			end
 		end
 
 		def successful?
-			response.present?
+			customer.present?
 		end
 
 		def customer_token
-			response.id
+			customer.id
 		end
 	end
 end

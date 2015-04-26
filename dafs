@@ -1,0 +1,18 @@
+
+[1mFrom:[0m /home/action/workspace/servicepay/app/controllers/payments_controller.rb @ line 11 PaymentsController#create:
+
+    [1;34m10[0m: 	[32mdef[0m [1;34mcreate[0m
+ => [1;34m11[0m:     binding.pry
+    [1;34m12[0m: 		@result = [1;34;4mStripeWrapper[0m::[1;34;4mCharge[0m.create(
+    [1;34m13[0m: 	        [33m:card[0m => params[[33m:stripeToken[0m]
+    [1;34m14[0m: 	        )
+    [1;34m15[0m: 	    [32mif[0m @result.present?
+    [1;34m16[0m: 		  @payment = [1;34;4mPayment[0m.create(payment_params)
+    [1;34m17[0m: 	      flash[[33m:success[0m] = [31m[1;31m"[0m[31mThank you for your payment[1;31m"[0m[31m[0m
+    [1;34m18[0m: 	      redirect_to thank_you_path
+    [1;34m19[0m: 	    [32melse[0m
+    [1;34m20[0m: 	      flash[[33m:danger[0m] = @result.error_message
+    [1;34m21[0m: 	      render [33m:new[0m
+    [1;34m22[0m: 	    [32mend[0m
+    [1;34m23[0m: 	[32mend[0m
+

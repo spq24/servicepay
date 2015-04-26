@@ -15,15 +15,10 @@
 								<div class="col-lg-3 col-md-4 col-sm-4">
 									<div class="main-box clearfix">
 										<header class="main-box-header clearfix">
-											<h2><%= @user.first_name %> <%= @user.last_name %></h2>
+											<center><h2><%= @user.first_name %> <%= @user.last_name %></h2></center>
 										</header>
 										
-										<div class="main-box-body clearfix">
-											<p>put profile completeness bar</p>
-											<div class="profile-label">
-												<span class="label label-danger">Admin</span>
-											</div>
-											
+										<div class="main-box-body clearfix">										
 											<div class="profile-since">
 												User since: <%= @user.created_at.strftime("%b %Y") %>
 											</div>

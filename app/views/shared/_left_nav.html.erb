@@ -3,14 +3,15 @@
 		<div id="col-left-inner" class="col-left-nano-content">
 			<div id="user-left-box" class="clearfix hidden-sm hidden-xs">
 					<center>
-						LOGO
+						<% if current_user.company.logo.present? %>
+							<%= image_tag(current_user.company.logo)  %>
+						<% else %>
+							<h1><%= link_to "Upload Your Logo", edit_company_path(current_user.company) %></h1>
+						<% end %>
 					</center>
 				<div class="user-box">
 					<span class="name">
 						<%= @user.first_name %> <%= @user.last_name %>
-					</span>
-					<span class="status">
-						put completion status bar here
 					</span>
 				</div>
 			</div>
@@ -20,7 +21,6 @@
 						<%= link_to company_path(current_user.company) do %>
 							<i class="fa fa-dashboard"></i>
 							<span>Dashboard</span>
-							<span class="label label-info label-circle pull-right">28</span>
 						<% end %>
 					</li>
 					<% if !@user.access_code.nil? %>
@@ -30,10 +30,15 @@
 								<span>Customers</span>
 							</a>
 	 					</li>
-
-	 					<%= link_to payment_form_path, target: "_blank", class: "btn btn-success left-pay" do %>
-	 						Go to My Payment Form <i class="fa fa-external-link"></i>
-	 					<% end %>
+						<li>
+							 
+		 					<%= link_to payment_form_path(current_user.company.id), target: "_blank" do %>
+		 					<i class="fa fa-usd"></i>
+		 					<span>My Payment Form</span>
+		 					<span class="label label-success label-circle pull-right"><i class="fa fa-external-link"></i></span>
+		 					<% end %>
+		 						
+	 					</li>
  					<% end %>
 				</ul>
 			</div>

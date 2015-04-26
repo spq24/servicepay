@@ -1060,11 +1060,11 @@ h3 .small {
   padding: 20px 15px;
 }
 #user-left-box img {
-  border-radius: 50%;
+  /* border-radius: 50%; */
   background-clip: padding-box;
   /* stops bg color from leaking outside the border: */
   /* float: left; */
-  width: 80px;
+  width: 150px;
 }
 #user-left-box .user-box {
   color: #fff;
@@ -1583,7 +1583,7 @@ h3 .small {
 }
 
 .label.label-circle {
-  border-radius: 50%;
+  border-radius: 20%;
   background-clip: padding-box;
   /* stops bg color from leaking outside the border: */
   padding: 4px !important;

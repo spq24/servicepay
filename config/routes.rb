@@ -6,7 +6,10 @@ Rails.application.routes.draw do
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 
-  resources :companies
+  resources :companies do
+      resources :company_steps, controller: 'companies/company_steps'
+  end
+
   resources :users, only: [:index, :show]
   resources :payments
 
@@ -14,7 +17,8 @@ Rails.application.routes.draw do
    root 'companies#new'
 
    get '/companies/:id/payment' => 'payments#new', as: 'payment_form'
-
+   get '/payment/thank_you' => 'payments#thank_you', as: 'thank_you'
+  
    mount StripeEvent::Engine => '/stripe_events'
 
   # Example of regular route:

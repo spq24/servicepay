@@ -54,7 +54,6 @@
                                         <li><%= link_to "Dashboard", company_path(current_user.company), class: "btn-front btn-nav nav-link" %></li>
                                     <% else %>
                                         <li><%= link_to "Login", new_user_session_path, class: "btn-front btn-nav nav-link" %></li>
-                                        <li><a class="btn-front btn-nav btn-color scrollto" href="#top">Sign Up</a></li>
                                     <% end %>
                                 </ul>
                             </div><!-- /End Navbar-Collapse -->
@@ -62,83 +61,6 @@
                     </div><!-- /End Row -->
                 </div><!-- /End Container -->
             </nav><!-- /End Sticky Navigation -->
-
-
-
-            <!-- =========================================
-                 Login/Signup Bootstrap Modal
-            ==========================================  -->
-            <div class="modal fade login" id="loginModal">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        
-                        <!-- Modal-Header -->
-                        <div class="modal-header">
-                            <!-- Close Button -->
-                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
-                                <i class="icon icon_close_alt2"></i>
-                            </button>
-                            <!-- Modal-Header Title-->
-                            <h4 class="modal-title">Sign in to<span>LEADgen 2.0</span></h4>
-                            <p class="modal-subtitle">Enter your email and password</p>
-                        </div><!-- /End Modal-Header -->
-
-                        <!-- Modal-Body Content -->
-                        <div class="modal-body">  
-                            <div class="box">
-                                 <div class="content">
-                                    <!-- Login Form -->
-                                    <div class="loginBox">
-                                        <form id="login-modal" role="form">
-                                            <!-- Success/Alert Notification -->
-                                            <p class="lm-success"><i class="icon icon_check_alt2"></i> <strong>Logging You In Now...</strong></p>
-                                            <p class="lm-failed"><i class="icon icon_close_alt2"></i><strong> Something went wrong! Make Sure Your Username and Password Were Correct</strong></p>
-                                            <!-- Input Fields -->
-                                            <input id="lm-email" class="form-control input-lg" type="text" placeholder="Email" name="lm-email" required>
-                                            <input id="lm-password" class="form-control input-lg" type="password" placeholder="Password" name="lm-password" required>
-                                            <!-- Login Button -->
-                                            <button class="btn btn-color" type="submit">Login</button>
-                                        </form>
-                                    </div><!-- /End Login Form -->
-                                 </div>
-                            </div><!-- /End Login Form Box -->
-                            <div class="box">
-                                <!-- Signup Form -->
-                                <div class="content registerBox" style="display:none;">
-                                    <form id="signup-modal" role="form">
-                                        <!-- Success/Alert Notification -->
-                                        <p class="sm-success"><i class="icon icon_check_alt2"></i> <strong>Congratulation! Signup modal validation is working. Implement your code.</strong></p>
-                                        <p class="sm-failed"><i class="icon icon_close_alt2"></i><strong> Something went wrong! Insert correct value.</strong></p>
-                                        <!-- Input Fields -->
-                                        <input id="sm-email" class="form-control input-lg" type="text" placeholder="Email" name="sm-email" required>
-                                        <input id="sm-password" class="form-control input-lg" type="password" placeholder="Password" name="sm-password">
-                                        <input id="sm-confirm" class="form-control input-lg" type="password" placeholder="Repeat Password" name="sm-confirm">
-                                        <!-- Signup Button -->
-                                        <button class="btn btn-color">Create Account</button>
-                                    </form>
-                                    
-                                </div><!-- /End Signup Form -->
-                            </div><!-- /End Signup Form Box -->
-                        </div><!-- /End Modal-Body -->
-
-                        <!-- Modal-Footer -->
-                        <div class="modal-footer">
-                            <!-- Login-Footer. Redirect to Signup-Modal-->
-                            <div class="forgot login-footer">
-                                <span>Don't have an account? 
-                                     <a href="#canvas-bg" class="scrollto">Sign up.</a>
-                                </span>
-                            </div>
-                            <!-- Signup-Footer. Redirect to Login-Modal -->
-                            <div class="forgot register-footer" style="display:none">
-                                 <span>Already have an account?</span>
-                                 <a href="javascript: showLoginForm();">Login</a>
-                            </div>
-                        </div><!-- /End Modal-Footer -->      
-                      
-                    </div><!-- /End Modal Content -->
-                </div><!-- /End Modal Dialog -->
-            </div><!-- /End Modal -->
 
             
             <!-- =========================================
@@ -158,12 +80,10 @@
 
                                     <% else %>    
                                         <!-- Welcome - Hero Message -->
-                                        <h1 class="text-white hero-title">Payments Made Easy</h1>
-                                        <p class="text-white hero-title">Service Pay is a Payments System Designed For the Service Industry</p>
+                                        <h1 class="text-white hero-title">Payments For Home Service Professionals</h1>
                                         
                                     <div class="col-sm-12">                                    
                                         <div class="fast-reg-box">
-
                                             <%= form_for @company, html: { id: "fast-reg", role: "form"} do |f| %>
                                                 <div class="form-group">
                                                     <%= f.text_field :company_name, id: "company_company_name fast-email", class: "form-control input-lg", placeholder: "Company Name", required: true %>
