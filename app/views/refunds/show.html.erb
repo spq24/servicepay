@@ -1,0 +1,51 @@
+<%= render 'shared/nav_top' %>
+	<div class="row">
+		<%= render 'shared/left_nav' %>
+		<div id="content-wrapper">
+			<div class="row">
+				<div class="col-lg-12">
+					<%= render 'shared/messages' %>
+					<div class="row">
+						<div class="col-lg-12">							
+							<h1>Refunded Payment</h1>
+						</div>
+					</div>
+					
+					<div class="row" id="user-profile">						
+						<div class="col-lg-9 col-md-8 col-sm-8">
+							<div class="main-box clearfix">
+								<div class="tabs-wrapper profile-tabs">
+									<ul class="nav nav-tabs">
+										<li class="active"><a href="#tab-newsfeed" data-toggle="tab">Company Info</a></li>
+									</ul>
+									
+									<div class="tab-content">
+										<div class="tab-pane fade in active" id="tab-newsfeed">
+										<header class="story-header">
+											<div class="story-time pull-right">
+												<i class="fa fa-clock-o"></i> Refund Date: <%= @refund.created_at.strftime("%m/%d/%Y") %>
+											</div>
+											<div class="story-author">
+												Refund Amount: <%= number_to_currency(@refund.amount) %>
+											</div><br />
+											<div class="story-author">
+												Refunded by: <%= mail_to @refund.user.email, @refund.user.first_name, target: "_blank"  %>
+											</div><br />									
+											<div class="story-author">
+												Customer: <%= mail_to @payment.customer_email, @payment.customer_name, target: "_blank" %>
+											</div>
+										</header>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					
+				</div>
+			</div>
+		  <%= render 'shared/footer' %>
+		</div>
+	</div>
+</div>
+</div>

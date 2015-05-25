@@ -35,6 +35,6 @@ class Companies::CompanyStepsController < ApplicationController
   	end
 
     def company_params
-        params.require(:company).permit(:phonenumber, :website_url, :address_one, :address_two, :city, :state, :postcode, users_attributes: [:id, :email])
+        params.require(:company).permit(:company_name, :logo, :phonenumber, :website_url, :address_one, :address_two, :city, :state, :postcode, :facebook, :google, :yelp, users_attributes: [:id, :email, :first_name, :last_name, :password])
     end
 end

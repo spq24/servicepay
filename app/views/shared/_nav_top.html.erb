@@ -1,7 +1,7 @@
 	<div id="theme-wrapper">
 		<header class="navbar" id="header-navbar">
 			<div class="container-app">
-				<%= link_to company_path(current_user.company), class: "navbar-brand", id: "logo" do %>
+				<%= link_to company_path(@user.company), class: "navbar-brand", id: "logo" do %>
 					<%= image_tag("logo.png", class: "normal-logo logo-white") %>
 					<%= image_tag("logo-black.png", class: "normal-logo logo-black") %>
 					<%= image_tag("logo-small.png", class: "small-logo hidden-xs hidden-sm hidden") %>
@@ -36,15 +36,15 @@
 									<% end %>
 							    </li>
 								<li>
-									<%= link_to edit_company_path(current_user.company), class: "table-link" do %>
+									<%= link_to edit_company_path(@user.company), class: "table-link" do %>
 										<i class="fa fa-building"></i>Company Info
 									<% end %>
 							    </li>
-								<li>
+								<!-- <li>
 									<%= link_to users_path, class: "table-link" do %>
 										<i class="fa fa-users"></i>Users
 									<% end %>
-							    </li>
+							    </li> -->
 								<li>
 									<%= link_to destroy_user_session_path, method: :delete do %>
 										<i class="fa fa-power-off"></i>Logout

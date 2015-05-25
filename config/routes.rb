@@ -12,12 +12,22 @@ Rails.application.routes.draw do
 
   resources :users, only: [:index, :show]
   resources :payments
+  resources :refunds
+  resources :customers
+  resources :reviews
 
   # You can have the root of your site routed with "root"
    root 'companies#new'
 
    get '/companies/:id/payment' => 'payments#new', as: 'payment_form'
-   get '/payment/thank_you' => 'payments#thank_you', as: 'thank_you'
+   get '/companies/:id/payment/thank_you' => 'payments#thank_you', as: 'thank_you'
+   get '/payments/:payment_id/refund/new' => 'refunds#new', as: "refund_payment"
+   get '/companies/:id/happy' => 'reviews#happy', as: "happy_review"
+   get '/companies/:id/okay' => 'reviews#okay', as: "okay_review"
+   get '/companies/:id/sad' => 'reviews#sad', as: "sad_review"
+   get '/companies/:id/review/thank-you-comments' => 'reviews#final', as: "final_review"
+   get '/faq' => 'static_pages#faq'
+   get '/tc' => 'static_pages#tc'
   
    mount StripeEvent::Engine => '/stripe_events'
 

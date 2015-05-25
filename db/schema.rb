@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150426005308) do
+ActiveRecord::Schema.define(version: 20150521185159) do
 
   create_table "active_admin_comments", force: true do |t|
     t.string   "namespace"
@@ -77,7 +77,31 @@ ActiveRecord::Schema.define(version: 20150426005308) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "logo"
+    t.string   "publishable_key"
+    t.string   "provider"
+    t.string   "uid"
+    t.string   "access_code"
+    t.string   "facebook"
+    t.string   "google"
+    t.string   "yelp"
+    t.datetime "deleted_at"
+    t.string   "encrypted_publishable_key"
+    t.string   "encrypted_uid"
+    t.string   "encrypted_access_code"
   end
+
+  add_index "companies", ["deleted_at"], name: "index_companies_on_deleted_at"
+
+  create_table "customers", force: true do |t|
+    t.integer  "company_id"
+    t.string   "customer_email"
+    t.string   "customer_name"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.datetime "deleted_at"
+  end
+
+  add_index "customers", ["deleted_at"], name: "index_customers_on_deleted_at"
 
   create_table "friendly_id_slugs", force: true do |t|
     t.string   "slug",                      null: false
@@ -103,11 +127,50 @@ ActiveRecord::Schema.define(version: 20150426005308) do
     t.string   "access_code"
     t.string   "customer_email"
     t.string   "customer_name"
+    t.string   "stripe_charge_id"
+    t.boolean  "refunded"
+    t.string   "stripe_refund_id"
+    t.string   "invoice_number"
+    t.integer  "customer_id"
+    t.datetime "deleted_at"
   end
+
+  add_index "payments", ["deleted_at"], name: "index_payments_on_deleted_at"
+
+  create_table "refunds", force: true do |t|
+    t.integer  "user_id"
+    t.integer  "company_id"
+    t.integer  "amount"
+    t.string   "stripe_refund_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "payment_id"
+    t.string   "reason"
+    t.integer  "customer_id"
+    t.datetime "deleted_at"
+  end
+
+  add_index "refunds", ["deleted_at"], name: "index_refunds_on_deleted_at"
+
+  create_table "reviews", force: true do |t|
+    t.integer  "company_id"
+    t.integer  "customer_id"
+    t.string   "score"
+    t.text     "comments"
+    t.boolean  "google"
+    t.boolean  "yelp"
+    t.boolean  "facebook"
+    t.boolean  "email"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.datetime "deleted_at"
+  end
+
+  add_index "reviews", ["deleted_at"], name: "index_reviews_on_deleted_at"
 
   create_table "users", force: true do |t|
     t.string   "email",                  default: "", null: false
-    t.string   "encrypted_password",     default: "", null: false
+    t.string   "encrypted_password",     default: ""
     t.string   "reset_password_token"
     t.datetime "reset_password_sent_at"
     t.datetime "remember_created_at"
@@ -129,9 +192,22 @@ ActiveRecord::Schema.define(version: 20150426005308) do
     t.string   "provider"
     t.string   "uid"
     t.string   "access_code"
+    t.string   "invitation_token"
+    t.datetime "invitation_created_at"
+    t.datetime "invitation_sent_at"
+    t.datetime "invitation_accepted_at"
+    t.integer  "invitation_limit"
+    t.integer  "invited_by_id"
+    t.string   "invited_by_type"
+    t.integer  "invitations_count",      default: 0
+    t.datetime "deleted_at"
   end
 
+  add_index "users", ["deleted_at"], name: "index_users_on_deleted_at"
   add_index "users", ["email"], name: "index_users_on_email", unique: true
+  add_index "users", ["invitation_token"], name: "index_users_on_invitation_token", unique: true
+  add_index "users", ["invitations_count"], name: "index_users_on_invitations_count"
+  add_index "users", ["invited_by_id"], name: "index_users_on_invited_by_id"
   add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
 
 end

@@ -3138,7 +3138,7 @@ input[type="radio"] {
 }
 #login-logo > img {
   display: block;
-  height: 40px;
+  height: 100px;
   margin: 0 auto;
 }
 #login-logo > span {
@@ -9493,4 +9493,19 @@ section{
 
 .left-pay {
   margin: 10px;
+}
+
+.socials li {
+  display: inline-block;
+  margin: 15px;
+}
+
+.socials i {
+  font-size: 150px;
+}
+
+.review-comments {
+  margin: 0px; 
+  width: 647px; 
+  height: 143px;
 }

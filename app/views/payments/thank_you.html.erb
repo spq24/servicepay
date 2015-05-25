@@ -1,3 +1,47 @@
-<h1>thanks dawg</h1>
-
-<%= render 'shared/messages' %>
+<div id="login-full-wrapper">
+	<div class="container">
+		<div class="row">
+			<div class="col-xs-12">
+				<div id="signup-box">
+					<div class="row">
+						<div class="col-xs-12">
+							<header id="signup-header">
+								<div id="login-logo">
+									<%= image_tag @company.logo %>
+								</div>
+							</header>
+							<div id="signup-box-inner">
+								<%= render 'shared/messages' %>
+								<center>
+									<h1>Thank You For Your Business!</h1><br />
+									<h2>How Likely Would You Be To Recommend Us to a Friend or Family Member?</h2>
+									<%= form_for @review do |f| %>
+										<%= f.hidden_field :company_id, value: @company.id %>
+										<%= f.hidden_field :customer_id, value: @customer.id %>
+										<ul class="nps-numbers">
+											<li><%= f.label :score_1, "1" %><br /><%= f.radio_button :score, "1" %></li>
+											<li><%= f.label :score_2, "2" %><br /><%= f.radio_button :score, "2" %></li>
+											<li><%= f.label :score_3, "3" %><br /><%= f.radio_button :score, "3" %></li>
+											<li><%= f.label :score_4, "4" %><br /><%= f.radio_button :score, "4" %></li>
+											<li><%= f.label :score_5, "5" %><br /><%= f.radio_button :score, "5" %></li>
+											<li><%= f.label :score_6, "6" %><br /><%= f.radio_button :score, "6" %></li>
+											<li><%= f.label :score_7, "7" %><br /><%= f.radio_button :score, "7" %></li>
+											<li><%= f.label :score_8, "8" %><br /><%= f.radio_button :score, "8" %></li>
+											<li><%= f.label :score_9, "9" %><br /><%= f.radio_button :score, "9" %></li>
+											<li><%= f.label :score_10, "10" %><br /><%= f.radio_button :score, "10" %></li>
+										</ul>
+					                  <div class="row">
+					                    <div class="col-xs-12">
+					                    	<%= f.submit "Submit Review", class: "btn btn-success" %>
+					                    </div>
+					                  </div>
+									<% end %>
+								</center>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

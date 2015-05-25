@@ -1,1 +1,1 @@
-Rails.application.config.assets.precompile += %w( payment.js )
+Rails.application.config.assets.precompile += %w( morris.js )

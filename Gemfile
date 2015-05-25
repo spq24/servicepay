@@ -17,7 +17,7 @@ gem 'coffee-rails', '~> 4.0.0'
 # gem 'therubyracer',  platforms: :ruby
 
 gem 'devise'
-gem "font-awesome-rails"
+gem 'font-awesome-rails'
 gem 'morrisjs-rails'
 gem 'raphael-rails'
 gem 'stripe'
@@ -27,13 +27,17 @@ gem 'mini_magick'
 gem 'fog'
 gem 'fog-aws'
 gem 'aws-sdk'
-gem 'friendly_id'
 gem 'figaro'
 gem 'kaminari'
 gem 'omniauth-stripe-connect'
 gem 'activeadmin', github: 'activeadmin'
 gem 'wicked'
-gem 'public_activity'
+gem 'autonumeric-rails'
+gem 'money'
+gem 'customerio'
+gem 'devise_invitable'
+gem "paranoia", "~> 2.0"
+gem 'attr_encrypted'
 
 # Use jquery as the JavaScript library
 gem 'jquery-rails'

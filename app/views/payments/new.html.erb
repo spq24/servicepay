@@ -2,11 +2,9 @@
 
 <script type="text/javascript">
   // This identifies your website in the createToken call below
-  Stripe.setPublishableKey('<%= @user.publishable_key %>');
+  Stripe.setPublishableKey('<%= @company.publishable_key %>');
   // ...
 </script>
-
-<%= javascript_include_tag 'payment' %>
 
 <div id="login-full-wrapper">
   <div class="container">
@@ -23,7 +21,7 @@
             <div class="col-xs-12">
               <header id="login-header">
                 <div id="login-logo">
-                  <%= image_tag @company.logo %>
+                  <%= image_tag @company.logo if @company.logo.present? %>
                 </div>
               </header>
               <div id="login-box-inner">
@@ -32,15 +30,22 @@
                     <%= f.hidden_field :company_id, value: @company.id %>
                     <div class="input-group">
                       <span class="input-group-addon"><i class="fa fa-user"></i></span>
-                      <%= f.text_field :customer_name, autofocus: true, placeholder: "Your Name", class: "form-control" %>
+                      <%= f.text_field :invoice_number, autofocus: true, placeholder: "Invoice Number", class: "form-control" %>
                     </div>
+                    <%= f.fields_for :customer, @payment.build_customer do |f| %>
+                      <%= f.hidden_field :company_id, value: @company.id %>
+                      <div class="input-group">
+                        <span class="input-group-addon"><i class="fa fa-user"></i></span>
+                        <%= f.text_field :customer_name, placeholder: "Your Name", class: "form-control" %>
+                      </div>
+                      <div class="input-group">
+                        <span class="input-group-addon"><i class="fa fa-user"></i></span>
+                        <%= f.text_field :customer_email, placeholder: "Your Email (For Receipt)", class: "form-control" %>
+                      </div>
+                    <% end %>
                     <div class="input-group">
                       <span class="input-group-addon"><i class="fa fa-user"></i></span>
-                      <%= f.text_field :customer_email, placeholder: "Your Email (For Receipt)", class: "form-control" %>
-                    </div>
-                    <div class="input-group">
-                      <span class="input-group-addon"><i class="fa fa-user"></i></span>
-                      <%= f.text_field :amount, placeholder: "Amount", class: "form-control" %>
+                      <%= f.text_field :amount, data: {autonumeric: true, aSign: 'USD'}, placeholder: "Amount", class: "form-control" %>
                     </div>
                     <div class="input-group">
                       <span class="input-group-addon"><i class="fa fa-user"></i></span>
@@ -71,3 +76,4 @@
     </div>
   </div>
 </div>
+<%= content_tag :div, "", id: "payments_chart", class: "graph", style: "display:none;" %>

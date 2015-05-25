@@ -1,0 +1,68 @@
+<%= render 'shared/nav_top' %>
+	<div class="row">
+		<%= render 'shared/left_nav' %>
+		<div id="content-wrapper">
+			<div class="row">
+				<div class="col-lg-12">
+					<%= render 'shared/messages' %>
+					<div class="row">
+						<div class="col-lg-12">							
+							<h1>Customer Profile</h1>
+						</div>
+					</div>
+					
+					<div class="row" id="user-profile">
+						<div class="col-lg-3 col-md-4 col-sm-4">
+							<div class="main-box clearfix">
+								<header class="main-box-header clearfix">
+									<center><h2><%= @customer.customer_name %></h2></center>
+								</header>
+								
+								<div class="main-box-body clearfix">
+									<div class="profile-since">
+										<%= @customer.company.company_name %> customer since: <%= @customer.created_at.strftime("%b %Y") %>
+									</div>
+								</div>
+								
+							</div>
+						</div>
+						
+						<div class="col-lg-9 col-md-8 col-sm-8">
+							<div class="main-box clearfix">
+								<div class="tabs-wrapper profile-tabs">
+									<ul class="nav nav-tabs">
+										<li class="active"><a href="#tab-newsfeed" data-toggle="tab">Company Info</a></li>
+									</ul>
+									
+									<div class="tab-content">
+										<div class="tab-pane fade in active" id="tab-newsfeed">
+											<%= form_for @customer do |f| %>
+												<div class="row">
+													<div class="col-md-6">
+														<%= f.label :customer_name %>
+														<%= f.text_field :customer_name, class: "form-control" %><br />
+													</div>
+													<div class="col-md-6">
+														<%= f.label :customer_email %>
+														<%= f.text_field :customer_email, class: "form-control" %><br />
+													</div>
+													<div class="col-md-12">
+														<%= f.submit "Save Changes", class: "btn btn-success pull-right" %>
+													</div>
+												</div>
+											<% end %>
+										</div>
+									</div>
+								</div>
+								
+							</div>
+						</div>
+					</div>
+					
+				</div>
+			</div>
+		  <%= render 'shared/footer' %>
+		</div>
+	</div>
+</div>
+</div>

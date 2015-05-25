@@ -3,10 +3,10 @@
 		<div id="col-left-inner" class="col-left-nano-content">
 			<div id="user-left-box" class="clearfix hidden-sm hidden-xs">
 					<center>
-						<% if current_user.company.logo.present? %>
-							<%= image_tag(current_user.company.logo)  %>
+						<% if @user.company.logo.present? %>
+							<%= image_tag(@user.company.logo)  %>
 						<% else %>
-							<h1><%= link_to "Upload Your Logo", edit_company_path(current_user.company) %></h1>
+							<h1><%= link_to "Upload Your Logo", edit_company_path(@user.company) %></h1>
 						<% end %>
 					</center>
 				<div class="user-box">
@@ -17,22 +17,35 @@
 			</div>
 			<div class="collapse navbar-collapse navbar-ex1-collapse" id="sidebar-nav">	
 				<ul class="nav nav-pills nav-stacked">
-					<li class="<%= 'active' if current_page?(company_path(current_user.company)) %>">
-						<%= link_to company_path(current_user.company) do %>
+					<li class="<%= 'active' if current_page?(company_path(@user.company)) %>">
+						<%= link_to company_path(@user.company) do %>
 							<i class="fa fa-dashboard"></i>
 							<span>Dashboard</span>
 						<% end %>
 					</li>
-					<% if !@user.access_code.nil? %>
-						<li>
-							<a href="#">
-								<i class="fa fa-phone"></i>
-								<span>Customers</span>
-							</a>
+					<% if !@user.company.access_code.nil? %>
+						<li class="<%= 'active' if current_page?(customers_path) %>">
+		 					<%= link_to customers_path do %>
+		 					<i class="fa fa-users"></i>
+		 					<span>Customers</span>
+		 					<% end %>
+	 					</li>
+						<li class="<%= 'active' if current_page?(reviews_path) %>">
+		 					<%= link_to reviews_path do %>
+		 					<i class="fa fa-comments-o"></i>
+		 					<span>Reviews</span>
+		 					<% end %>
+	 					</li>
+						<li class="<%= 'active' if current_page?(refunds_path) %>">
+		 					<%= link_to refunds_path do %>
+		 					<i class="fa fa-warning"></i>
+		 					<span>Refunds</span>
+		 					<% end %>
+		 						
 	 					</li>
 						<li>
 							 
-		 					<%= link_to payment_form_path(current_user.company.id), target: "_blank" do %>
+		 					<%= link_to payment_form_path(@user.company.id), target: "_blank" do %>
 		 					<i class="fa fa-usd"></i>
 		 					<span>My Payment Form</span>
 		 					<span class="label label-success label-circle pull-right"><i class="fa fa-external-link"></i></span>

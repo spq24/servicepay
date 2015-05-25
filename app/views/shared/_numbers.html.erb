@@ -5,7 +5,7 @@
 			<span class="headline">Payments</span>
 			<span class="value">
 				<span class="timer" data-from="0" data-to="2562" data-speed="800" data-refresh-interval="10">
-					<%= @payments.all.count %>
+					<%= @payments_count.count %>
 				</span>
 			</span>
 		</div>
@@ -13,10 +13,32 @@
 	<div class="col-lg-3 col-sm-6 col-xs-12">
 		<div class="main-box infographic-box">
 			<i class="fa fa-money green-bg"></i>
-			<span class="headline">Revenue</span>
+			<span class="headline">Net Revenue</span>
 			<span class="value">
 				<span class="timer" data-from="83" data-to="2562" data-speed="900" data-refresh-interval="60">
 				  <%= number_to_currency(@revenue) %>
+				</span>
+			</span>
+		</div>
+	</div>
+	<div class="col-lg-3 col-sm-6 col-xs-12">
+		<div class="main-box infographic-box">
+			<i class="fa fa-warning red-bg"></i>
+			<span class="headline">Refunds</span>
+			<span class="value">
+				<span class="timer" data-from="83" data-to="2562" data-speed="900" data-refresh-interval="60">
+				  <%= @refunds_count.count %>
+				</span>
+			</span>
+		</div>
+	</div>
+	<div class="col-lg-3 col-sm-6 col-xs-12">
+		<div class="main-box infographic-box">
+			<i class="fa fa-money red-bg"></i>
+			<span class="headline">Refunded Amount</span>
+			<span class="value">
+				<span class="timer" data-from="83" data-to="2562" data-speed="900" data-refresh-interval="60">
+				  <%= number_to_currency(@refunded_amount) %>
 				</span>
 			</span>
 		</div>

@@ -49,6 +49,10 @@ GEM
     arbre (1.0.3)
       activesupport (>= 3.0.0)
     arel (5.0.1.20140414130214)
+    attr_encrypted (1.3.4)
+      encryptor (>= 1.3.0)
+    autonumeric-rails (1.9.33)
+      jquery-rails (>= 2.0.2)
     aws-sdk (2.0.38)
       aws-sdk-resources (= 2.0.38)
     aws-sdk-core (2.0.38)
@@ -75,6 +79,8 @@ GEM
       coffee-script-source
       execjs
     coffee-script-source (1.9.1)
+    customerio (0.5.1)
+      httparty (>= 0.5, < 1.0)
     devise (3.4.1)
       bcrypt (~> 3.0)
       orm_adapter (~> 0.1)
@@ -82,8 +88,12 @@ GEM
       responders
       thread_safe (~> 0.1)
       warden (~> 1.2.3)
+    devise_invitable (1.4.2)
+      actionmailer (>= 3.2.6, < 5)
+      devise (>= 3.2.0)
     domain_name (0.5.23)
       unf (>= 0.0.5, < 1.0.0)
+    encryptor (1.3.0)
     erubis (2.7.0)
     excon (0.45.1)
     execjs (2.5.2)
@@ -188,8 +198,6 @@ GEM
     formtastic (3.1.3)
       actionpack (>= 3.2.13)
     formtastic_i18n (0.2.0)
-    friendly_id (5.1.0)
-      activerecord (>= 4.0.0)
     has_scope (0.6.0)
       actionpack (>= 3.2, < 5)
       activesupport (>= 3.2, < 5)
@@ -197,6 +205,9 @@ GEM
     hike (1.2.3)
     http-cookie (1.0.2)
       domain_name (~> 0.5)
+    httparty (0.13.3)
+      json (~> 1.8)
+      multi_xml (>= 0.5.2)
     i18n (0.7.0)
     inflecto (0.0.2)
     inherited_resources (1.6.0)
@@ -228,6 +239,8 @@ GEM
     mini_magick (4.2.3)
     mini_portile (0.6.2)
     minitest (5.5.1)
+    money (6.5.1)
+      i18n (>= 0.6.4, <= 0.7.0)
     morrisjs-rails (0.5.1)
       railties (> 3.1, < 5)
     multi_json (1.11.0)
@@ -257,6 +270,8 @@ GEM
       omniauth (~> 1.0)
       omniauth-oauth2 (~> 1.2.0)
     orm_adapter (0.5.0)
+    paranoia (2.1.2)
+      activerecord (~> 4.0)
     pg (0.18.1)
     polyamorous (1.2.0)
       activerecord (>= 3.0)
@@ -267,11 +282,6 @@ GEM
       slop (~> 3.4)
     pry-nav (0.2.4)
       pry (>= 0.9.10, < 0.11.0)
-    public_activity (1.4.2)
-      actionpack (>= 3.0.0)
-      activerecord (>= 3.0)
-      i18n (>= 0.5.0)
-      railties (>= 3.0.0)
     rack (1.5.2)
     rack-test (0.6.3)
       rack (>= 1.0)
@@ -362,25 +372,29 @@ PLATFORMS
 
 DEPENDENCIES
   activeadmin!
+  attr_encrypted
+  autonumeric-rails
   aws-sdk
   carrierwave
   coffee-rails (~> 4.0.0)
+  customerio
   devise
+  devise_invitable
   figaro
   fog
   fog-aws
   font-awesome-rails
-  friendly_id
   jbuilder (~> 2.0)
   jquery-rails
   kaminari
   mini_magick
+  money
   morrisjs-rails
   omniauth-stripe-connect
+  paranoia (~> 2.0)
   pg
   pry
   pry-nav
-  public_activity
   rails (= 4.1.0)
   rails_12factor
   raphael-rails

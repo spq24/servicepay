@@ -14,4 +14,5 @@
 //= require jquery_ujs
 //= require raphael
 //= require morris
+//= require autonumeric
 //= require_tree .

@@ -48,7 +48,7 @@
 														<%= f.label :logo %>
 														<%= f.file_field :logo, class: "form-control" %><br />
 
-														<%= image_tag(@company.logo) if @company.logo.present? %>
+														<%= image_tag(@company.logo, size: "150x150") if @company.logo.present? %>
 													</div>
 													<div class="col-md-6">
 														<%= f.label :address_one %>
@@ -60,18 +60,26 @@
 														<%= f.label :city %>
 														<%= f.text_field :city, class: "form-control" %><br />
 
-														<div class="form-group form-group-select2">	
-															<%= f.label :state %>
-															<%= f.select :state, options_for_select(us_states, @company.state), {}, style: "width:300px", id: "company_state sel2" %><br /><br />
-															<%= f.label :postcode, "Zip Code" %>									    
-														    <%= f.text_field :postcode %>
-													    </div
+														<%= f.label :state %>
+														<%= f.select :state, options_for_select(us_states, @company.state), {}, style: "width:300px", id: "company_state sel2" %><br /><br />
+														<%= f.label :postcode, "Zip Code" %>									    
+													    <%= f.text_field :postcode %><br /><br />
+
+													    <%= f.label :google, "Google+ Listing" %>
+														<%= f.text_field :google, value: @company.google, placeholder: "Google+ Listing", class: "form-control" %><br />
+
+													    <%= f.label :yelp, "Yelp Listing" %>
+														<%= f.text_field :yelp, value: @company.yelp, placeholder: "Yelp Listing", class: "form-control" %><br />
+
+														<%= f.label :facebook, "Facebook Page" %>
+														<%= f.text_field :facebook, value: @company.facebook, placeholder: "Facebook Page", class: "form-control" %><br />
 													</div>
 													<div class="col-md-12">
 														<%= f.submit "Save Changes", class: "btn btn-success pull-right" %>
 													</div>
 												</div>
 											<% end %>
+											<%= link_to "Delete Account", company_path, method: :delete, data: {confirm: "Are you sure? This will delete all information associated with your account"}, class: "table-link danger" %>
 										</div>
 									</div>
 								</div>

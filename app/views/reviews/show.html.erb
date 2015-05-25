@@ -1,0 +1,55 @@
+<%= render 'shared/nav_top' %>
+	<div class="row">
+		<%= render 'shared/left_nav' %>
+		<div id="content-wrapper">
+			<div class="row">
+				<div class="col-lg-12">
+					<%= render 'shared/messages' %>
+					<div class="row">
+						<div class="col-lg-12">							
+							<h1>Review</h1>
+						</div>
+					</div>
+					
+					<div class="row" id="user-profile">						
+						<div class="col-lg-9 col-md-8 col-sm-8">
+							<div class="main-box clearfix">
+								<div class="tabs-wrapper profile-tabs">
+									<ul class="nav nav-tabs">
+										<li class="active"><a href="#tab-newsfeed" data-toggle="tab">Review</a></li>
+									</ul>
+									
+									<div class="tab-content">
+											<div class="table-responsive">
+												<table class="table">
+													<tbody>
+														<tr>
+															<td class="text-center">
+																<i class="fa fa-comment"></i>
+															</td>
+															<td>
+																<%= mail_to Customer.find(@review.customer_id).customer_email, Customer.find(@review.customer_id).customer_name, target: "_blank" %>
+																reviewed your business. They gave you a <%= @review.score %> out of 10.
+															</td>
+															<td style="max-width:600px;">
+																<%= @review.comments %>
+															</td>
+															<td>
+																<%= @review.created_at.strftime("%m/%d/%Y") %>
+															</td>
+														</tr>
+													</tbody>
+												</table>
+											</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>					
+				</div>
+			</div>
+		  <%= render 'shared/footer' %>
+		</div>
+	</div>
+</div>
+</div>

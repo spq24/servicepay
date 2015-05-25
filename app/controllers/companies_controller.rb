@@ -45,18 +45,26 @@ class CompaniesController < ApplicationController
   def show
     @user = current_user
     @company = @user.company
-    @payments = @company.payments
-    @revenue = @payments.sum(:amount)
-    @activities = PublicActivity::Activity.order("created_at desc").where(owner_id: @company.id)
+    @payments = @company.payments.order(id: :desc).page params[:page]
+    @payments_count = @company.payments.all
+    @refunds_count = @company.refunds.all
+    @refunded_amount = @refunds_count.sum(:amount)
+    @revenue = @company.payments.all.sum(:amount) - @refunded_amount
+    @refund = Refund.new
   end
   
   def destroy
+    Company.find(params[:id]).destroy
+    session[:user_id] = nil
+    current_user = nil
+    flash[:success] = "Your Company Account Has Been Deleted"
+    redirect_to root_path
   end
   
   private
   
   def company_params
-      params.require(:company).permit(:company_name, :logo, :phonenumber, :website_url, :address_one, :address_two, :city, :state, :postcode, users_attributes: [:id, :email, :first_name, :last_name, :password])
+      params.require(:company).permit(:company_name, :logo, :phonenumber, :website_url, :address_one, :address_two, :city, :state, :postcode, :facebook, :google, :yelp, users_attributes: [:id, :email, :first_name, :last_name, :password])
   end
 
   def correct_user

@@ -1,0 +1,1 @@
+$customerio = Customerio::Client.new(ENV['CIO_SITE_ID'], ENV['CIO_API_KEY'])
