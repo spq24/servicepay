@@ -83,7 +83,7 @@
 											  <% @reviews.each do |r| %>
 												<tr>
 													<td class="text-center">
-						                                <%= mail_to Customer.find(r.customer_id).customer_email,Customer.find(r.customer_id).customer_name, target: "_blank", class: "user-link" %>
+						                                <%= link_to Customer.find(r.customer_id).customer_name, r, class: "user-link" %>
 													</td>
 													<td class="text-center">
 														<%= r.score %>

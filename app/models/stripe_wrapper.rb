@@ -13,7 +13,7 @@ module StripeWrapper
 					amount: options[:amount],
 					currency: "usd",
 					source: options[:source],
-					description: "test charge",
+					description: "Charge for service",
 					application_fee: options[:fee]
 				}, 
 					{stripe_account: options[:uid]}

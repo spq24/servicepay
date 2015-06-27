@@ -45,6 +45,9 @@
 														<%= f.label :phonenumber %>
 														<%= f.text_field :phonenumber, class: "form-control", id: "company_phonenumber maskedPhone" %><br />
 
+														<%= f.label :description %>
+														<%= f.text_area :description, cols: 20, rows: 4, placeholder: "What do you sell and when do you charge your customers", class: "form-control" %><br />
+
 														<%= f.label :logo %>
 														<%= f.file_field :logo, class: "form-control" %><br />
 
@@ -61,9 +64,9 @@
 														<%= f.text_field :city, class: "form-control" %><br />
 
 														<%= f.label :state %>
-														<%= f.select :state, options_for_select(us_states, @company.state), {}, style: "width:300px", id: "company_state sel2" %><br /><br />
+														<%= f.select :state, options_for_select(us_states, @company.state), {}, style: "width:300px", id: "company_state sel2", class: "form-control" %><br />
 														<%= f.label :postcode, "Zip Code" %>									    
-													    <%= f.text_field :postcode %><br /><br />
+													    <%= f.text_field :postcode, class: "form-control" %><br />
 
 													    <%= f.label :google, "Google+ Listing" %>
 														<%= f.text_field :google, value: @company.google, placeholder: "Google+ Listing", class: "form-control" %><br />

@@ -29,10 +29,12 @@
 												Refund Amount: <%= number_to_currency(@refund.amount) %>
 											</div><br />
 											<div class="story-author">
-												Refunded by: <%= mail_to @refund.user.email, @refund.user.first_name, target: "_blank"  %>
+												Refunded by: <%= link_to @refund.user.email, target: "_blank" do %>
+													<%= @refund.user.first_name %>&nbsp;<%= @refund.user.last_name %>
+												<% end %>
 											</div><br />									
 											<div class="story-author">
-												Customer: <%= mail_to @payment.customer_email, @payment.customer_name, target: "_blank" %>
+												Customer: <%= link_to @payment.customer.customer_name, @payment.customer %>
 											</div>
 										</header>
 										</div>

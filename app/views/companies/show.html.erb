@@ -9,7 +9,8 @@
 							<center>
 								<h1>Welcome To Service Pay!</h1>
 								<h2>Set Up Your Stripe Account to Start Accepting Payments</h2>
-								<%= link_to image_tag('stripe-connect-3.png'), user_omniauth_authorize_path(:stripe_connect, scope: "read_write") %>
+								<%= link_to image_tag('stripe-connect-3.png'), "/users/auth/stripe_connect?scope=read_write&stripe_user[email]=#{@user.email}&stripe_user[url]=http://#{@company.website_url}&stripe_user[country]=US&stripe_user[phone_number]=#{@company.phonenumber}&stripe_user[business_name]=#{@company.company_name}&stripe_user[first_name]=#{@user.first_name}&stripe_user[last_name]=#{@user.last_name}&stripe_user[street_address]=#{@company.address_one}%20#{@company.address_two}&stripe_user[city]=#{@company.city}&stripe_user[state]=#{@company.state}&stripe_user[zip]=#{@company.postcode}&stripe_user[physical_product]=false&stripe_user[product_category]=professional_services&stripe_user[product_description]=#{@company.description}" %><br />
+								<h4>(Don't worry we've already filled out most of the form for you!)</h4>
 							</center>
 						<% else %>	
 							<div class="row">
@@ -63,7 +64,7 @@
 																<%= p.id %>
 															</td>
 															<td>
-																<%= Customer.find(p.customer_id).customer_name if !p.customer_id.nil? %>
+																<%= link_to Customer.find(p.customer_id).customer_name, Customer.find(p.customer_id) %>
 															</td>
 															<td>
 																<%= mail_to Customer.find(p.customer_id).customer_email, Customer.find(p.customer_id).customer_email, target: "_blank" if !p.customer_id.nil? %>

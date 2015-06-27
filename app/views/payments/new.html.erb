@@ -32,33 +32,30 @@
                       <span class="input-group-addon"><i class="fa fa-user"></i></span>
                       <%= f.text_field :invoice_number, autofocus: true, placeholder: "Invoice Number", class: "form-control" %>
                     </div>
-                    <%= f.fields_for :customer, @payment.build_customer do |f| %>
-                      <%= f.hidden_field :company_id, value: @company.id %>
                       <div class="input-group">
                         <span class="input-group-addon"><i class="fa fa-user"></i></span>
-                        <%= f.text_field :customer_name, placeholder: "Your Name", class: "form-control" %>
+                        <input class="form-control" id="payment_customer_attributes_customer_name" name="payment[customer_attributes][customer_name]" placeholder="Your Name" type="text" required>
                       </div>
                       <div class="input-group">
                         <span class="input-group-addon"><i class="fa fa-user"></i></span>
-                        <%= f.text_field :customer_email, placeholder: "Your Email (For Receipt)", class: "form-control" %>
+                        <input class="form-control" id="payment_customer_attributes_customer_email" name="payment[customer_attributes][customer_email]" placeholder="Your Email (For Receipt)" type="text" required>
                       </div>
-                    <% end %>
                     <div class="input-group">
                       <span class="input-group-addon"><i class="fa fa-user"></i></span>
-                      <%= f.text_field :amount, data: {autonumeric: true, aSign: 'USD'}, placeholder: "Amount", class: "form-control" %>
+                      <%= f.text_field :amount, data: {autonumeric: true, aSign: 'USD'}, placeholder: "Amount", class: "form-control", required: true %>
                     </div>
                     <div class="input-group">
                       <span class="input-group-addon"><i class="fa fa-user"></i></span>
-                      <input class="form-control" data-stripe="number" maxlength="20" placeholder="Credit Card Number" type="text"></input>
+                      <input class="form-control" data-stripe="number" maxlength="20" placeholder="Credit Card Number" type="text" required></input>
                     </div>
                     <div class="input-group">
                       <span class="input-group-addon"><i class="fa fa-user"></i></span>
-                      <input class="form-control" data-stripe="cvc" size="10" placeholder="Security Number" type="text"></input>
+                      <input class="form-control" data-stripe="cvc" size="10" placeholder="Security Number" type="text" required></input>
                     </div>
           					<div class="input-group">
           						<center><p>Expiration Date:</p></center>
           						<ul class="dates">
-          							<li><%= select_month(Date.today, {add_month_numbers: true},  class: 'form-control', data: {stripe: "exp-month"}, style: "height: 46px;") %></li>
+          							<li><%= select_month(Date.today, {add_month_numbers: true},  class: 'form-control', data: {stripe: "exp-month"}, style: "height: 46px;")%></li>
           							<li><%= select_year(Date.today.year, {start_year: Date.today.year, end_year: Date.today.year + 4}, class: 'form-control', data: {stripe: "exp-year"}, style: "height: 46px;") %></li>
           						</ul>
           					</div>

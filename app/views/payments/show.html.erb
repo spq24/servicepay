@@ -18,6 +18,7 @@
 									<%= form_for @review do |f| %>
 										<%= f.hidden_field :company_id, value: @company.id %>
 										<%= f.hidden_field :customer_id, value: @customer.id %>
+										<%= f.hidden_field :payment_id, value: @payment.id %>
 										<ul class="nps-numbers">
 											<li><%= f.label :score_1, "1" %><br /><%= f.radio_button :score, "1" %></li>
 											<li><%= f.label :score_2, "2" %><br /><%= f.radio_button :score, "2" %></li>

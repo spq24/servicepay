@@ -16,6 +16,8 @@ class Companies::CompanyStepsController < ApplicationController
     when :company_info
       if @company
         @company.update_attributes(company_params)
+        @company.status = true if step == :company_info
+        @company.save
         flash[:success] = "Awesome, just some info about you and we'll be ready to go!"
         render_wizard @company
       else
@@ -35,6 +37,8 @@ class Companies::CompanyStepsController < ApplicationController
   	end
 
     def company_params
-        params.require(:company).permit(:company_name, :logo, :phonenumber, :website_url, :address_one, :address_two, :city, :state, :postcode, :facebook, :google, :yelp, users_attributes: [:id, :email, :first_name, :last_name, :password])
+        params.require(:company).permit(:company_name, :description, :logo, :phonenumber, :website_url, :address_one, :address_two, :city, :state, :postcode, :facebook, :google, :yelp, :status, :terms, users_attributes: [:id, :email, :first_name, :last_name, :password])
     end
+
+
 end

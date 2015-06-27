@@ -31,7 +31,7 @@
 											  <% @customers.each do |c| %>
 												<tr>
 													<td class="text-center">
-						                                <%= mail_to c.customer_email, c.customer_name, target: "_blank", class: "user-link" %>
+						                                <%= link_to c.customer_name, c, class: "user-link" %>
 													</td>
 													<td class="text-center">
 														<%= @payments.where(customer_id: c.id).count %>

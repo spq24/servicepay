@@ -12,5 +12,12 @@ class Company < ActiveRecord::Base
   has_many :reviews, dependent: :destroy
   
   accepts_nested_attributes_for :users, :reject_if => :all_blank, :allow_destroy => true
+
+  validates_presence_of :company_name, :address_one, :city, :state, :postcode, :phonenumber, :website_url, :if => :active?
+
+
+  def active?
+    status == 'active'
+  end
   
 end

@@ -29,7 +29,8 @@ class CustomersController < ApplicationController
 		@user = current_user
 		@company = @user.company
 		@customer = Customer.find(params[:id])
-		@payments = @customer.payments
+		@payments = @customer.payments.reverse
+		@reviews = @customer.reviews.reverse
 	end
 
 	def index

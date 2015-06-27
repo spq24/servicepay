@@ -26,7 +26,7 @@
 												</div><br />
 
 												<div class="story-author">
-													Customer: <%= mail_to @payment.customer_email, @payment.customer_name, target: "_blank" %>
+													Customer: <%= mail_to @payment.customer.customer_email, @payment.customer.customer_name, target: "_blank" %>
 												</div>
 
 												<div class="story-time pull-right">
@@ -41,11 +41,11 @@
 												<div class="row">
 													<div class="col-md-6">
 														<%= f.label :amount %>
-														<%= f.text_field :amount, data: {autonumeric: true, aSign: 'USD'}, placeholder: number_to_currency(@payment.amount), class: "form-control" %><br />
+														<%= f.text_field :amount, data: {autonumeric: true, aSign: 'USD'}, placeholder: number_to_currency(@payment.amount), class: "form-control", required: true %><br />
 													</div>
 													<div class="col-md-6">
 														<%= f.label :reason, "Reason a Refund is Requested" %>
-														<%= f.text_field :reason, placeholder: "Customer request because of damage...", class: "form-control" %><br />
+														<%= f.text_field :reason, placeholder: "Customer request because of damage...", class: "form-control", required: true %><br />
 													</div>
 													<div class="col-md-12">
 														<%= f.submit "Create Refund", class: "btn btn-danger pull-right" %>

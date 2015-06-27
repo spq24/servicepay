@@ -14,20 +14,26 @@ class RefundsController < ApplicationController
 		payment = Payment.find(params[:refund][:payment_id])
 		company = payment.company
 		ch = Stripe::Charge.retrieve(payment.stripe_charge_id, stripe_account: company.uid)
-		@result = ch.refunds.create(amount: refund_amount)
-	    if @result.present?
-		  @refund = Refund.create(refund_params)
-		  @refund.stripe_refund_id = @result.id
-		  @refund.save
-		  payment.refunded = true
-		  payment.stripe_refund_id = @result.id
-		  payment.save
-	      flash[:success] = "Successfully Refunded Payment"
-	      redirect_to company_path(company)
-	    else
-	      flash[:danger] = @result.error_message
-	      redirect_to render :new
-	    end
+		@refund = Refund.create(refund_params)
+		if @refund.valid?
+			@result = ch.refunds.create(amount: refund_amount)
+		    if @result.present?
+			  @refund.stripe_refund_id = @result.id
+			  @refund.save
+			  payment.refunded = true
+			  payment.stripe_refund_id = @result.id
+			  payment.save
+			  track_cio
+		      flash[:success] = "Successfully Refunded Payment"
+		      redirect_to company_path(company)
+		    else
+		      flash[:danger] = @result.error_message
+		      render :new
+		    end
+		else
+			flash[:danger] = "There was a problem with your refund. Please make sure all required fields are filled out."
+			redirect_to refund_payment_path(payment)
+		end
 	end
 
 	def show
@@ -47,7 +53,10 @@ class RefundsController < ApplicationController
   private
 
   def refund_params
-    params.require(:refund).permit(:payment_id, :company_id, :stripe_refund_id, :amount, :user_id)
+    params.require(:refund).permit(:payment_id, :company_id, :stripe_refund_id, :amount, :user_id, :customer_id, :reason)
   end
 
+  def track_cio
+	$customerio.track(@refund.customer_id,"refund", customer_name: @refund.customer.customer_name, customer_email: @refund.customer.customer_email, amount: @refund.amount, company_name: @refund.company.company_name, company_user_email: @refund.user.email)
+  end
 end

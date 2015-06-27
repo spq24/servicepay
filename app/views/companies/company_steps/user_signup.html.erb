@@ -30,29 +30,17 @@
                       </div>
                       <div class="input-group">
                         <span class="input-group-addon"><i class="fa fa-user"></i></span>
-                        <%= f.text_field :last_name, placeholder: "Last Name", class: "form-control", required: true %>
-                      </div>
-                      <div class="input-group">
-                        <span class="input-group-addon"><i class="fa fa-user"></i></span>
                         <%= f.email_field :email, class: "form-control input-lg", placeholder: "Your Email", required: true %>
                       </div>
                     </div>
                     <div class="col-sm-6">
                       <div class="input-group">
                         <span class="input-group-addon"><i class="fa fa-envelope"></i></span>
-                        <%= f.password_field :password, autocomplete: "off", class: "form-control input-lg", placeholder: "Password (8 characters minimum)", required: true %>
+                        <%= f.text_field :last_name, placeholder: "Last Name", class: "form-control", required: true %>
                       </div>
-                      <div id="remember-me-wrapper" class="pull-right">
-                        <div class="row">
-                          <div class="col-xs-12">
-                            <div class="checkbox-nice">
-                              <input type="checkbox" id="terms-cond" checked="checked" />
-                              <label for="terms-cond">
-                                I accept terms and conditions
-                              </label>
-                            </div>
-                          </div>
-                        </div>
+                      <div class="input-group">
+                        <span class="input-group-addon"><i class="fa fa-user"></i></span>
+                        <%= f.password_field :password, autocomplete: "off", class: "form-control input-lg", placeholder: "Password (8 characters minimum)", required: true %>
                       </div>
                     </div>
                     <div class="row">
@@ -81,3 +69,4 @@ $(function () {
   $("#maskedPhoneExt").mask("(999) 999-9999? x99999");
 });
 </script>
+<%= content_tag :div, "", id: "payments_chart", class: "graph", style: "display:none;" %>

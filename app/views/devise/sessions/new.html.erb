@@ -8,7 +8,6 @@
               <div class="col-xs-12">
                 <header id="login-header">
                   <div id="login-logo">
-                    <%= image_tag "logo.png" %>
                   </div>
                 </header>
                 <div id="login-box-inner">
@@ -25,14 +24,6 @@
                       <% if devise_mapping.rememberable? -%>
                         <div id="remember-me-wrapper">
                           <div class="row">
-                            <div class="col-xs-6">
-                              <div class="checkbox-nice">
-                                <%= f.check_box :remember_me, id: "remember-me", checked: true %>
-                                <label for="remember-me">
-                                  Remember me
-                                </label>
-                              </div>
-                            </div>
                             <%= link_to "Forgot password?", new_user_password_path, id: "login-forget-link", class: "col-xs-6" %>
                           </div>
                         </div>

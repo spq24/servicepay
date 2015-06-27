@@ -13,56 +13,65 @@
 							<div id="signup-box-inner">
 								<%= render 'shared/messages' %>
 								<h1>Company Info</h1>
-									<div id="myWizard" class="wizard">
-										<div class="wizard-inner">
-											<ul class="steps">
-												<li data-target="#step1" class="active"><span class="badge badge-primary">1</span>Company Info<span class="chevron"></span></li>
-												<li data-target="#step2"><span class="badge">2</span>Your Info<span class="chevron"></span></li>
-											</ul>
+								<div id="myWizard" class="wizard">
+									<div class="wizard-inner">
+										<ul class="steps">
+											<li data-target="#step1" class="active"><span class="badge badge-primary">1</span>Company Info<span class="chevron"></span></li>
+											<li data-target="#step2"><span class="badge">2</span>Your Info<span class="chevron"></span></li>
+										</ul>
+									</div>
+								</div><br /><br />
+								<%= form_for @company, url: wizard_path, html: {id: "edit_company_#{@company.id}"} do |f| %>
+									<div class="col-sm-6">
+										<div class="input-group">
+											<span class="input-group-addon"><i class="fa fa-user"></i></span>
+											<%= f.text_field :phonenumber, placeholder: "Company Phone Number", class: "form-control", id: "maskedPhone", required: true%>
 										</div>
-									</div><br /><br />
-										<%= form_for @company, url: wizard_path, html: {id: "edit_company_#{@company.id}"} do |f| %>
-											<div class="col-sm-6">
-												<div class="input-group">
-													<span class="input-group-addon"><i class="fa fa-user"></i></span>
-													<%= f.text_field :phonenumber, placeholder: "Company Phone Number", class: "form-control", id: "maskedPhone" %>
-												</div>
-												<div class="input-group">
-													<span class="input-group-addon"><i class="fa fa-user"></i></span>
-													<%= f.text_field :website_url, placeholder: "Website (www.domain.com)", class: "form-control" %>
-												</div>
-												<div class="input-group">
-													<span class="input-group-addon"><i class="fa fa-user"></i></span>
-													<%= f.text_field :address_one, placeholder: "Address One", class: "form-control" %>
-												</div>
-												<div class="input-group">
-													<h5>Company Logo</h5>
-													<%= f.file_field :logo, class: "form-control" %>
-												</div>
-
+										<div class="input-group">
+											<span class="input-group-addon"><i class="fa fa-user"></i></span>
+											<%= f.text_field :website_url, placeholder: "Website (www.domain.com)", class: "form-control", required: true %>
+										</div>
+										<div class="input-group">
+											<span class="input-group-addon"><i class="fa fa-user"></i></span>
+											<%= f.text_field :address_one, placeholder: "Address One", class: "form-control", required: true %>
+										</div>
+										<div class="input-group">
+											<span class="input-group-addon"><i class="fa fa-user"></i></span>
+											<%= f.text_area :description, cols: 20, rows: 4, placeholder: "What do you sell and when do you charge your customers", required: true, class: "form-control" %>
+										</div>
+										<div class="input-group">
+											<h5>Company Logo</h5>
+											<%= f.file_field :logo, class: "form-control" %>
+										</div>
+									</div>
+									<div class="col-sm-6">
+										<div class="input-group">
+											<span class="input-group-addon"><i class="fa fa-envelope"></i></span>
+											<%= f.text_field :address_two, placeholder: "Address Two", class: "form-control" %>
+										</div>
+										<div class="input-group">
+											<span class="input-group-addon"><i class="fa fa-lock"></i></span>
+											<%= f.text_field :city, placeholder: "City", class: "form-control", required: true %>
+										</div>
+										<div class="input-group">
+											<span class="input-group-addon"><i class="fa fa-lock"></i></span>
+											<%= f.select :state, options_for_select(us_states), {}, class: "form-control", required: true %>
+										</div>
+										<div class="input-group">
+											<span class="input-group-addon"><i class="fa fa-lock"></i></span>
+											<%= f.text_field :postcode, placeholder: "Zip Code", class: "form-control", required: true %>
+										</div>
+									  </div>
+									  <br />
+									  <div class="row">
+										  <div class="col-xs-12">
+										  	<div class="col-sm-6">
 												<div class="input-group">
 													<span class="input-group-addon"><i class="fa fa-user"></i></span>
 													<%= f.text_field :google, placeholder: "Google+ Listing", class: "form-control" %>
 												</div>
-
 											</div>
 											<div class="col-sm-6">
-												<div class="input-group">
-													<span class="input-group-addon"><i class="fa fa-envelope"></i></span>
-													<%= f.text_field :address_two, placeholder: "Address Two", class: "form-control" %>
-												</div>
-												<div class="input-group">
-													<span class="input-group-addon"><i class="fa fa-lock"></i></span>
-													<%= f.text_field :city, placeholder: "City", class: "form-control" %>
-												</div>
-												<div class="input-group">
-													<span class="input-group-addon"><i class="fa fa-lock"></i></span>
-													<%= f.select :state, options_for_select(us_states), {}, class: "form-control" %>
-												</div>
-												<div class="input-group">
-													<span class="input-group-addon"><i class="fa fa-lock"></i></span>
-													<%= f.text_field :postcode, placeholder: "Zip Code", class: "form-control" %>
-												</div>
 												<div class="input-group">
 													<span class="input-group-addon"><i class="fa fa-user"></i></span>
 													<%= f.text_field :yelp, placeholder: "Yelp Listing", class: "form-control" %>
@@ -71,13 +80,27 @@
 													<span class="input-group-addon"><i class="fa fa-lock"></i></span>
 													<%= f.text_field :facebook, placeholder: "Facebook Page", class: "form-control" %>
 												</div>
+						                        <div id="remember-me-wrapper" class="pull-right">
+						                          <div class="row">
+						                            <div class="col-xs-12">
+						                              <div class="checkbox-nice">
+						                              	<%= f.check_box :terms, checked: "checked", id: "terms-cond", required: "true" %>
+						                                <label for="terms-cond">
+						                                  I accept the <%= link_to "terms and conditions", "/tc", target: "_blank" %>
+						                                </label>
+						                              </div>
+						                            </div>
+						                          </div>
+						                        </div>
 											</div>
-										<div class="row">
-											<div class="col-xs-12">
-												<%= f.submit "Create Company", class: "btn btn-success col-xs-3 pull-right" %>
-											</div>
-										</div>
-									<% end %>
+										  </div>
+									  </div>
+									  <div class="row">
+										  <div class="col-xs-12">
+											<%= f.submit "Create Company", class: "btn btn-success col-xs-3 pull-right" %>
+										  </div>
+									  </div>
+							    <% end %>
 							</div>
 						</div>
 					</div>
@@ -98,3 +121,4 @@ $(function () {
 	$("#maskedPhoneExt").mask("(999) 999-9999? x99999");
 });
 </script>
+<%= content_tag :div, "", id: "payments_chart", class: "graph", style: "display:none;" %>

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150521185159) do
+ActiveRecord::Schema.define(version: 20150626023305) do
 
   create_table "active_admin_comments", force: true do |t|
     t.string   "namespace"
@@ -88,6 +88,9 @@ ActiveRecord::Schema.define(version: 20150521185159) do
     t.string   "encrypted_publishable_key"
     t.string   "encrypted_uid"
     t.string   "encrypted_access_code"
+    t.boolean  "status"
+    t.boolean  "terms"
+    t.text     "description"
   end
 
   add_index "companies", ["deleted_at"], name: "index_companies_on_deleted_at"
@@ -125,8 +128,6 @@ ActiveRecord::Schema.define(version: 20150521185159) do
     t.datetime "updated_at"
     t.string   "stripe_uid"
     t.string   "access_code"
-    t.string   "customer_email"
-    t.string   "customer_name"
     t.string   "stripe_charge_id"
     t.boolean  "refunded"
     t.string   "stripe_refund_id"
@@ -164,6 +165,7 @@ ActiveRecord::Schema.define(version: 20150521185159) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "deleted_at"
+    t.integer  "payment_id"
   end
 
   add_index "reviews", ["deleted_at"], name: "index_reviews_on_deleted_at"

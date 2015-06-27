@@ -28,7 +28,7 @@
 																<i class="fa fa-comment"></i>
 															</td>
 															<td>
-																<%= mail_to Customer.find(@review.customer_id).customer_email, Customer.find(@review.customer_id).customer_name, target: "_blank" %>
+																<%= link_to Customer.find(@review.customer_id).customer_name, Customer.find(@review.customer_id) %>
 																reviewed your business. They gave you a <%= @review.score %> out of 10.
 															</td>
 															<td style="max-width:600px;">

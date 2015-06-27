@@ -57,7 +57,7 @@
 												  <% @refunds.each do |r| %>
 													<tr>
 														<td>
-							                                <%= mail_to Payment.find(r.payment_id).customer_email, Payment.find(r.payment_id).customer_name, target: "_blank" %>
+							                                <%= link_to r.customer.customer_name, r.customer %>
 														</td>
 														<td>
 															<%= number_to_currency(r.amount) %>
@@ -66,7 +66,7 @@
 															<%= r.created_at.strftime("%m/%d/%Y") %>
 														</td>
 														<td>
-															<%= mail_to User.find(r.user_id).email, User.find(r.user_id).first_name, target: "_blank" %>
+															<%= mail_to r.user.email, r.user.first_name, target: "_blank" %>
 														</td>
 														<td style="width: 20%;">
 															<%= link_to r, class: "table-link" do %>
