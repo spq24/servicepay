@@ -12,11 +12,11 @@ class ReviewsController < ApplicationController
 		      $customerio.identify(id: @review.customer_id, reviewed: true)
 		      flash[:success] = "Thank you for your review! Just One More Question."
 		      if @review.score.to_i > 8
-		      	redirect_to happy_review_path(id: params[:review][:company_id])
+            redirect_to happy_review_path(id: params[:review][:payment_id])
 		      elsif @review.score.to_i.between?(7,8)
-		      	redirect_to okay_review_path(id: params[:review][:company_id])
+            redirect_to okay_review_path(id: params[:review][:payment_id])
 		      else
-		      	redirect_to sad_review_path(id: params[:review][:company_id])
+            redirect_to sad_review_path(id: params[:review][:payment_id])
 		      end
 		    else
 		      flash[:danger] = "We Couldn't Create Your Review Something Went Wrong"
@@ -65,21 +65,24 @@ class ReviewsController < ApplicationController
 	end
 
 	def happy
-		@company = Company.find(params[:id])
-		@customer = @company.customers.last
-		@review = @customer.reviews.last
+    @payment = Payment.find(params[:id])
+    @company = @payment.company
+    @customer = @payment.customer
+    @review = Review.find_by(payment_id: @payment.id)
 	end
 
 	def okay
-		@company = Company.find(params[:id])
-		@customer = @company.customers.last
-		@review = @customer.reviews.last
+    @payment = Payment.find(params[:id])
+    @company = @payment.company
+    @customer = @payment.customer
+    @review = Review.find_by(payment_id: @payment.id)
 	end
 
 	def sad
-		@company = Company.find(params[:id])
-		@customer = @company.customers.last
-		@review = @customer.reviews.last
+    @payment = Payment.find(params[:id])
+    @company = @payment.company
+    @customer = @payment.customer
+    @review = Review.find_by(payment_id: @payment.id)
 	end
 
 	def final
