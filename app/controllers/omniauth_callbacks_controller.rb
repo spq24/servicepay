@@ -24,13 +24,17 @@ class OmniauthCallbacksController < Devise::OmniauthCallbacksController
 
   def add_to_cio
     $customerio.identify(
-      id: @user.id,
+      id: @company.id,
       created_at: @user.created_at,
       email: @user.email,
       first_name: @user.first_name,
       last_name: @user.last_name,
       company_name: Company.find(@user.company_id).company_name,
       company_id: @user.company_id,
+      company_logo: @user.company.logo,
+      facebook_url: @user.company.facebook,
+      google_url: @user.company.google,
+      yelp_url: @user.company.yelp,
       user: true
     )
   end
