@@ -1,5 +1,6 @@
 class RefundsController < ApplicationController
   before_action :authenticate_user!, if: :user_signed_in?
+  before_filter :allowed_user, only: [:edit, :update, :show, :destroy]
 
 	def new
 		@user = current_user
@@ -58,5 +59,13 @@ class RefundsController < ApplicationController
 
   def track_cio
 	$customerio.track(@refund.customer_id,"refund", customer_name: @refund.customer.customer_name, customer_email: @refund.customer.customer_email, amount: @refund.amount, company_name: @refund.company.company_name, company_user_email: @refund.user.email)
+  end
+
+
+  def allowed_user
+	@refund	 = Refund.find(params[:id])	
+	@company = @refund.company
+	redirect_to root_path unless @company.users.include?(current_user)
+	flash[:danger] = "You are not authorized to view that account. Please login as a user associated with that company" unless @company.users.include?(current_user)
   end
 end

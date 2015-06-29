@@ -32,8 +32,7 @@ class Companies::CompanyStepsController < ApplicationController
   private
   	def finish_wizard_path
       @user = current_user
-      session[:user_id] = @user.id
-  	  company_path
+  	  company_path(@user.company)
   	end
 
     def company_params

@@ -1,4 +1,6 @@
 class CustomersController < ApplicationController
+	before_action :authenticate_user!, if: :user_signed_in?
+	before_filter :allowed_user, only: [:show, :edit, :update, :destroy]
 
 	def new
 		@customer = Customer.new
@@ -51,4 +53,11 @@ class CustomersController < ApplicationController
 	def customer_params
 	    params.require(:customer).permit(:customer_email, :customer_name, :company_id, :deleted_at)
 	end
+
+	def allowed_user
+		@customer = Customer.find(params[:id])	
+    	@company = @customer.company
+    	redirect_to root_path unless @company.users.include?(current_user)
+    	flash[:danger] = "You are not authorized to view that account. Please login as a user associated with that company" unless @company.users.include?(current_user)
+    end
 end

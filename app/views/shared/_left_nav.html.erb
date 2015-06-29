@@ -30,6 +30,12 @@
 		 					<span>Customers</span>
 		 					<% end %>
 	 					</li>
+						<li class="<%= 'active' if current_page?(payments_path) %>">
+		 					<%= link_to payments_path do %>
+		 					<i class="fa fa-usd"></i>
+		 					<span>Payments</span>
+		 					<% end %>
+	 					</li>
 						<li class="<%= 'active' if current_page?(reviews_path) %>">
 		 					<%= link_to reviews_path do %>
 		 					<i class="fa fa-comments-o"></i>

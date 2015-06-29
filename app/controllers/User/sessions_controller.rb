@@ -2,9 +2,12 @@ class User::SessionsController < Devise::SessionsController
 # before_filter :configure_sign_in_params, only: [:create]
 
   # GET /resource/sign_in
-  # def new
-  #   super
-  # end
+   def new
+     super
+      if params[:redirect_to].present?
+        store_location_for(resource, params[:redirect_to])    
+      end
+   end
 
   # POST /resource/sign_in
   # def create

@@ -1,4 +1,6 @@
 class ReviewsController < ApplicationController
+	before_action :authenticate_user!, if: :user_signed_in?
+	before_filter :allowed_user, only: [:show, :edit, :update, :destroy]
 
 	def new
 		@review = Review.new
@@ -65,24 +67,24 @@ class ReviewsController < ApplicationController
 	end
 
 	def happy
-    @payment = Payment.find(params[:id])
-    @company = @payment.company
-    @customer = @payment.customer
-    @review = Review.find_by(payment_id: @payment.id)
+	    @payment = Payment.find(params[:id])
+	    @company = @payment.company
+	    @customer = @payment.customer
+	    @review = Review.find_by(payment_id: @payment.id)
 	end
 
 	def okay
-    @payment = Payment.find(params[:id])
-    @company = @payment.company
-    @customer = @payment.customer
-    @review = Review.find_by(payment_id: @payment.id)
+	    @payment = Payment.find(params[:id])
+	    @company = @payment.company
+	    @customer = @payment.customer
+	    @review = Review.find_by(payment_id: @payment.id)
 	end
 
 	def sad
-    @payment = Payment.find(params[:id])
-    @company = @payment.company
-    @customer = @payment.customer
-    @review = Review.find_by(payment_id: @payment.id)
+	    @payment = Payment.find(params[:id])
+	    @company = @payment.company
+	    @customer = @payment.customer
+	    @review = Review.find_by(payment_id: @payment.id)
 	end
 
 	def final
@@ -94,4 +96,11 @@ class ReviewsController < ApplicationController
 	def review_params
 	    params.require(:review).permit(:customer_id, :company_id, :score, :comments, :payment_id, :facebook, :google, :yelp, :email)
 	end
+
+	def allowed_user
+		@review = Review.find(params[:id])	
+    	@company = @review.company
+    	redirect_to root_path unless @company.users.include?(current_user)
+    	flash[:danger] = "You are not authorized to view that account. Please login as a user associated with that company" unless @company.users.include?(current_user)
+    end
 end

@@ -32,6 +32,7 @@
 												Email: <%= mail_to @customer.customer_email, @customer.customer_email, target: "_blank" %>
 											</div>
 										</header>
+										<%= link_to "Edit Customer", edit_customer_path(@customer), class: "pull-right" %>
 										</div>
 									</div>
 								</div>
