@@ -22,8 +22,10 @@
 											<thead>
 												<tr>
 													<th class="text-center"><span>Customer</span></th>
+													<th class="text-center"><span>Email</span></th>
 													<th class="text-center"><span>Number of Payments</span></th>
 													<th class="text-center"><span>Created</span></th>
+													<th class="text-center"><span>Last Payment</span></th>
 													<th>&nbsp;</th>
 												</tr>
 											</thead>
@@ -34,10 +36,16 @@
 						                                <%= link_to c.customer_name, c, class: "user-link" %>
 													</td>
 													<td class="text-center">
+						                                <%= link_to c.customer_email, c, class: "user-link" %>
+													</td>
+													<td class="text-center">
 														<%= @payments.where(customer_id: c.id).count %>
 													</td>
 													<td class="text-center">
 														<%= c.created_at.strftime("%m/%d/%Y") %>
+													</td>
+													<td class="text-center">
+															<%= @payments.where(customer_id: c.id).last.created_at.strftime("%m/%d/%Y") %>
 													</td>
 													<td style="width: 20%;">
 														<%= link_to c, class: "table-link" do %>

@@ -12,7 +12,7 @@ module StripeWrapper
 				response = Stripe::Charge.create({
 					amount: options[:amount],
 					currency: "usd",
-					source: options[:source],
+					customer: options[:customer],
 					description: "Charge for service",
 					application_fee: options[:fee]
 				}, 
@@ -41,8 +41,7 @@ module StripeWrapper
 			begin
 			customer = Stripe::Customer.create({
 				source: options[:source],
-				email: options[:customer_email],
-				description: "Service Pay"
+				email: options[:customer_email]
 				},
 			    {stripe_account: options[:uid]}
 			)
@@ -53,11 +52,11 @@ module StripeWrapper
 		end
 
 		def successful?
-			customer.present?
+			response.present?
 		end
 
 		def customer_token
-			customer.id
+			response.id
 		end
 	end
 end

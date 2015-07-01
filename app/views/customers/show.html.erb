@@ -27,10 +27,10 @@
 											</div>									
 											<div class="story-author">
 												Customer: <%= @customer.customer_name %>
-											</div>
+											</div><br />
 											<div class="story-author">
 												Email: <%= mail_to @customer.customer_email, @customer.customer_email, target: "_blank" %>
-											</div>
+											</div><br />
 										</header>
 										<%= link_to "Edit Customer", edit_customer_path(@customer), class: "pull-right" %>
 										</div>
@@ -55,6 +55,7 @@
 											<thead>
 												<tr>
 													<th class="text-center"><span>Amount</span></th>
+													<th class="text-center"><span>Last 4 of Credit Card Used</span></th>
 													<th class="text-center"><span>Payment Date</span></th>
 													<th>&nbsp;</th>
 												</tr>
@@ -64,6 +65,11 @@
 												<tr>
 													<td class="text-center">
 						                                <%= number_to_currency(p.amount) %>
+													</td>
+													<td class="text-center">
+														<% if p.last_4.present? %>
+						                                	<%= p.last_4 %>
+						                                <% end %>
 													</td>
 													<td class="text-center">
 														<%= p.created_at.strftime("%m/%d/%Y") %>

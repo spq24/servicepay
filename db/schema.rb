@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150629150517) do
+ActiveRecord::Schema.define(version: 20150701142146) do
 
   create_table "active_admin_comments", force: true do |t|
     t.string   "namespace"
@@ -76,10 +76,7 @@ ActiveRecord::Schema.define(version: 20150629150517) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "logo"
-    t.string   "publishable_key"
     t.string   "provider"
-    t.string   "uid"
-    t.string   "access_code"
     t.string   "facebook"
     t.string   "google"
     t.string   "yelp"
@@ -101,6 +98,7 @@ ActiveRecord::Schema.define(version: 20150629150517) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "deleted_at"
+    t.string   "encrypted_stripe_token"
   end
 
   add_index "customers", ["deleted_at"], name: "index_customers_on_deleted_at"
@@ -119,20 +117,17 @@ ActiveRecord::Schema.define(version: 20150629150517) do
   add_index "friendly_id_slugs", ["sluggable_type"], name: "index_friendly_id_slugs_on_sluggable_type"
 
   create_table "payments", force: true do |t|
-    t.integer  "user_id"
     t.integer  "company_id"
     t.integer  "amount"
-    t.integer  "reference_id"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "stripe_uid"
-    t.string   "access_code"
     t.string   "stripe_charge_id"
     t.boolean  "refunded"
     t.string   "stripe_refund_id"
     t.string   "invoice_number"
     t.integer  "customer_id"
     t.datetime "deleted_at"
+    t.string   "last_4"
   end
 
   add_index "payments", ["deleted_at"], name: "index_payments_on_deleted_at"

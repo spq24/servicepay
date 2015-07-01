@@ -1,6 +1,6 @@
 class RefundsController < ApplicationController
   before_action :authenticate_user!, if: :user_signed_in?
-  before_filter :allowed_user, only: [:edit, :update, :show, :destroy]
+  before_action :allowed_user, only: [:edit, :update, :show, :destroy]
 
 	def new
 		@user = current_user

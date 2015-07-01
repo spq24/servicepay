@@ -11,7 +11,6 @@ class OmniauthCallbacksController < Devise::OmniauthCallbacksController
       publishable_key: request.env["omniauth.auth"].info.stripe_publishable_key
     })
       add_to_cio
-      sign_in @user, :event => :authentication
       set_flash_message(:success, :success, :kind => "Stripe") if is_navigational_format?
       redirect_to company_path(@company)
     else

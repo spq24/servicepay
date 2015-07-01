@@ -39,12 +39,13 @@ class CustomersController < ApplicationController
 		@user = current_user
 		@company = @user.company
 		@customers = @company.customers.reverse
-		@payments = @company.payments.all	
+		@payments = @company.payments	
 	end
 
 	def destroy
-	  Customer.find(params[:id]).destroy
+	  @customer = Customer.find(params[:id]).destroy
 	  flash[:success] = "Customer Deleted."
+	  $customerio.delete(@customer.id)
 	  redirect_to customers_path
 	end
 

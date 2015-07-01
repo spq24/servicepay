@@ -15,9 +15,9 @@
 								<center>
 									<h1>We're So Happy You Had a Good Experience With Us!<br /> Would You Mind Sharing It With Your Friends?</h1><br />
 									<ul class="socials" %>
-										<li><%= link_to image_tag("google.png", size: "150x150"), @company.google, target: "_blank" unless !@company.google.present? %></li>
-										<li><%= link_to image_tag("yelp.png", size: "150x150"), @company.yelp, target: "_blank" unless !@company.yelp.present? %></li>
-										<li><%= link_to image_tag("facebook.png", size: "150x150"), @company.facebook, target: "_blank" unless !@company.facebook.present? %></li>
+										<li><%= link_to image_tag("google.png", size: "150x150"), "http://"+@company.google, target: "_blank" unless !@company.google.present? %></li>
+										<li><%= link_to image_tag("yelp.png", size: "150x150"), "http://"+@company.yelp, target: "_blank" unless !@company.yelp.present? %></li>
+										<li><%= link_to image_tag("facebook.png", size: "150x150"), "http://"+@company.facebook, target: "_blank" unless !@company.facebook.present? %></li>
 										<li><%= image_tag "email.jpg", size: "150x150" %></li>
 									</ul>
 								</center>
