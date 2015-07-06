@@ -21,17 +21,34 @@
 									
 									<div class="tab-content">
 										<div class="tab-pane fade in active" id="tab-newsfeed">
-										<header class="story-header">
-											<div class="story-time pull-right">
-												<i class="fa fa-clock-o"></i> <%= @customer.company.company_name %> customer since: <%= @customer.created_at.strftime("%b %Y") %>
-											</div>									
-											<div class="story-author">
-												Customer: <%= @customer.customer_name %>
-											</div><br />
-											<div class="story-author">
-												Email: <%= mail_to @customer.customer_email, @customer.customer_email, target: "_blank" %>
-											</div><br />
-										</header>
+											<div id="newsfeed">
+												<div class="story">
+													<div class="story-content">
+														<header class="story-header">
+															<div class="story-time pull-right">
+																<i class="fa fa-clock-o"></i> <%= @customer.company.company_name %> customer since: <%= @customer.created_at.strftime("%b %Y") %>
+															</div>									
+															<div class="story-author">
+																Customer: <%= @customer.customer_name %>
+															</div><br />
+															<div class="story-author">
+																Email: <%= mail_to @customer.customer_email, @customer.customer_email, target: "_blank" %>
+															</div><br />
+															<div class="story-author">
+																Default Credit Card: <%= @brand %> | <%= @default_last_4 %>
+															</div><br />
+															
+														</header>
+														<h3>All Credit Cards</h3>
+														<% @all_cards.each do |c| %>
+															<div class="story-inner-content">
+																<%= c[:last4] %> | <%= c[:brand] %>
+																<p class="pull-right"><%= c[:exp_month] %> / <%= c[:exp_year] %></p>
+															</div>	
+														<% end %>
+													</div>
+												</div>
+											</div>
 										<%= link_to "Edit Customer", edit_customer_path(@customer), class: "pull-right" %>
 										</div>
 									</div>
@@ -55,7 +72,7 @@
 											<thead>
 												<tr>
 													<th class="text-center"><span>Amount</span></th>
-													<th class="text-center"><span>Last 4 of Credit Card Used</span></th>
+													<th class="text-center"><span>Credit Card Used</span></th>
 													<th class="text-center"><span>Payment Date</span></th>
 													<th>&nbsp;</th>
 												</tr>
@@ -67,8 +84,8 @@
 						                                <%= number_to_currency(p.amount) %>
 													</td>
 													<td class="text-center">
-														<% if p.last_4.present? %>
-						                                	<%= p.last_4 %>
+														<% if p.last_4.present? && p.stripe_charge_id.present? %>
+						                                	<%= p.last_4 %> | <%= Stripe::Charge.retrieve(p.stripe_charge_id)[:source][:brand] %>
 						                                <% end %>
 													</td>
 													<td class="text-center">

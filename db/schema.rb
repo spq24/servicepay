@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150701142146) do
+ActiveRecord::Schema.define(version: 20150706122432) do
 
   create_table "active_admin_comments", force: true do |t|
     t.string   "namespace"
@@ -27,23 +27,6 @@ ActiveRecord::Schema.define(version: 20150701142146) do
   add_index "active_admin_comments", ["author_type", "author_id"], name: "index_active_admin_comments_on_author_type_and_author_id"
   add_index "active_admin_comments", ["namespace"], name: "index_active_admin_comments_on_namespace"
   add_index "active_admin_comments", ["resource_type", "resource_id"], name: "index_active_admin_comments_on_resource_type_and_resource_id"
-
-  create_table "activities", force: true do |t|
-    t.integer  "trackable_id"
-    t.string   "trackable_type"
-    t.integer  "owner_id"
-    t.string   "owner_type"
-    t.string   "key"
-    t.text     "parameters"
-    t.integer  "recipient_id"
-    t.string   "recipient_type"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  add_index "activities", ["owner_id", "owner_type"], name: "index_activities_on_owner_id_and_owner_type"
-  add_index "activities", ["recipient_id", "recipient_type"], name: "index_activities_on_recipient_id_and_recipient_type"
-  add_index "activities", ["trackable_id", "trackable_type"], name: "index_activities_on_trackable_id_and_trackable_type"
 
   create_table "admin_users", force: true do |t|
     t.string   "email",                  default: "", null: false
@@ -103,19 +86,6 @@ ActiveRecord::Schema.define(version: 20150701142146) do
 
   add_index "customers", ["deleted_at"], name: "index_customers_on_deleted_at"
 
-  create_table "friendly_id_slugs", force: true do |t|
-    t.string   "slug",                      null: false
-    t.integer  "sluggable_id",              null: false
-    t.string   "sluggable_type", limit: 50
-    t.string   "scope"
-    t.datetime "created_at"
-  end
-
-  add_index "friendly_id_slugs", ["slug", "sluggable_type", "scope"], name: "index_friendly_id_slugs_on_slug_and_sluggable_type_and_scope", unique: true
-  add_index "friendly_id_slugs", ["slug", "sluggable_type"], name: "index_friendly_id_slugs_on_slug_and_sluggable_type"
-  add_index "friendly_id_slugs", ["sluggable_id"], name: "index_friendly_id_slugs_on_sluggable_id"
-  add_index "friendly_id_slugs", ["sluggable_type"], name: "index_friendly_id_slugs_on_sluggable_type"
-
   create_table "payments", force: true do |t|
     t.integer  "company_id"
     t.integer  "amount"
@@ -131,6 +101,21 @@ ActiveRecord::Schema.define(version: 20150701142146) do
   end
 
   add_index "payments", ["deleted_at"], name: "index_payments_on_deleted_at"
+
+  create_table "plans", force: true do |t|
+    t.string   "name"
+    t.integer  "customer_id"
+    t.integer  "amount"
+    t.string   "currency"
+    t.string   "interval"
+    t.integer  "interval_count"
+    t.string   "statement_descriptor"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "company_id"
+    t.integer  "user_id"
+    t.datetime "deleted_at"
+  end
 
   create_table "refunds", force: true do |t|
     t.integer  "user_id"
@@ -163,6 +148,17 @@ ActiveRecord::Schema.define(version: 20150701142146) do
   end
 
   add_index "reviews", ["deleted_at"], name: "index_reviews_on_deleted_at"
+
+  create_table "subscriptions", force: true do |t|
+    t.integer  "customer_id"
+    t.integer  "plan_id"
+    t.string   "stripe_subscription_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "subscriptions", ["customer_id"], name: "index_subscriptions_on_customer_id"
+  add_index "subscriptions", ["plan_id"], name: "index_subscriptions_on_plan_id"
 
   create_table "users", force: true do |t|
     t.string   "email",                  default: "", null: false

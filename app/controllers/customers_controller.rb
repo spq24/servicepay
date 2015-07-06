@@ -33,6 +33,13 @@ class CustomersController < ApplicationController
 		@customer = Customer.find(params[:id])
 		@payments = @customer.payments.reverse
 		@reviews = @customer.reviews.reverse
+		require "stripe"
+		Stripe.api_key = @company.access_code
+		stripe_customer = Stripe::Customer.retrieve(@customer.stripe_token)
+		default_card = stripe_customer[:default_source]
+		@default_last_4 = stripe_customer.sources.retrieve(default_card)[:last4]
+		@brand = stripe_customer.sources.retrieve(default_card)[:brand]
+		@all_cards = stripe_customer.sources.all(:object => "card")
 	end
 
 	def index
@@ -43,10 +50,10 @@ class CustomersController < ApplicationController
 	end
 
 	def destroy
-	  @customer = Customer.find(params[:id]).destroy
-	  flash[:success] = "Customer Deleted."
-	  $customerio.delete(@customer.id)
-	  redirect_to customers_path
+	    @customer = Customer.find(params[:id]).destroy
+	    flash[:success] = "Customer Deleted."
+	    $customerio.delete(@customer.id)
+	    redirect_to customers_path
 	end
 
 	private
@@ -56,6 +63,7 @@ class CustomersController < ApplicationController
 	end
 
 	def allowed_user
+		@binding.pry
 		@customer = Customer.find(params[:id])	
     	@company = @customer.company
     	redirect_to root_path unless @company.users.include?(current_user)

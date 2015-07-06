@@ -15,6 +15,9 @@ Rails.application.routes.draw do
   resources :refunds
   resources :customers
   resources :reviews
+  resources :plans do
+    resources :subscriptions
+  end
 
   # You can have the root of your site routed with "root"
    root 'companies#new'

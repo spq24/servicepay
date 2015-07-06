@@ -64,7 +64,7 @@
 																<%= p.id %>
 															</td>
 															<td>
-																<%= link_to Customer.find(p.customer_id).customer_name, Customer.find(p.customer_id) %>
+																<%= link_to Customer.find(p.customer_id).customer_name, Customer.find(p.customer_id) if !p.customer_id.nil?  %>
 															</td>
 															<td>
 																<%= mail_to Customer.find(p.customer_id).customer_email, Customer.find(p.customer_id).customer_email, target: "_blank" if !p.customer_id.nil? %>

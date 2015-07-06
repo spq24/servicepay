@@ -6,4 +6,6 @@ class Customer < ActiveRecord::Base
 	has_many :payments, dependent: :delete_all
 	has_many :refunds, dependent: :delete_all
 	has_many :reviews, dependent: :delete_all
+	has_many :subscriptions
+	has_many :plans, -> { uniq }, through: :subscriptions, dependent: :delete_all
 end

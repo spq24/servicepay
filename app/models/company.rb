@@ -10,6 +10,7 @@ class Company < ActiveRecord::Base
   has_many :refunds, dependent: :destroy
   has_many :customers, dependent: :destroy
   has_many :reviews, dependent: :destroy
+  has_many :plans, dependent: :destroy
   
   accepts_nested_attributes_for :users, :reject_if => :all_blank, :allow_destroy => true
 

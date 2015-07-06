@@ -46,10 +46,20 @@
 														<%= f.label :customer_email %>
 														<%= f.text_field :customer_email, class: "form-control" %><br />
 													</div>
-													<div class="col-md-12">
-														<%= f.submit "Save Changes", class: "btn btn-success pull-right" %>
+												</div>
+												<div class="row">
+													<h3>Service Plans They Already Belong To</h3>
+													<div class="col-md-6">
+														<ul>
+															<% @customer.plans.each do |p| %>
+																<li><%= p.name %> | <%= number_to_currency(p.amount) %> / <%= p.interval %></li>
+															<% end %>
+														</ul>
 													</div>
 												</div>
+												<div class="col-md-12">
+													<%= f.submit "Save Changes", class: "btn btn-success pull-right" %>
+												</div><br /><br />
 											<% end %>
 										</div>
 									</div>

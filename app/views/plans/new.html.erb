@@ -1,0 +1,57 @@
+<%= render 'shared/nav_top' %>
+	<div class="row">
+		<%= render 'shared/left_nav' %>
+		<div id="content-wrapper">
+			<div class="row">
+				<div class="col-lg-12">
+					<%= render 'shared/messages' %>
+					<div class="row">
+						<div class="col-lg-12">							
+							<h1>Create A New Service Plan</h1>
+						</div>
+					</div>
+					<div class="row" id="user-profile">						
+						<div class="col-lg-9 col-md-8 col-sm-8">
+							<div class="main-box clearfix">
+								<div class="tabs-wrapper profile-tabs">
+									<ul class="nav nav-tabs">
+										<li class="active"><a href="#tab-newsfeed" data-toggle="tab">Company Info</a></li>
+									</ul>
+									
+									<div class="tab-content">
+										<div class="tab-pane fade in active" id="tab-newsfeed">
+											<%= form_for @plan do |f| %>
+												<%= f.hidden_field :user_id, value: @user.id %>
+												<%= f.hidden_field :company_id, value: @company.id %>
+												<%= f.hidden_field :currency, value: "usd" %>
+												<div class="row">
+													<div class="col-md-6">
+														<%= f.label :name %>
+														<%= f.text_field :name, placeholder: "Service Plan 1", class: "form-control", required: true %><br />
+														<%= f.label :statement_descriptor, "Description That Will Show On Customers Credit Card Statement (Can't include <> or \" or \')" %>
+														<%= f.text_field :statement_descriptor, placeholder: "Yearly Service Plan", maxlength: 22, class: "form-control", required: true %><br />
+													</div>
+													<div class="col-md-6">
+														<%= f.label :amount, "Amount To Be Charged To Customer" %>
+														<%= f.text_field :amount, data: {autonumeric: true, aSign: 'USD'}, placeholder: "10", class: "form-control", required: true %><br />
+														<%= f.label :interval, "How Often Should The Customer Be Charged" %>
+														<%= f.select :interval, options_for_select([["Yearly", "year"], ["Monthly", "month"], ["Daily", "day"]], "year"), {}, class: "form-control", required: true %><br />
+													</div>
+													<div class="col-md-12">
+														<%= f.submit "Create Plan", class: "btn btn-success pull-right" %>
+													</div>
+												</div>
+											<% end %>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		  <%= render 'shared/footer' %>
+		</div>
+	</div>
+</div>
+</div>

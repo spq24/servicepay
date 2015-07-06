@@ -49,6 +49,13 @@
 		 					<% end %>
 		 						
 	 					</li>
+						<li class="<%= 'active' if current_page?(plans_path) %>">
+		 					<%= link_to plans_path do %>
+		 					<i class="fa fa-calendar-o"></i>
+		 					<span>Service Plans</span>
+		 					<% end %>
+		 						
+	 					</li>
 						<li>
 							 
 		 					<%= link_to payment_form_path(@user.company.id), target: "_blank" do %>
