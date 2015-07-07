@@ -16,7 +16,7 @@ Rails.application.routes.draw do
   resources :customers
   resources :reviews
   resources :plans do
-    resources :subscriptions
+    resources :subscriptions, except: [:edit, :update]
   end
 
   # You can have the root of your site routed with "root"

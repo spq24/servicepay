@@ -31,8 +31,9 @@ class CustomersController < ApplicationController
 		@user = current_user
 		@company = @user.company
 		@customer = Customer.find(params[:id])
-		@payments = @customer.payments.reverse
-		@reviews = @customer.reviews.reverse
+		@payments = @customer.payments.order(id: :desc).page params[:page] 
+		@reviews = @customer.reviews.order(id: :desc).page params[:page] 
+		@subscriptions = Subscription.where(customer_id: @customer.id).order(id: :desc).page params[:page]
 		require "stripe"
 		Stripe.api_key = @company.access_code
 		stripe_customer = Stripe::Customer.retrieve(@customer.stripe_token)
@@ -59,11 +60,10 @@ class CustomersController < ApplicationController
 	private
 	  
 	def customer_params
-	    params.require(:customer).permit(:customer_email, :customer_name, :company_id, :deleted_at)
+	    params.require(:customer).permit(:customer_email, :customer_name, :company_id, :deleted_at, subscription_attributes: [:stripe_subscription_id])
 	end
 
 	def allowed_user
-		@binding.pry
 		@customer = Customer.find(params[:id])	
     	@company = @customer.company
     	redirect_to root_path unless @company.users.include?(current_user)

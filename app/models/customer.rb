@@ -8,4 +8,6 @@ class Customer < ActiveRecord::Base
 	has_many :reviews, dependent: :delete_all
 	has_many :subscriptions
 	has_many :plans, -> { uniq }, through: :subscriptions, dependent: :delete_all
+
+	accepts_nested_attributes_for :subscriptions
 end
