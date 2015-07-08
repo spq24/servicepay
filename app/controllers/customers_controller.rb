@@ -51,10 +51,20 @@ class CustomersController < ApplicationController
 	end
 
 	def destroy
-	    @customer = Customer.find(params[:id]).destroy
-	    flash[:success] = "Customer Deleted."
-	    $customerio.delete(@customer.id)
-	    redirect_to customers_path
+	    @user = current_user
+	    @company = @user.company
+	    @customer = Customer.find(params[:id])
+	    Stripe.api_key = @company.access_code
+	    response = Stripe::Customer.retrieve(@customer.stripe_token).delete
+	    if response[:deleted] == true
+		    @customer.destroy
+		    flash[:success] = "Customer Deleted."
+		    $customerio.delete(@customer.id)
+		    redirect_to customers_path
+	    else
+	  	    flash[:danger] = "We couldn't delete your #{@customer.customer_name} right now. Please try again soon"
+	  	    redirect_to customers_path
+	  end
 	end
 
 	private

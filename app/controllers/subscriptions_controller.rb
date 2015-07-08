@@ -18,11 +18,13 @@ class SubscriptionsController < ApplicationController
 		@customers = Customer.where(id: params[:subscription][:customer_id])
 		@customers.each do |c|
 			stripe_customer = Stripe::Customer.retrieve(c.stripe_token)
-			response = stripe_customer.subscriptions.create(plan: @plan.name)
+			response = stripe_customer.subscriptions.create(plan: @plan.name, application_fee_percent: 1)
+			binding.pry
 			if response.id.present?
 				@plan.customers << c
 				@subscription = Subscription.where(customer_id: c.id, plan_id: @plan.id).first
 				@subscription.update_attributes(stripe_subscription_id: response.id)
+				track_cio
 			else
 				break
 				flash[:danger] = "There was a problem adding your customers to this plan"
@@ -47,6 +49,16 @@ class SubscriptionsController < ApplicationController
 		end
 	end
 
+	def show
+		@user = current_user
+		@company = @user.company
+		@subscription = Subscription.find(params[:id])
+		@plan = @subscription.plan
+		@customer = @subscription.customer
+		@stripe_customer = Stripe::Customer.retrieve(@customer.stripe_token)
+		@stripe_subscription = @stripe_customer.subscriptions.retrieve(@subscription.stripe_subscription_id)
+	end
+
 	private
 	  
 	def subscription_params
@@ -58,5 +70,9 @@ class SubscriptionsController < ApplicationController
 	  @company = @plan.company
 	  redirect_to root_path unless @company.users.include?(current_user)
 	  flash[:danger] = "You are not authorized to view that account. Please login as a user associated with that company" unless @company.users.include?(current_user)
+	end
+
+	def track_cio
+		$customerio.track(@subscription.customer.id,"subscription", customer_name: @subscription.customer.customer_name, customer_email: @subscription.customer.customer_email, plan: @plan.name, amount: @plan.amount, interval: @plan.interval, company_user_email: @company.users.first.email, company_logo: @company.logo)
 	end
 end

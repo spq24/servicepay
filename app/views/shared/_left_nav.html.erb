@@ -36,6 +36,13 @@
 		 					<span>Payments</span>
 		 					<% end %>
 	 					</li>
+						<li class="<%= 'active' if current_page?(plans_path) %>">
+		 					<%= link_to plans_path do %>
+		 					<i class="fa fa-calendar-o"></i>
+		 					<span>Service Plans</span>
+		 					<% end %>
+		 						
+	 					</li>
 						<li class="<%= 'active' if current_page?(reviews_path) %>">
 		 					<%= link_to reviews_path do %>
 		 					<i class="fa fa-comments-o"></i>
@@ -46,13 +53,6 @@
 		 					<%= link_to refunds_path do %>
 		 					<i class="fa fa-warning"></i>
 		 					<span>Refunds</span>
-		 					<% end %>
-		 						
-	 					</li>
-						<li class="<%= 'active' if current_page?(plans_path) %>">
-		 					<%= link_to plans_path do %>
-		 					<i class="fa fa-calendar-o"></i>
-		 					<span>Service Plans</span>
 		 					<% end %>
 		 						
 	 					</li>

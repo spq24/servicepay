@@ -13,9 +13,12 @@ class PlansController < ApplicationController
 		@company = @user.company
 		@plan = Plan.new(amount: params[:plan][:amount], name: params[:plan][:name], user_id: params[:plan][:user_id], company_id: params[:plan][:company_id], interval: params[:plan][:interval], statement_descriptor: params[:plan][:statement_descriptor], currency: params[:plan][:currency])
 		if @plan.valid?
+			Stripe.api_key = @company.access_code
 			stripe_plan = Stripe::Plan.create(amount: params[:plan][:amount], name: params[:plan][:name], id: params[:plan][:name], interval: params[:plan][:interval], statement_descriptor: params[:plan][:statement_descriptor], currency: params[:plan][:currency])
 			if stripe_plan.id.present?
 				Plan.create(plan_params)
+				track_cio
+				flash[:success] = "#{@plan.name} created"
 				redirect_to plans_path
 			else
 				flash[:danger] = "There was a problem creating your plan. #{result.error_message}"
@@ -41,6 +44,9 @@ class PlansController < ApplicationController
 	end
 
 	def destroy
+	  @user = current_user
+	  @company = @user.company
+	  Stripe.api_key = @company.access_code
 	  response = Stripe::Plan.retrieve(@plan.name).delete
 	  if response[:deleted] == true
 		@plan = Plan.find(params[:id]).destroy
@@ -64,6 +70,10 @@ class PlansController < ApplicationController
 	  @company = @plan.company
 	  redirect_to root_path unless @company.users.include?(current_user)
 	  flash[:danger] = "You are not authorized to view that account. Please login as a user associated with that company" unless @company.users.include?(current_user)
+	end
+
+	def track_cio
+		$customerio.track(@company.id,"plan create", plan: @plan.name, amount: @plan.amount, interval: @plan.interval, company_user_email: @plan.user.first.email, company_logo: @company.logo)
 	end
 
 

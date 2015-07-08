@@ -1,0 +1,95 @@
+<%= render 'shared/nav_top' %>
+	<div class="row">
+		<%= render 'shared/left_nav' %>
+		<div id="content-wrapper">
+			<div class="row">
+				<div class="col-lg-12">
+					<%= render 'shared/messages' %>
+					<div class="row">
+						<div class="col-lg-12">							
+							<h1><%= @plan.name %> For <%= @customer.customer_name %></h1>
+						</div>
+					</div>
+					
+					<div class="row" id="user-profile">						
+						<div class="col-lg-9 col-md-8 col-sm-8">
+							<div class="main-box clearfix">
+								<div class="tabs-wrapper profile-tabs">
+									<ul class="nav nav-tabs">
+										<li class="active"><a href="#tab-newsfeed" data-toggle="tab">Plan Info</a></li>
+									</ul>
+									
+									<div class="tab-content">
+										<div class="tab-pane fade in active" id="tab-newsfeed">
+											<header class="story-header">
+												<div class="story-author">
+													Amount Charged to Customer: <%= number_to_currency(@plan.amount) %>
+												</div><br />
+												<div class="story-author">
+													Created by: <%= link_to @plan.user.email, target: "_blank" do %>
+														<%= @plan.user.first_name %>&nbsp;<%= @plan.user.last_name %>
+													<% end %>
+												</div><br />									
+												<div class="story-author">
+													Interval: <%= @plan.interval %>
+												</div><br />									
+												<div class="story-author">
+													Statement Descriptor: <%= @plan.statement_descriptor %>
+												</div>
+											</header>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="row" id="user-profile">						
+						<div class="col-lg-9 col-md-8 col-sm-8">
+							<div class="main-box clearfix">
+								<div class="tabs-wrapper profile-tabs">
+									<ul class="nav nav-tabs">
+										<li class="active"><a href="#tab-newsfeed" data-toggle="tab">Customer Info</a></li>
+									</ul>
+									
+									<div class="tab-content">
+										<div class="tab-pane fade in active" id="tab-newsfeed">
+											<header class="story-header">
+												<div class="story-time pull-right">
+													<i class="fa fa-clock-o"></i> Subscription Created: <%= @subscription.created_at.strftime("%m/%d/%Y") %><br />
+												</div>
+												<div class="story-author">
+													Customer Name: <%= @customer.customer_name %>
+												</div><br />
+												<div class="story-author">
+													Last 4 of Active Credit Card: <%= @stripe_customer[:sources][:data][0][:last4] %> | <%= @stripe_customer[:sources][:data][0][:brand] %>
+												</div><br />									
+											</header>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<h1>Payments By This Customer For This Plan</h1>
+
+					<div class="row">
+						<div class="col-lg-12">
+							<div class="main-box no-header clearfix">
+								<div class="main-box-body clearfix">
+									<%= @stripe_subscription %>
+								</div>
+							</div>
+						</div>
+					</div>
+					
+				</div>
+			</div>
+		  <%= render 'shared/footer' %>
+		</div>
+	</div>
+</div>
+</div>
+
+<%= content_tag :div, "", id: "payments_chart", class: "graph", style: "display: none;" %>
