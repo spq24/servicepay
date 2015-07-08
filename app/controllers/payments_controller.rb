@@ -11,7 +11,7 @@ class PaymentsController < ApplicationController
 	def create
 		@company = Company.find(params[:payment][:company_id])
 		money = Money.new((params[:payment][:amount].to_f * 100).to_i, "USD")
-		fee = @company.application_fee.nil? ? 1 : @company.application_fee
+		fee = @company.application_fee.nil? ? 0.8 : @company.application_fee
 		app_fee = money * (fee/100)
 		binding.pry
 		@customer = Customer.find_by_customer_email_and_company_id(params[:payment][:customer_attributes][:customer_email], params[:payment][:company_id])
@@ -28,14 +28,11 @@ class PaymentsController < ApplicationController
 				end
 			end
 
-
-
 			if Stripe::Customer.retrieve(@customer.stripe_token)[:default_source] != Stripe::Token.retrieve(params[:stripeToken])[:card][:id]
 				stripe_customer = Stripe::Customer.retrieve(@customer.stripe_token)
 				stripe_customer.source = params[:stripeToken]
 				stripe_customer.save
 			end
-
 
 			result = StripeWrapper::Charge.create(customer: @customer.stripe_token, uid: @company.uid, amount: money.cents,  fee: app_fee.cents)
 			if result.successful?

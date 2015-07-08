@@ -34,13 +34,13 @@ class CustomersController < ApplicationController
 		@payments = @customer.payments.order(id: :desc).page params[:page] 
 		@reviews = @customer.reviews.order(id: :desc).page params[:page] 
 		@subscriptions = Subscription.where(customer_id: @customer.id).order(id: :desc).page params[:page]
-		require "stripe"
 		Stripe.api_key = @company.access_code
 		stripe_customer = Stripe::Customer.retrieve(@customer.stripe_token)
 		default_card = stripe_customer[:default_source]
 		@default_last_4 = stripe_customer.sources.retrieve(default_card)[:last4]
 		@brand = stripe_customer.sources.retrieve(default_card)[:brand]
 		@all_cards = stripe_customer.sources.all(:object => "card")
+		@stripe_invoices = Stripe::Invoice.all(customer: stripe_customer.id)
 	end
 
 	def index

@@ -216,6 +216,56 @@
 						</div>
 					</div>
 
+					<h1>Service Plan Invoices</h1>
+
+					<div class="row">
+						<div class="col-lg-12">
+							<div class="main-box no-header clearfix">
+								<div class="main-box-body clearfix">
+									<div class="table-responsive">
+										<table class="table user-list table-hover">
+											<thead>
+												<tr>
+													<th><span>Customer Name</span></th>
+													<th><span>Service Plan</span></th>
+													<th><span>Period</span></th>
+													<th><span>Amount</span></th>
+													<th><span>Status</span></th>
+													<th>&nbsp;</th>
+												</tr>
+											</thead>
+											<tbody>
+											  <% @stripe_invoices.each do |i| %>
+												<tr>
+													<td>
+						                                <%= @customer.customer_name %>
+													</td>
+													<td>
+						                                <%= i[:lines][:data][0][:plan][:id] %>
+													</td>
+													<td>
+														<%= Time.at(i[:lines][:data][0][:period][:start].to_s.to_f).to_datetime.strftime("%m/%d/%Y") %> - <%= Time.at(i[:lines][:data][0][:period][:end].to_s.to_f).to_datetime.strftime("%m/%d/%Y")  %>
+													</td>
+													<td style="width: 20%;">
+														<%= number_to_currency(i[:total]) %>
+													</td>
+													<td style="width: 20%;">
+														<% if i[:paid] == true %>
+															<span class="label label-success">Paid</span>
+														<% else %>
+															<span class="label label-danger">Failed Payment | Next Attempt <%= Time.at(i[:next_payment_attempt].to_s.to_f).to_datetime.strftime("%m/%d/%Y") %></span>
+														<% end %>
+													</td>
+												</tr>
+											  <% end %>
+											</tbody>
+										</table>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
 
 				</div>
 			</div>

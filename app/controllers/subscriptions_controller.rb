@@ -49,16 +49,6 @@ class SubscriptionsController < ApplicationController
 		end
 	end
 
-	def show
-		@user = current_user
-		@company = @user.company
-		@subscription = Subscription.find(params[:id])
-		@plan = @subscription.plan
-		@customer = @subscription.customer
-		@stripe_customer = Stripe::Customer.retrieve(@customer.stripe_token)
-		@stripe_subscription = @stripe_customer.subscriptions.retrieve(@subscription.stripe_subscription_id)
-	end
-
 	private
 	  
 	def subscription_params
