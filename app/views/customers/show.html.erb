@@ -73,6 +73,7 @@
 												<tr>
 													<th class="text-center"><span>Amount</span></th>
 													<th class="text-center"><span>Credit Card Used</span></th>
+													<th class="text-center"><span>Plan</span></th>
 													<th class="text-center"><span>Payment Date</span></th>
 													<th>&nbsp;</th>
 												</tr>
@@ -87,6 +88,9 @@
 														<% if p.last_4.present? && p.stripe_charge_id.present? %>
 						                                	<%= p.last_4 %> | <%= Stripe::Charge.retrieve(p.stripe_charge_id)[:source][:brand] %>
 						                                <% end %>
+													</td>
+													<td class="text-center">
+														<%= Plan.find(p.plan_id).name unless p.plan_id.nil? %>
 													</td>
 													<td class="text-center">
 														<%= p.created_at.strftime("%m/%d/%Y") %>
@@ -230,6 +234,7 @@
 													<th><span>Service Plan</span></th>
 													<th><span>Period</span></th>
 													<th><span>Amount</span></th>
+													<th><span>Created</span></th>
 													<th><span>Status</span></th>
 													<th>&nbsp;</th>
 												</tr>
@@ -246,8 +251,11 @@
 													<td>
 														<%= Time.at(i[:lines][:data][0][:period][:start].to_s.to_f).to_datetime.strftime("%m/%d/%Y") %> - <%= Time.at(i[:lines][:data][0][:period][:end].to_s.to_f).to_datetime.strftime("%m/%d/%Y")  %>
 													</td>
-													<td style="width: 20%;">
+													<td>
 														<%= number_to_currency(i[:total]) %>
+													</td>
+													<td>
+														<%= Time.at(i[:date].to_s.to_f).to_datetime.strftime("%m/%d/%Y") %>
 													</td>
 													<td style="width: 20%;">
 														<% if i[:paid] == true %>

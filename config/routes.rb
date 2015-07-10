@@ -32,6 +32,6 @@ Rails.application.routes.draw do
    get '/faq' => 'static_pages#faq'
    get '/tc' => 'static_pages#tc'
   
-   #mount StripeEvent::Engine => '/stripe_events'
+   mount StripeEvent::Engine => '/stripe_events'
 
 end

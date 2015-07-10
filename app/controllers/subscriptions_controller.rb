@@ -14,24 +14,27 @@ class SubscriptionsController < ApplicationController
 		@user = current_user
 		@company = @user.company
 		@plan = Plan.find(params[:subscription][:plan_id])
+		fee = @company.application_fee.nil? ? 1 : @company.application_fee
 		Stripe.api_key = @company.access_code
 		@customers = Customer.where(id: params[:subscription][:customer_id])
 		@customers.each do |c|
-			stripe_customer = Stripe::Customer.retrieve(c.stripe_token)
-			response = stripe_customer.subscriptions.create(plan: @plan.name, application_fee_percent: 1)
-			binding.pry
-			if response.id.present?
-				@plan.customers << c
-				@subscription = Subscription.where(customer_id: c.id, plan_id: @plan.id).first
-				@subscription.update_attributes(stripe_subscription_id: response.id)
-				track_cio
-			else
-				break
-				flash[:danger] = "There was a problem adding your customers to this plan"
-				render :new
+			if !@plan.customers.to_a.include?(c)
+				binding.pry
+				stripe_customer = Stripe::Customer.retrieve(c.stripe_token)
+				response = stripe_customer.subscriptions.create(plan: @plan.name, application_fee_percent: fee)
+				if response.id.present?
+					@plan.customers << c
+					@subscription = Subscription.where(customer_id: c.id, plan_id: @plan.id).first
+					@subscription.update_attributes(stripe_subscription_id: response.id)
+					track_cio
+				else
+					break
+					flash[:danger] = "There was a problem adding your customers to this plan"
+					render :new
+				end
 			end
 		end
-		flash[:success] = "Successfully Added Customers to Plan"
+		flash[:success] = "Successfully Added Customers to #{@plan.name}"
 		redirect_to plan_path(@plan)
 	end
 

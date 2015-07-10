@@ -13,7 +13,6 @@ class PaymentsController < ApplicationController
 		money = Money.new((params[:payment][:amount].to_f * 100).to_i, "USD")
 		fee = @company.application_fee.nil? ? 0.8 : @company.application_fee
 		app_fee = money * (fee/100)
-		binding.pry
 		@customer = Customer.find_by_customer_email_and_company_id(params[:payment][:customer_attributes][:customer_email], params[:payment][:company_id])
 		@payment = Payment.new(amount: params[:payment][:amount], company_id: params[:payment][:company_id])
 		if @payment.valid?
@@ -76,7 +75,7 @@ class PaymentsController < ApplicationController
   private
 
 	def payment_params
-	    params.require(:payment).permit(:user_id, :company_id, :reference_id, :amount, :stripeToken, :refunded, :invoice_number, :application_fee)
+	    params.require(:payment).permit(:user_id, :company_id, :reference_id, :amount, :stripeToken, :refunded, :invoice_number, :application_fee, :subscription, :plan_id)
 	end
 
 	def add_cio

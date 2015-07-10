@@ -33,7 +33,7 @@ class PlansController < ApplicationController
 		@user = current_user
 		@company = @user.company
 		@plan = Plan.find(params[:id])
-		@plan_customers = @plan.customers
+		@plan_customers = @plan.customers.reverse
 		@company_customers = @company.customers
 	end
 
@@ -73,7 +73,7 @@ class PlansController < ApplicationController
 	end
 
 	def track_cio
-		$customerio.track(@company.id,"plan create", plan: @plan.name, amount: @plan.amount, interval: @plan.interval, company_user_email: @plan.user.first.email, company_logo: @company.logo)
+		$customerio.track(@company.id,"plan create", plan: @plan.name, amount: @plan.amount, interval: @plan.interval, company_user_email: @plan.users.first.email, company_logo: @company.logo)
 	end
 
 
