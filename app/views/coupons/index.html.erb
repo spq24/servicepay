@@ -8,8 +8,8 @@
 						<div class="row">
 							<div class="col-lg-12">									
 								<div class="clearfix">
-									<h1 class="pull-left">Service Plans</h1>
-									<%= link_to "Create A New Service Plan", new_plan_path, class: "btn btn-lrg btn-success pull-right" %>										
+									<h1 class="pull-left">Coupons</h1>
+									<%= link_to "Create A New Coupon", new_coupon_path, class: "btn btn-lrg btn-success pull-right" %>										
 								</div>
 							</div>
 						</div>
@@ -18,32 +18,10 @@
 							<div class="col-lg-3 col-sm-6 col-xs-12">
 								<div class="main-box infographic-box">
 									<i class="fa fa-shopping-cart emerald-bg"></i>
-									<span class="headline">Service Plans</span>
+									<span class="headline">Coupons</span>
 									<span class="value">
 										<span class="timer" data-from="0" data-to="2562" data-speed="800" data-refresh-interval="10">
-											<%= @plans.count %>	
-										</span>
-									</span>
-								</div>
-							</div>
-							<div class="col-lg-3 col-sm-6 col-xs-12">
-								<div class="main-box infographic-box">
-									<i class="fa fa-shopping-cart emerald-bg"></i>
-									<span class="headline">Payments From All Plans</span>
-									<span class="value">
-										<span class="timer" data-from="0" data-to="2562" data-speed="800" data-refresh-interval="10">
-											<%= @payments_count.count %>
-										</span>
-									</span>
-								</div>
-							</div>
-							<div class="col-lg-3 col-sm-6 col-xs-12">
-								<div class="main-box infographic-box">
-									<i class="fa fa-money green-bg"></i>
-									<span class="headline">Net Revenue From All Plans</span>
-									<span class="value">
-										<span class="timer" data-from="83" data-to="2562" data-speed="900" data-refresh-interval="60">
-										  <%= number_to_currency(@revenue) %>
+											<%= @coupons.count %>	
 										</span>
 									</span>
 								</div>
@@ -58,40 +36,37 @@
 											<table class="table user-list table-hover">
 												<thead>
 													<tr>
-														<th><span>Plan Name</span></th>
-														<th class="text-center"><span>Amount To Charge</span></th>
-														<th class="text-center"><span>Customers</span></th>
+														<th><span>Coupon Name</span></th>
+														<th class="text-center"><span>Amount Off</span></th>
+														<th class="text-center"><span>Duration</span></th>
 														<th class="text-center"><span>Created</span></th>
 														<th class="text-center"><span>Created By</span></th>
 														<th>&nbsp;</th>
 													</tr>
 												</thead>
 												<tbody>
-												  <% @plans.each do |p| %>
+												  <% @coupons.each do |c| %>
 													<tr>
 														<td>
-							                                <%= link_to p.name, p %>
+							                                <%= link_to c.name, c %>
 														</td>
 														<td class="text-center">
-															<%= number_to_currency(p.amount) %>
+															<%= c.duration %>
 														</td>
 														<td class="text-center">
-															<%= p.customers.count %>
+															<%= c.created_at.strftime("%m/%d/%Y") %>
 														</td>
 														<td class="text-center">
-															<%= p.created_at.strftime("%m/%d/%Y") %>
-														</td>
-														<td class="text-center">
-															<%= mail_to p.user.email, "#{p.user.first_name} #{p.user.last_name}", target: "_blank" %>
+															<%= mail_to c.user.email, "#{c.user.first_name} #{c.user.last_name}", target: "_blank" %>
 														</td>
 														<td  style="width: 20%;">
-															<%= link_to p, class: "table-link" do %>
+															<%= link_to c, class: "table-link" do %>
 																<span class="fa-stack">
 																	<i class="fa fa-square fa-stack-2x"></i>
 																	<i class="fa fa-search-plus fa-stack-1x fa-inverse"></i>
 																</span>
 															<% end %>
-															<%= link_to p, method: :delete, data: {confirm: "Are you sure?"}, class: "table-link danger" do %>
+															<%= link_to c, method: :delete, data: {confirm: "Are you sure?"}, class: "table-link danger" do %>
 																<span class="fa-stack">
 																	<i class="fa fa-square fa-stack-2x"></i>
 																	<i class="fa fa-trash-o fa-stack-1x fa-inverse"></i>

@@ -16,7 +16,7 @@ class PlansController < ApplicationController
 			Stripe.api_key = @company.access_code
 			stripe_plan = Stripe::Plan.create(amount: params[:plan][:amount], name: params[:plan][:name], id: params[:plan][:name], interval: params[:plan][:interval], statement_descriptor: params[:plan][:statement_descriptor], currency: params[:plan][:currency])
 			if stripe_plan.id.present?
-				Plan.create(plan_params)
+				@plan = Plan.create(plan_params)
 				track_cio
 				flash[:success] = "#{@plan.name} created"
 				redirect_to plans_path
@@ -35,12 +35,16 @@ class PlansController < ApplicationController
 		@plan = Plan.find(params[:id])
 		@plan_customers = @plan.customers.reverse
 		@company_customers = @company.customers
+		@revenue = Payment.where(plan_id: @plan.id, company_id: @company.id).sum(:amount)
+		@payments_count = Payment.where(plan_id: @plan.id, company_id: @company.id)
 	end
 
 	def index
 		@user = current_user
 		@company = @user.company
 		@plans = @company.plans.reverse
+		@revenue = Payment.where(subscription: true, company_id: @company.id).sum(:amount)
+		@payments_count = Payment.where(subscription: true, company_id: @company.id)
 	end
 
 	def destroy

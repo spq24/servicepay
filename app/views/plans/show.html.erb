@@ -10,6 +10,31 @@
 							<h1><%= @plan.name %></h1>
 						</div>
 					</div>
+
+					<div class="row">
+						<div class="col-lg-3 col-sm-6 col-xs-12">
+							<div class="main-box infographic-box">
+								<i class="fa fa-shopping-cart emerald-bg"></i>
+								<span class="headline">Payments From This Plan</span>
+								<span class="value">
+									<span class="timer" data-from="0" data-to="2562" data-speed="800" data-refresh-interval="10">
+										<%= @payments_count.count %>
+									</span>
+								</span>
+							</div>
+						</div>
+						<div class="col-lg-3 col-sm-6 col-xs-12">
+							<div class="main-box infographic-box">
+								<i class="fa fa-money green-bg"></i>
+								<span class="headline">Net Revenue From this Plan</span>
+								<span class="value">
+									<span class="timer" data-from="83" data-to="2562" data-speed="900" data-refresh-interval="60">
+									  <%= number_to_currency(@revenue) %>
+									</span>
+								</span>
+							</div>
+						</div>
+					</div>
 					
 					<div class="row" id="user-profile">						
 						<div class="col-lg-9 col-md-8 col-sm-8">

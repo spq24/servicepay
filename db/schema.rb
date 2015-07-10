@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150710061607) do
+ActiveRecord::Schema.define(version: 20150710073717) do
 
   create_table "active_admin_comments", force: true do |t|
     t.string   "namespace"
@@ -74,6 +74,21 @@ ActiveRecord::Schema.define(version: 20150710061607) do
   end
 
   add_index "companies", ["deleted_at"], name: "index_companies_on_deleted_at"
+
+  create_table "coupons", force: true do |t|
+    t.string   "name"
+    t.string   "duration"
+    t.integer  "amount_off"
+    t.integer  "currency"
+    t.integer  "duration_in_months"
+    t.integer  "max_redemptions"
+    t.integer  "percent_off"
+    t.datetime "redeem_by"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "company_id"
+    t.integer  "user_id"
+  end
 
   create_table "customers", force: true do |t|
     t.integer  "company_id"

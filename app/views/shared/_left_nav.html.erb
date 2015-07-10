@@ -56,6 +56,13 @@
 		 					<% end %>
 		 						
 	 					</li>
+						<li class="<%= 'active' if current_page?(coupons_path) %>">
+		 					<%= link_to coupons_path do %>
+		 					<i class="fa fa-calculator"></i>
+		 					<span>Coupons</span>
+		 					<% end %>
+		 						
+	 					</li>
 						<li>
 							 
 		 					<%= link_to payment_form_path(@user.company.id), target: "_blank" do %>

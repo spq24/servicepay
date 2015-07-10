@@ -8,5 +8,6 @@ class User < ActiveRecord::Base
   belongs_to :company
   has_many :refunds
   has_many :plans
+  has_many :coupons
   
 end

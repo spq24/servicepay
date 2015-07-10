@@ -7,7 +7,7 @@
 					<%= render 'shared/messages' %>
 					<div class="row">
 						<div class="col-lg-12">							
-							<h1>Create A New Service Plan</h1>
+							<h1>Create A New Coupon</h1>
 						</div>
 					</div>
 					<div class="row" id="user-profile">						
@@ -15,30 +15,28 @@
 							<div class="main-box clearfix">
 								<div class="tabs-wrapper profile-tabs">
 									<ul class="nav nav-tabs">
-										<li class="active"><a href="#tab-newsfeed" data-toggle="tab">Plan Info</a></li>
+										<li class="active"><a href="#tab-newsfeed" data-toggle="tab">Coupon Info</a></li>
 									</ul>
 									
 									<div class="tab-content">
 										<div class="tab-pane fade in active" id="tab-newsfeed">
-											<%= form_for @plan do |f| %>
+											<%= form_for @coupon do |f| %>
 												<%= f.hidden_field :user_id, value: @user.id %>
 												<%= f.hidden_field :company_id, value: @company.id %>
 												<%= f.hidden_field :currency, value: "usd" %>
 												<div class="row">
 													<div class="col-md-6">
 														<%= f.label :name %>
-														<%= f.text_field :name, placeholder: "Service Plan 1", class: "form-control", required: true %><br />
-														<%= f.label :statement_descriptor, "Description That Will Show On Customers Credit Card Statement (Can't include <> or \" or \')" %>
-														<%= f.text_field :statement_descriptor, placeholder: "Yearly Service Plan", maxlength: 22, class: "form-control", required: true %><br />
+														<%= f.text_field :name, placeholder: "Fall Deal", class: "form-control", required: true %><br />
+														<%= f.label :duration, "How Long Will This Coupon Be Valid?" %>
+														<%= f.select :duration, options_for_select([["Forever", "forever"], ["Repeating Over Months", "repeating"], ["Once", "once"]]), class: "form-control", required: true %><br />
 													</div>
 													<div class="col-md-6">
-														<%= f.label :amount, "Amount To Be Charged To Customer" %>
-														<%= f.text_field :amount, data: {autonumeric: true, aSign: 'USD'}, placeholder: "10", class: "form-control", required: true %><br />
-														<%= f.label :interval, "How Often Should The Customer Be Charged" %>
-														<%= f.select :interval, options_for_select([["Yearly", "year"], ["Monthly", "month"], ["Daily", "day"]], "year"), {}, class: "form-control", required: true %><br />
+														<%= f.label :amount_off, "Amount Off (Whole Number)" %>
+														<%= f.text_field :amount_off, data: {autonumeric: true, aSign: 'USD'}, placeholder: "10", class: "form-control" %><br />
 													</div>
 													<div class="col-md-12">
-														<%= f.submit "Create Plan", class: "btn btn-success pull-right" %>
+														<%= f.submit "Create Coupon", class: "btn btn-success pull-right" %>
 													</div>
 												</div>
 											<% end %>
