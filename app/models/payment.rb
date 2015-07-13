@@ -5,6 +5,7 @@ class Payment < ActiveRecord::Base
 	has_one    :refund
 	belongs_to :customer
 	has_many   :reviews
+	belongs_to :coupon
 
 
 

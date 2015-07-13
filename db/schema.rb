@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150710073717) do
+ActiveRecord::Schema.define(version: 20150713045000) do
 
   create_table "active_admin_comments", force: true do |t|
     t.string   "namespace"
@@ -88,6 +88,7 @@ ActiveRecord::Schema.define(version: 20150710073717) do
     t.datetime "updated_at"
     t.integer  "company_id"
     t.integer  "user_id"
+    t.boolean  "active",             default: true
   end
 
   create_table "customers", force: true do |t|
@@ -98,6 +99,7 @@ ActiveRecord::Schema.define(version: 20150710073717) do
     t.datetime "updated_at"
     t.datetime "deleted_at"
     t.string   "encrypted_stripe_token"
+    t.integer  "coupon_id"
   end
 
   add_index "customers", ["deleted_at"], name: "index_customers_on_deleted_at"
@@ -116,6 +118,7 @@ ActiveRecord::Schema.define(version: 20150710073717) do
     t.string   "last_4"
     t.integer  "plan_id"
     t.boolean  "subscription"
+    t.integer  "coupon_id"
   end
 
   add_index "payments", ["deleted_at"], name: "index_payments_on_deleted_at"

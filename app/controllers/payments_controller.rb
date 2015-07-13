@@ -11,8 +11,16 @@ class PaymentsController < ApplicationController
 	def create
 		@company = Company.find(params[:payment][:company_id])
 		money = Money.new((params[:payment][:amount].to_f * 100).to_i, "USD")
+		if params[:coupon_code].present?	
+			coupon = Coupon.find_by_name(params[:coupon_code])
+			money_percent = money * coupon.percent_off.to_f / 100
+			money_off = coupon.percent_off.nil? ? Money.new((coupon.amount_off.to_s.to_f * 100).to_i, "USD") : Money.new((money_percent.to_s.to_f * 100).to_i, "USD")
+			amount_to_charge = money - money_off
+		else
+			amount_to_charge = money
+		end
 		fee = @company.application_fee.nil? ? 0.8 : @company.application_fee
-		app_fee = money * (fee/100)
+		app_fee = amount_to_charge  * (fee/100)
 		@customer = Customer.find_by_customer_email_and_company_id(params[:payment][:customer_attributes][:customer_email], params[:payment][:company_id])
 		@payment = Payment.new(amount: params[:payment][:amount], company_id: params[:payment][:company_id])
 		if @payment.valid?
@@ -33,13 +41,14 @@ class PaymentsController < ApplicationController
 				stripe_customer.save
 			end
 
-			result = StripeWrapper::Charge.create(customer: @customer.stripe_token, uid: @company.uid, amount: money.cents,  fee: app_fee.cents)
+			result = StripeWrapper::Charge.create(customer: @customer.stripe_token, uid: @company.uid, amount: amount_to_charge.cents,  fee: app_fee.cents)
 			if result.successful?
 				  @payment = Payment.create(payment_params)
 				  @payment.customer = @customer
 				  @payment.company = @company
 				  @payment.stripe_charge_id = result.response.id
 				  @payment.last_4 = result.response.source.last4
+				  @payment.coupon_id = coupon.id unless params[:coupon_code].nil?
 				  @payment.save
 				  track_cio
 			      flash[:success] = "Your Payment Was Successful!"
@@ -75,7 +84,7 @@ class PaymentsController < ApplicationController
   private
 
 	def payment_params
-	    params.require(:payment).permit(:user_id, :company_id, :reference_id, :amount, :stripeToken, :refunded, :invoice_number, :application_fee, :subscription, :plan_id)
+	    params.require(:payment).permit(:user_id, :company_id, :reference_id, :amount, :stripeToken, :refunded, :invoice_number, :application_fee, :subscription, :plan_id, :coupon_id)
 	end
 
 	def add_cio

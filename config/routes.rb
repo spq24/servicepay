@@ -15,7 +15,7 @@ Rails.application.routes.draw do
   resources :refunds
   resources :customers
   resources :reviews
-  resources :coupons
+  resources :coupons, except: [:edit, :update]
   resources :plans do
     resources :subscriptions, except: [:edit, :update]
   end

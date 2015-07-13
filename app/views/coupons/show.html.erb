@@ -1,0 +1,79 @@
+<%= render 'shared/nav_top' %>
+	<div class="row">
+		<%= render 'shared/left_nav' %>
+		<div id="content-wrapper">
+			<div class="row">
+				<div class="col-lg-12">
+					<%= render 'shared/messages' %>
+					<div class="row">
+						<div class="col-lg-12">							
+							<h1><%= @coupon.name %></h1>
+						</div>
+					</div>
+					
+					<div class="row" id="user-profile">						
+						<div class="col-lg-9 col-md-8 col-sm-8">
+							<div class="main-box clearfix">
+								<div class="tabs-wrapper profile-tabs">
+									<ul class="nav nav-tabs">
+										<li class="active"><a href="#tab-newsfeed" data-toggle="tab">Coupon Info</a></li>
+									</ul>
+									
+									<div class="tab-content">
+										<div class="tab-pane fade in active" id="tab-newsfeed">
+											<header class="story-header">
+												<div class="story-time pull-right">
+													<i class="fa fa-clock-o"></i> Created: <%= @coupon.created_at.strftime("%m/%d/%Y") %><br />
+													<% if @coupon.active? %>
+														<span class="label label-success">Active</span>
+													<% else %>
+														<span class="label label-danger">Not Active</span>
+													<% end %>
+												</div>
+												<div class="story-author">
+													<%= @coupon.amount_off.nil? ? "Percent Off: #{number_to_percent(@coupon.percent_off)}"  : "Amount Off: #{number_to_currency(@coupon.amount_off)}" %>
+												</div><br />
+												<div class="story-author">
+													Created by: <%= link_to @coupon.user.email, target: "_blank" do %>
+														<%= @coupon.user.first_name %>&nbsp;<%= @coupon.user.last_name %>
+													<% end %>
+												</div><br />
+												<% if @coupon.redeem_by.present? %>							
+													<div class="story-author">
+														Redeem By: <%= @coupon.redeem_by.strftime("%m/%d/%Y") %>
+													</div><br />	
+												<% end %>								
+												<div class="story-author">
+													<% if @coupon.duration == "repeating" %>
+														Coupon Valid For: <%= @coupon.duration_in_months %> Months
+													<% elsif @coupon.duration == "once" %>
+														Coupon Is Only Valid Once
+													<% else %>
+														Coupon is valid until you delete it.
+													<% end %>															
+												</div><br />
+												<% if @coupon.max_redemptions.present? %>
+													<div class="story-author">
+														Coupon Max Redemptions: <%= @coupon.max_redemptions %>
+													</div><br />
+												<% end %>
+												<div class="story-author">
+													Redeemed: <%= @stripe_coupon[:times_redeemed] %>
+											</header> 
+											<%= link_to "Deactivate Coupon", @coupon, method: :delete, data: {confirm: "Are you sure?"}, class: "pull-right", style: "color: red;" %><br />
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					
+				</div>
+			</div>
+		  <%= render 'shared/footer' %>
+		</div>
+	</div>
+</div>
+</div>
+
+<%= content_tag :div, "", id: "payments_chart", class: "graph", style: "display: none;" %>

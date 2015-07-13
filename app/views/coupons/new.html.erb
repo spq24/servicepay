@@ -21,19 +21,30 @@
 									<div class="tab-content">
 										<div class="tab-pane fade in active" id="tab-newsfeed">
 											<%= form_for @coupon do |f| %>
-												<%= f.hidden_field :user_id, value: @user.id %>
-												<%= f.hidden_field :company_id, value: @company.id %>
-												<%= f.hidden_field :currency, value: "usd" %>
 												<div class="row">
 													<div class="col-md-6">
-														<%= f.label :name %>
+														<%= f.label :name, "Coupon Code - This Will Be What Your Customers Type In To Apply The Coupon" %>
 														<%= f.text_field :name, placeholder: "Fall Deal", class: "form-control", required: true %><br />
-														<%= f.label :duration, "How Long Will This Coupon Be Valid?" %>
-														<%= f.select :duration, options_for_select([["Forever", "forever"], ["Repeating Over Months", "repeating"], ["Once", "once"]]), class: "form-control", required: true %><br />
+														<%= f.label :duration, "How Long Will This Coupon Be Valid?" %> <br />
+														<%= f.select :duration, options_for_select([["Forever", "forever"], ["Repeating Monthly", "repeating"], ["Once", "once"]]), {}, class: "form-control", required: true, id: "duration_select" %><br />
+														<div id="months">
+															<%= f.label :duration_in_months, "How Months Should This Be Valid For?" %> <br />
+															<%= f.text_field :duration_in_months, placeholder: "3", class: "form-control" %><br />
+														</div>
+														<%= f.label :max_redemptions, "How Many Times Can This Coupon Be Redeemed? (Default: Unlimited)" %><br />
+														<%= f.text_field :max_redemptions, placeholder: "100", class: "form-control" %><br />
+														<%= f.label :redeem_by, "What's The Last Day This Coupon Can Be Redeemed By? (Default: Valid Forever)" %><br />
+														<div class="input-group">
+															<span class="input-group-addon"><i class="fa fa-calendar-o"></i></span>
+															<%= f.text_field :redeem_by, placeholder: "1/1/2020", class: "form-control", id: "datepickerDate" %><br />
+														</div>
 													</div>
 													<div class="col-md-6">
-														<%= f.label :amount_off, "Amount Off (Whole Number)" %>
+														<%= f.label :amount_off, "Amount Off (Whole Number)" %><br />
 														<%= f.text_field :amount_off, data: {autonumeric: true, aSign: 'USD'}, placeholder: "10", class: "form-control" %><br />
+														<center>OR</center>
+														<%= f.label :percent_off, "Amount Off (Percentage)" %><br />
+														<%= f.text_field :percent_off, placeholder: "between 1 and 100", class: "form-control" %><br />
 													</div>
 													<div class="col-md-12">
 														<%= f.submit "Create Coupon", class: "btn btn-success pull-right" %>
@@ -53,3 +64,4 @@
 	</div>
 </div>
 </div>
+<%= content_tag :div, "", id: "payments_chart", class: "graph", style: "display: none;" %>

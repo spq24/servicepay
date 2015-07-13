@@ -37,10 +37,11 @@
 												<thead>
 													<tr>
 														<th><span>Coupon Name</span></th>
-														<th class="text-center"><span>Amount Off</span></th>
+														<th class="text-center"><span>Amount / Percent Off</span></th>
 														<th class="text-center"><span>Duration</span></th>
 														<th class="text-center"><span>Created</span></th>
 														<th class="text-center"><span>Created By</span></th>
+														<th class="text-center"><span>Active Coupon?</span></th>
 														<th>&nbsp;</th>
 													</tr>
 												</thead>
@@ -48,7 +49,10 @@
 												  <% @coupons.each do |c| %>
 													<tr>
 														<td>
-							                                <%= link_to c.name, c %>
+							                                <%= c.active? ? link_to(c.name, c) : c.name %>
+														</td>
+														<td class="text-center">
+															<%= c.amount_off.nil? ? "#{c.percent_off}%" : number_to_currency(c.amount_off) %>
 														</td>
 														<td class="text-center">
 															<%= c.duration %>
@@ -59,18 +63,27 @@
 														<td class="text-center">
 															<%= mail_to c.user.email, "#{c.user.first_name} #{c.user.last_name}", target: "_blank" %>
 														</td>
-														<td  style="width: 20%;">
-															<%= link_to c, class: "table-link" do %>
-																<span class="fa-stack">
-																	<i class="fa fa-square fa-stack-2x"></i>
-																	<i class="fa fa-search-plus fa-stack-1x fa-inverse"></i>
-																</span>
+														<td class="text-center">
+															<% if c.active? %>
+																<span class="label label-success">Active</span>
+															<% else %>
+																<span class="label label-danger">Not Active</span>
 															<% end %>
-															<%= link_to c, method: :delete, data: {confirm: "Are you sure?"}, class: "table-link danger" do %>
-																<span class="fa-stack">
-																	<i class="fa fa-square fa-stack-2x"></i>
-																	<i class="fa fa-trash-o fa-stack-1x fa-inverse"></i>
-																</span>
+														</td>
+														<td  style="width: 20%;">
+															<% if c.active? %>
+																<%= link_to c, class: "table-link" do %>
+																	<span class="fa-stack">
+																		<i class="fa fa-square fa-stack-2x"></i>
+																		<i class="fa fa-search-plus fa-stack-1x fa-inverse"></i>
+																	</span>
+																<% end %>
+																<%= link_to c, method: :delete, data: {confirm: "Are you sure?"}, class: "table-link danger" do %>
+																	<span class="fa-stack">
+																		<i class="fa fa-square fa-stack-2x"></i>
+																		<i class="fa fa-trash-o fa-stack-1x fa-inverse"></i>
+																	</span>
+																<% end %>
 															<% end %>
 														</td>
 													</tr>
