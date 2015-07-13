@@ -14,14 +14,17 @@ class SubscriptionsController < ApplicationController
 		@user = current_user
 		@company = @user.company
 		@plan = Plan.find(params[:subscription][:plan_id])
-		fee = @company.application_fee.nil? ? 1 : @company.application_fee
+		@coupon = Coupon.find(params[:coupon])
 		Stripe.api_key = @company.access_code
 		@customers = Customer.where(id: params[:subscription][:customer_id])
 		@customers.each do |c|
 			if !@plan.customers.to_a.include?(c)
-				binding.pry
 				stripe_customer = Stripe::Customer.retrieve(c.stripe_token)
-				response = stripe_customer.subscriptions.create(plan: @plan.name, application_fee_percent: fee)
+				if @coupon.present?
+					response = stripe_customer.subscriptions.create(plan: @plan.name, application_fee_percent: @company.application_fee, coupon: Stripe::Coupon.retrieve(@coupon.name))
+				else
+					response = stripe_customer.subscriptions.create(plan: @plan.name, application_fee_percent: @company.application_fee)
+				end
 				if response.id.present?
 					@plan.customers << c
 					@subscription = Subscription.where(customer_id: c.id, plan_id: @plan.id).first

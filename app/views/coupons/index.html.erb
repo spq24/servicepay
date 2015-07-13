@@ -18,10 +18,22 @@
 							<div class="col-lg-3 col-sm-6 col-xs-12">
 								<div class="main-box infographic-box">
 									<i class="fa fa-shopping-cart emerald-bg"></i>
-									<span class="headline">Coupons</span>
+									<span class="headline">Active Coupons</span>
 									<span class="value">
 										<span class="timer" data-from="0" data-to="2562" data-speed="800" data-refresh-interval="10">
 											<%= @coupons.count %>	
+										</span>
+									</span>
+								</div>
+							</div>
+
+							<div class="col-lg-3 col-sm-6 col-xs-12">
+								<div class="main-box infographic-box">
+									<i class="fa fa-shopping-cart emerald-bg"></i>
+									<span class="headline">Coupons Redeemed</span>
+									<span class="value">
+										<span class="timer" data-from="0" data-to="2562" data-speed="800" data-refresh-interval="10">
+											<%= @coupons_redeemed_sum %>	
 										</span>
 									</span>
 								</div>
@@ -39,6 +51,7 @@
 														<th><span>Coupon Name</span></th>
 														<th class="text-center"><span>Amount / Percent Off</span></th>
 														<th class="text-center"><span>Duration</span></th>
+														<th class="text-center"><span>Redeemed Count</span></th>
 														<th class="text-center"><span>Created</span></th>
 														<th class="text-center"><span>Created By</span></th>
 														<th class="text-center"><span>Active Coupon?</span></th>
@@ -57,6 +70,9 @@
 														<td class="text-center">
 															<%= c.duration %>
 														</td>
+														<td class="text-center">
+															<%= c.redeemed_count %>
+														</td>													
 														<td class="text-center">
 															<%= c.created_at.strftime("%m/%d/%Y") %>
 														</td>

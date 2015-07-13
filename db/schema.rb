@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150713045000) do
+ActiveRecord::Schema.define(version: 20150713161637) do
 
   create_table "active_admin_comments", force: true do |t|
     t.string   "namespace"
@@ -70,7 +70,7 @@ ActiveRecord::Schema.define(version: 20150713045000) do
     t.boolean  "status"
     t.boolean  "terms"
     t.text     "description"
-    t.float    "application_fee"
+    t.float    "application_fee",           default: 0.8
   end
 
   add_index "companies", ["deleted_at"], name: "index_companies_on_deleted_at"
@@ -89,6 +89,7 @@ ActiveRecord::Schema.define(version: 20150713045000) do
     t.integer  "company_id"
     t.integer  "user_id"
     t.boolean  "active",             default: true
+    t.integer  "redeemed_count",     default: 0
   end
 
   create_table "customers", force: true do |t|

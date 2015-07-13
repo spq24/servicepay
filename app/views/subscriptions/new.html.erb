@@ -24,7 +24,10 @@
 												<%= f.hidden_field :plan_id, value: @plan.id %>
 												<div class="row">
 													<div class="col-md-6">
-														<%= f.select :customer_id, options_from_collection_for_select(@customers_to_add, 'id', 'customer_name'), {}, multiple: true, style: "width: 50%;" %><br />
+														<%= f.label :customer_id, "Customers Who Are Not Currently In This Plan" %>
+														<%= f.select :customer_id, options_from_collection_for_select(@customers_to_add, 'id', 'customer_name'), {}, multiple: true, style: "width: 50%;", class: "form-control" %><br /><br />
+														<%= f.label :coupon, "Coupons You Can Apply To This Subscription" %>
+														<%= select_tag :coupon, options_from_collection_for_select(@company.coupons, 'id', 'name'), include_blank: true, style: "width: 50%;", class: "form-control" %>
 													</div>
 													<div class="col-md-6">
 

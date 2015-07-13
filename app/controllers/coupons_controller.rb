@@ -40,14 +40,13 @@ class CouponsController < ApplicationController
 		@user = current_user
 		@company = @user.company
 		@coupon = Coupon.find(params[:id])
-		Stripe.api_key = @company.access_code
-		@stripe_coupon = Stripe::Coupon.retrieve(@coupon.name)
 	end
 
 	def index
 		@user = current_user
 		@company = @user.company
 		@coupons = @company.coupons.reverse
+		@coupons_redeemed_sum = @coupons.map(&:redeemed_count).sum
 	end
 
 	def destroy

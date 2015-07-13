@@ -10,53 +10,69 @@ class PaymentsController < ApplicationController
 
 	def create
 		@company = Company.find(params[:payment][:company_id])
-		money = Money.new((params[:payment][:amount].to_f * 100).to_i, "USD")
-		if params[:coupon_code].present?	
-			coupon = Coupon.find_by_name(params[:coupon_code])
-			money_percent = money * coupon.percent_off.to_f / 100
-			money_off = coupon.percent_off.nil? ? Money.new((coupon.amount_off.to_s.to_f * 100).to_i, "USD") : Money.new((money_percent.to_s.to_f * 100).to_i, "USD")
-			amount_to_charge = money - money_off
-		else
-			amount_to_charge = money
-		end
-		fee = @company.application_fee.nil? ? 0.8 : @company.application_fee
-		app_fee = amount_to_charge  * (fee/100)
+		@money = Money.new((params[:payment][:amount].to_f * 100).to_i, "USD")	
+		@coupon = Coupon.find_by_name(params[:coupon_code])
 		@customer = Customer.find_by_customer_email_and_company_id(params[:payment][:customer_attributes][:customer_email], params[:payment][:company_id])
 		@payment = Payment.new(amount: params[:payment][:amount], company_id: params[:payment][:company_id])
+		Stripe.api_key = @company.access_code
 		if @payment.valid?
+			if @coupon.present?
+				count = @coupon.redeemed_count
+				@coupon.redeemed_count = count + 1
+				@coupon.save
+				money_percent = @money * @coupon.percent_off.to_f / 100
+				money_off = @coupon.percent_off.nil? ? Money.new((@coupon.amount_off.to_s.to_f * 100).to_i, "USD") : Money.new((money_percent.to_s.to_f * 100).to_i, "USD")
+				amount_to_charge = @money - money_off
+			else
+				amount_to_charge = @money
+			end
+			app_fee = amount_to_charge  * (@company.application_fee / 100)
+		
 			if @customer.nil?
 				stripe_customer = StripeWrapper::Customer.create(source: params[:stripeToken], customer_email: params[:payment][:customer_attributes][:customer_email], uid: @company.uid)
 				if stripe_customer.successful?
-				   @customer = Customer.create(customer_email: params[:payment][:customer_attributes][:customer_email], customer_name: params[:payment][:customer_attributes][:customer_name], company_id: @company.id, stripe_token: stripe_customer.response.id)	
-				   add_cio
+				    @customer = Customer.create(customer_email: params[:payment][:customer_attributes][:customer_email], customer_name: params[:payment][:customer_attributes][:customer_name], company_id: @company.id, stripe_token: stripe_customer.response.id)	
+				    add_cio
+					result = StripeWrapper::Charge.create(customer: @customer.stripe_token, uid: @company.uid, amount: amount_to_charge.cents,  fee: app_fee.cents)
+					if result.successful?
+						@payment = Payment.create(company_id: @company.id, amount: amount_to_charge, invoice_number: params[:payment][:invoice_number], customer_id: @customer.id, stripe_charge_id: result.response.id, last_4: result.response.source.last4)
+						if @coupon.present?
+							@payment.coupon_id = @coupon.id
+							@payment.save
+						end
+						track_cio
+					    flash[:success] = @coupon.present? ? "Your Payment of #{ActionController::Base.helpers.number_to_currency(@payment.amount)} Was Successful! #{@coupon.name} was applied to your payment!" : "Your Payment of #{ActionController::Base.helpers.number_to_currency(@payment.amount)} Was Successful!"
+					    redirect_to payment_path(@payment)
+				    else
+				      flash[:danger] = result.error_message
+				      render :new
+			    	end
 				else
 					flash[:danger] = result.error_message
 					render :new
 				end
-			end
+			else
+				if Stripe::Customer.retrieve(@customer.stripe_token)[:default_source] != Stripe::Token.retrieve(params[:stripeToken])[:card][:id]
+					stripe_customer = Stripe::Customer.retrieve(@customer.stripe_token)
+					stripe_customer.source = params[:stripeToken]
+					stripe_customer.save
+				end
 
-			if Stripe::Customer.retrieve(@customer.stripe_token)[:default_source] != Stripe::Token.retrieve(params[:stripeToken])[:card][:id]
-				stripe_customer = Stripe::Customer.retrieve(@customer.stripe_token)
-				stripe_customer.source = params[:stripeToken]
-				stripe_customer.save
+				result = StripeWrapper::Charge.create(customer: @customer.stripe_token, uid: @company.uid, amount: amount_to_charge.cents,  fee: app_fee.cents)
+				if result.successful?
+					@payment = Payment.create(company_id: @company.id, amount: amount_to_charge, invoice_number: params[:payment][:invoice_number], customer_id: @customer.id, stripe_charge_id: result.response.id, last_4: result.response.source.last4)
+					if @coupon.present?
+						@payment.coupon_id = @coupon.id
+						@payment.save
+					end
+					track_cio
+				    flash[:success] = @coupon.present? ? "Your Payment of #{ActionController::Base.helpers.number_to_currency(@payment.amount)} Was Successful! #{@coupon.name} was applied to your payment!" : "Your Payment of #{ActionController::Base.helpers.number_to_currency(@payment.amount)} Was Successful!"
+				    redirect_to payment_path(@payment)
+			    else
+			      flash[:danger] = result.error_message
+			      render :new
+		    	end
 			end
-
-			result = StripeWrapper::Charge.create(customer: @customer.stripe_token, uid: @company.uid, amount: amount_to_charge.cents,  fee: app_fee.cents)
-			if result.successful?
-				  @payment = Payment.create(payment_params)
-				  @payment.customer = @customer
-				  @payment.company = @company
-				  @payment.stripe_charge_id = result.response.id
-				  @payment.last_4 = result.response.source.last4
-				  @payment.coupon_id = coupon.id unless params[:coupon_code].nil?
-				  @payment.save
-				  track_cio
-			      flash[:success] = "Your Payment Was Successful!"
-			      redirect_to payment_path(@payment)
-		    else
-		      flash[:danger] = result.error_message
-		      render :new
-	    	end
 		else
 		  flash[:danger] = "There was a problem with your payment. #{@payment.errors.full_messages.to_sentence}"
 		  render :new
@@ -84,7 +100,7 @@ class PaymentsController < ApplicationController
   private
 
 	def payment_params
-	    params.require(:payment).permit(:user_id, :company_id, :reference_id, :amount, :stripeToken, :refunded, :invoice_number, :application_fee, :subscription, :plan_id, :coupon_id)
+	    params.require(:payment).permit(:company_id, :amount, :refunded, :invoice_number, :subscription, :plan_id, :coupon_id, :customer_id, :stripe_charge_id)
 	end
 
 	def add_cio

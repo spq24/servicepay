@@ -29,6 +29,8 @@
 															<th><span>Payment ID</span></a></th>
 															<th><span>Customer Name</span></a></th>
 															<th><span>Customer Email</span></a></th>
+															<th><span>Service Plan</span></a></th>
+															<th><span>Coupon</span></a></th>
 															<th class="text-center"><span>Net Revenue</span></th>
 															<th class="text-right"><span>Date</span></th>
 															<th>&nbsp;</th>
@@ -45,6 +47,12 @@
 															</td>
 															<td>
 																<%= mail_to Customer.find(p.customer_id).customer_email, Customer.find(p.customer_id).customer_email, target: "_blank" if !p.customer_id.nil? %>
+															</td>
+															<td>
+																<%= Plan.find(p.plan_id).name unless p.plan_id.nil? %>
+															</td>
+															<td>
+																<%= p.coupon.name unless p.coupon.nil? %>
 															</td>
 															<td class="text-center">
 																<% if p.refunded? %>

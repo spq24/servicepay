@@ -87,6 +87,8 @@
 													<td class="text-center">
 														<% if p.last_4.present? && p.stripe_charge_id.present? %>
 						                                	<%= p.last_4 %> | <%= Stripe::Charge.retrieve(p.stripe_charge_id)[:source][:brand] %>
+						                                <% else %>
+						                                	<%= p.last_4 %> | <%= Stripe::Customer.retrieve(p.customer.stripe_token).sources.retrieve(Stripe::Customer.retrieve(p.customer.stripe_token)[:default_source])[:brand] %>
 						                                <% end %>
 													</td>
 													<td class="text-center">

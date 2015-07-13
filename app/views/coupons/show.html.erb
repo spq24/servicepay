@@ -31,7 +31,7 @@
 													<% end %>
 												</div>
 												<div class="story-author">
-													<%= @coupon.amount_off.nil? ? "Percent Off: #{number_to_percent(@coupon.percent_off)}"  : "Amount Off: #{number_to_currency(@coupon.amount_off)}" %>
+													<%= @coupon.amount_off.nil? ? "Percent Off: #{@coupon.percent_off}%"  : "Amount Off: #{number_to_currency(@coupon.amount_off)}" %>
 												</div><br />
 												<div class="story-author">
 													Created by: <%= link_to @coupon.user.email, target: "_blank" do %>
@@ -58,7 +58,7 @@
 													</div><br />
 												<% end %>
 												<div class="story-author">
-													Redeemed: <%= @stripe_coupon[:times_redeemed] %>
+													Redeemed Count: <%= @coupon.redeemed_count %>
 											</header> 
 											<%= link_to "Deactivate Coupon", @coupon, method: :delete, data: {confirm: "Are you sure?"}, class: "pull-right", style: "color: red;" %><br />
 										</div>
