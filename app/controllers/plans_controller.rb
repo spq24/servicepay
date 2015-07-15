@@ -11,12 +11,13 @@ class PlansController < ApplicationController
 	def create
 		@user = current_user
 		@company = @user.company
-		@plan = Plan.new(amount: params[:plan][:amount], name: params[:plan][:name], user_id: params[:plan][:user_id], company_id: params[:plan][:company_id], interval: params[:plan][:interval], statement_descriptor: params[:plan][:statement_descriptor], currency: params[:plan][:currency])
+		@money = Money.new((params[:plan][:amount].to_f * 100).to_i, "USD")
+		@plan = Plan.new(amount: @money.cents, name: params[:plan][:name], user_id: @user.id, company_id: @company.id, interval: params[:plan][:interval], statement_descriptor: params[:plan][:statement_descriptor], currency: params[:plan][:currency])
 		if @plan.valid?
 			Stripe.api_key = @company.access_code
-			stripe_plan = Stripe::Plan.create(amount: params[:plan][:amount], name: params[:plan][:name], id: params[:plan][:name], interval: params[:plan][:interval], statement_descriptor: params[:plan][:statement_descriptor], currency: params[:plan][:currency])
+			stripe_plan = Stripe::Plan.create(amount: @money.cents, name: params[:plan][:name], id: params[:plan][:name], interval: params[:plan][:interval], statement_descriptor: params[:plan][:statement_descriptor], currency: params[:plan][:currency])
 			if stripe_plan.id.present?
-				@plan = Plan.create(plan_params)
+				@plan = Plan.create(amount: @money.cents, name: params[:plan][:name], user_id: @user.id, company_id: @company.id, interval: params[:plan][:interval], statement_descriptor: params[:plan][:statement_descriptor], currency: params[:plan][:currency])
 				track_cio
 				flash[:success] = "#{@plan.name} created"
 				redirect_to plans_path
@@ -35,7 +36,7 @@ class PlansController < ApplicationController
 		@plan = Plan.find(params[:id])
 		@plan_customers = @plan.customers.reverse
 		@company_customers = @company.customers
-		@revenue = Payment.where(plan_id: @plan.id, company_id: @company.id).sum(:amount)
+		@revenue = Money.new((Payment.where(plan_id: @plan.id, company_id: @company.id).sum(:amount)), "USD").format
 		@payments_count = Payment.where(plan_id: @plan.id, company_id: @company.id)
 	end
 
@@ -43,7 +44,7 @@ class PlansController < ApplicationController
 		@user = current_user
 		@company = @user.company
 		@plans = @company.plans.reverse
-		@revenue = Payment.where(subscription: true, company_id: @company.id).sum(:amount)
+		@revenue = Money.new((Payment.where(subscription: true, company_id: @company.id).sum(:amount)), "USD").format
 		@payments_count = Payment.where(subscription: true, company_id: @company.id)
 	end
 
@@ -54,7 +55,7 @@ class PlansController < ApplicationController
 	  response = Stripe::Plan.retrieve(@plan.name).delete
 	  if response[:deleted] == true
 		@plan = Plan.find(params[:id]).destroy
-		flash[:success] = "Plan Deleted."
+		flash[:success] = "#{@plan.name} Deleted."
 		redirect_to plans_path
 	  else
 	  	flash[:danger] = "We couldn't delete your plan right now. Please try again soon"
@@ -77,7 +78,7 @@ class PlansController < ApplicationController
 	end
 
 	def track_cio
-		$customerio.track(@company.id,"plan create", plan: @plan.name, amount: @plan.amount, interval: @plan.interval, company_user_email: @plan.users.first.email, company_logo: @company.logo)
+		$customerio.track(@company.id,"plan create", plan: @plan.name, amount: @plan.amount, interval: @plan.interval, company_user_email: @plan.user.email, company_logo: @company.logo)
 	end
 
 

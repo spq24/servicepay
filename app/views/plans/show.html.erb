@@ -29,7 +29,7 @@
 								<span class="headline">Net Revenue From this Plan</span>
 								<span class="value">
 									<span class="timer" data-from="83" data-to="2562" data-speed="900" data-refresh-interval="60">
-									  <%= number_to_currency(@revenue) %>
+									  <%= @revenue %>
 									</span>
 								</span>
 							</div>
@@ -51,7 +51,7 @@
 													<i class="fa fa-clock-o"></i> Created: <%= @plan.created_at.strftime("%m/%d/%Y") %><br />
 												</div>
 												<div class="story-author">
-													Amount Charged to Customer: <%= number_to_currency(@plan.amount) %>
+													Amount Charged to Customer: <%= number_to_currency(@plan.amount / 100) %>
 												</div><br />
 												<div class="story-author">
 													Created by: <%= link_to @plan.user.email, target: "_blank" do %>

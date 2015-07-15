@@ -31,7 +31,7 @@
 													<% end %>
 												</div>
 												<div class="story-author">
-													<%= @coupon.amount_off.nil? ? "Percent Off: #{@coupon.percent_off}%"  : "Amount Off: #{number_to_currency(@coupon.amount_off)}" %>
+													<%= @coupon.amount_off.nil? ? "Percent Off: #{@coupon.percent_off}%"  : "Amount Off: #{number_to_currency(@coupon.amount_off / 100)}" %>
 												</div><br />
 												<div class="story-author">
 													Created by: <%= link_to @coupon.user.email, target: "_blank" do %>

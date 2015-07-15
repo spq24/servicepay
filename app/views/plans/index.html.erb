@@ -43,7 +43,7 @@
 									<span class="headline">Net Revenue From All Plans</span>
 									<span class="value">
 										<span class="timer" data-from="83" data-to="2562" data-speed="900" data-refresh-interval="60">
-										  <%= number_to_currency(@revenue) %>
+										  <%= @revenue %>
 										</span>
 									</span>
 								</div>
@@ -73,7 +73,7 @@
 							                                <%= link_to p.name, p %>
 														</td>
 														<td class="text-center">
-															<%= number_to_currency(p.amount) %>
+															<%= number_to_currency(p.amount / 100) %> / <%= p.interval %>
 														</td>
 														<td class="text-center">
 															<%= p.customers.count %>

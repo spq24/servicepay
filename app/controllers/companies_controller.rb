@@ -46,11 +46,11 @@ class CompaniesController < ApplicationController
     @user = current_user
     @company = @user.company
     @payments = @company.payments.order(id: :desc).page params[:page]
-    @payments_count = @company.payments.all
-    @refunds_count = @company.refunds.all
-    @refunded_amount = @refunds_count.sum(:amount)
-    @revenue = @company.payments.all.sum(:amount) - @refunded_amount
-    @refund = Refund.new
+    @payments_all = @company.payments
+    @refunds = @company.refunds
+    @refunded_amount = Money.new((@refunds.sum(:amount)), "USD")
+    @payments_amount = Money.new((@payments_all.sum(:amount)), "USD")
+    @revenue = @payments_amount - @refunded_amount
   end
   
   def destroy

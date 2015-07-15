@@ -4,9 +4,9 @@ module CompaniesHelper
 	  	(8.weeks.ago.to_date..Date.today).map do |date|
 	      {
 	        created_at: date,
-	        payments: @payments_count.where("date(payments.created_at) = ?", date).count(:id),
-        	net_revenue: (@payments_count.where("date(payments.created_at) = ?", date).sum(:amount) - @refunds_count.where("date(refunds.created_at) = ?", date).sum(:amount)),
-        	refunded_amount: @refunds_count.where("date(refunds.created_at) = ?", date).sum(:amount)
+	        payments: @payments_all.where("date(payments.created_at) = ?", date).count(:id),
+        	net_revenue: ((@payments_all.where("date(payments.created_at) = ?", date).sum(:amount) - @refunds.where("date(refunds.created_at) = ?", date).sum(:amount)) / 100),
+        	refunded_amount: (@refunds.where("date(refunds.created_at) = ?", date).sum(:amount) / 100)
 	      }
 	    end
 	  end

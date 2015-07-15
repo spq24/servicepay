@@ -58,7 +58,7 @@
 																<% if p.refunded? %>
 																	<p style="color:red;"><%= number_to_currency(p.amount - Refund.find_by(stripe_refund_id: p.stripe_refund_id).amount) %></p>
 																<% else %>
-																	<%= number_to_currency(p.amount) %>
+																	<%= number_to_currency(p.amount / 100) %>
 																<% end %>
 															</td>
 															<td class="text-right">

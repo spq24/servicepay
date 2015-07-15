@@ -82,7 +82,7 @@
 											  <% @payments.each do |p| %>
 												<tr>
 													<td class="text-center">
-						                                <%= number_to_currency(p.amount) %>
+						                                <%= number_to_currency(p.amount / 100) %>
 													</td>
 													<td class="text-center">
 														<% if p.last_4.present? && p.stripe_charge_id.present? %>
@@ -193,7 +193,7 @@
 							                                <%= link_to s.plan.name, s.plan %>
 														</td>
 														<td class="text-center">
-							                                <%= number_to_currency(s.plan.amount) %> / <%= s.plan.interval %>
+							                                <%= number_to_currency(s.plan.amount / 100) %> / <%= s.plan.interval %>
 														</td>
 														<td class="text-center">
 															<%= s.created_at.strftime("%m/%d/%Y") %>
@@ -254,7 +254,7 @@
 														<%= Time.at(i[:lines][:data][0][:period][:start].to_s.to_f).to_datetime.strftime("%m/%d/%Y") %> - <%= Time.at(i[:lines][:data][0][:period][:end].to_s.to_f).to_datetime.strftime("%m/%d/%Y")  %>
 													</td>
 													<td>
-														<%= number_to_currency(i[:total]) %>
+														<%= number_to_currency(i[:total] / 100) %>
 													</td>
 													<td>
 														<%= Time.at(i[:date].to_s.to_f).to_datetime.strftime("%m/%d/%Y") %>

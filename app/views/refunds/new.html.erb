@@ -21,27 +21,28 @@
 									<div class="tab-content">
 										<div class="tab-pane fade in active" id="tab-newsfeed">
 											<header class="story-header">
-												<div class="story-author">
-													Payment Amount: <%= number_to_currency(@payment.amount) %>
-												</div><br />
-
-												<div class="story-author">
-													Customer: <%= mail_to @payment.customer.customer_email, @payment.customer.customer_name, target: "_blank" %>
+												<div class="col-md-4">
+													<div class="story-author">
+														Payment Amount: <%= number_to_currency(@payment.amount / 100) %>
+													</div><br />
 												</div>
-
-												<div class="story-time pull-right">
-													<i class="fa fa-clock-o"></i> Payment Date: <%= @payment.created_at.strftime("%m/%d/%Y") %>
+												<div class="col-md-4">
+													<div class="story-author">
+														Customer: <%= mail_to @payment.customer.customer_email, @payment.customer.customer_name, target: "_blank" %>
+													</div>
+												</div>
+												<div class="col-md-4">
+													<div class="story-time pull-right">
+														<i class="fa fa-clock-o"></i> Payment Date: <%= @payment.created_at.strftime("%m/%d/%Y") %>
+													</div>
 												</div>
 											</header><br /><br />
 											<%= form_for @refund do |f| %>
 												<%= f.hidden_field :payment_id, value: @payment.id %>
-												<%= f.hidden_field :user_id, value: @user.id %>
-												<%= f.hidden_field :company_id, value: @company.id %>
-												<%= f.hidden_field :customer_id, value: @customer.id %>
 												<div class="row">
 													<div class="col-md-6">
 														<%= f.label :amount %>
-														<%= f.text_field :amount, data: {autonumeric: true, aSign: 'USD'}, placeholder: number_to_currency(@payment.amount), class: "form-control", required: true %><br />
+														<%= f.text_field :amount, data: {autonumeric: true, aSign: 'USD'}, placeholder: number_to_currency(@payment.amount / 100), class: "form-control", required: true %><br />
 													</div>
 													<div class="col-md-6">
 														<%= f.label :reason, "Reason a Refund is Requested" %>

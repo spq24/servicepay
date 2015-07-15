@@ -1,0 +1,26 @@
+
+[1mFrom:[0m /home/action/workspace/servicepay/app/controllers/plans_controller.rb @ line 19 PlansController#create:
+
+    [1;34m11[0m: [32mdef[0m [1;34mcreate[0m
+    [1;34m12[0m: 	@user = current_user
+    [1;34m13[0m: 	@company = @user.company
+    [1;34m14[0m: 	@money = [1;34;4mMoney[0m.new((params[[33m:plan[0m][[33m:amount[0m].to_f * [1;34m100[0m).to_i, [31m[1;31m"[0m[31mUSD[1;31m"[0m[31m[0m)
+    [1;34m15[0m: 	@plan = [1;34;4mPlan[0m.new([35mamount[0m: params[[33m:plan[0m][[33m:amount[0m], [35mname[0m: params[[33m:plan[0m][[33m:name[0m], [35muser_id[0m: params[[33m:plan[0m][[33m:user_id[0m], [35mcompany_id[0m: params[[33m:plan[0m][[33m:company_id[0m], [35minterval[0m: params[[33m:plan[0m][[33m:interval[0m], [35mstatement_descriptor[0m: params[[33m:plan[0m][[33m:statement_descriptor[0m], [35mcurrency[0m: params[[33m:plan[0m][[33m:currency[0m])
+    [1;34m16[0m: 	[32mif[0m @plan.valid?
+    [1;34m17[0m: 		[1;34;4mStripe[0m.api_key = @company.access_code
+    [1;34m18[0m: 		stripe_plan = [1;34;4mStripe[0m::[1;34;4mPlan[0m.create([35mamount[0m: @money.cents, [35mname[0m: params[[33m:plan[0m][[33m:name[0m], [35mid[0m: params[[33m:plan[0m][[33m:name[0m], [35minterval[0m: params[[33m:plan[0m][[33m:interval[0m], [35mstatement_descriptor[0m: params[[33m:plan[0m][[33m:statement_descriptor[0m], [35mcurrency[0m: params[[33m:plan[0m][[33m:currency[0m])
+ => [1;34m19[0m: 		binding.pry
+    [1;34m20[0m: 		[32mif[0m stripe_plan.id.present?
+    [1;34m21[0m: 			@plan = [1;34;4mPlan[0m.create(plan_params)
+    [1;34m22[0m: 			track_cio
+    [1;34m23[0m: 			flash[[33m:success[0m] = [31m[1;31m"[0m[31m#{@plan.name}[0m[31m created[1;31m"[0m[31m[0m
+    [1;34m24[0m: 			redirect_to plans_path
+    [1;34m25[0m: 		[32melse[0m
+    [1;34m26[0m: 			flash[[33m:danger[0m] = [31m[1;31m"[0m[31mThere was a problem creating your plan. #{result.error_message}[0m[31m[1;31m"[0m[31m[0m
+    [1;34m27[0m: 		[32mend[0m
+    [1;34m28[0m: 	[32melse[0m
+    [1;34m29[0m: 	  flash[[33m:danger[0m] = [31m[1;31m"[0m[31mThere was a problem creating your plan. #{@plan.errors.full_messages.to_sentence}[0m[31m[1;31m"[0m[31m[0m
+    [1;34m30[0m: 	  render [33m:new[0m
+    [1;34m31[0m: 	[32mend[0m		
+    [1;34m32[0m: [32mend[0m
+

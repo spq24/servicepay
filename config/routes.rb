@@ -32,7 +32,8 @@ Rails.application.routes.draw do
    get '/companies/:id/review/thank-you-comments' => 'reviews#final', as: "final_review"
    get '/faq' => 'static_pages#faq'
    get '/tc' => 'static_pages#tc'
-  
+   get '/learn-more' => 'static_pages#learn'
+   get '/vision' => 'static_pages#vision'
    mount StripeEvent::Engine => '/stripe_events'
 
 end

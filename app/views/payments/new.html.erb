@@ -32,10 +32,12 @@
                       <span class="input-group-addon"><i class="fa fa-user"></i></span>
                       <%= f.text_field :invoice_number, autofocus: true, placeholder: "Invoice Number", class: "form-control" %>
                     </div>
-                    <div class="input-group">
-                      <span class="input-group-addon"><i class="fa fa-user"></i></span>
-                      <%= text_field_tag :coupon_code, nil, placeholder: "Coupon Code", class: "form-control" %>
-                    </div>
+                    <% if @company.coupons.any? %>
+                      <div class="input-group">
+                        <span class="input-group-addon"><i class="fa fa-user"></i></span>
+                        <%= text_field_tag :coupon_code, nil, placeholder: "Coupon Code", class: "form-control" %>
+                      </div>
+                    <% end %>
                     <div class="input-group">
                       <span class="input-group-addon"><i class="fa fa-user"></i></span>
                       <input class="form-control" id="payment_customer_attributes_customer_name" name="payment[customer_attributes][customer_name]" placeholder="Your Name" type="text" required>

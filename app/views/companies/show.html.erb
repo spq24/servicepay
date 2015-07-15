@@ -79,9 +79,9 @@
 															</td>
 															<td class="text-center">
 																<% if p.refunded? %>
-																	<p style="color:red;"><%= number_to_currency(p.amount - Refund.find_by(stripe_refund_id: p.stripe_refund_id).amount) %></p>
+																	<p style="color:red;"><%= number_to_currency(p.amount - Refund.find_by_payment_id(p.id).amount) %></p>
 																<% else %>
-																	<%= number_to_currency(p.amount) %>
+																	<%= number_to_currency(p.amount / 100) %>
 																<% end %>
 															</td>
 															<td class="text-right">
@@ -89,7 +89,7 @@
 															</td>
 															<td class="pull-right">
 																<% if p.refunded? %>
-																	<%= link_to refund_path(Refund.find_by(stripe_refund_id: p.stripe_refund_id)) do %>
+																	<%= link_to refund_path(Refund.find_by_payment_id(p.id)) do %>
 																		<span class="label label-default">See Refund</span>
 																	<% end %>
 																<% else %>

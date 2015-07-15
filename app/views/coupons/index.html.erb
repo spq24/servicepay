@@ -65,7 +65,7 @@
 							                                <%= c.active? ? link_to(c.name, c) : c.name %>
 														</td>
 														<td class="text-center">
-															<%= c.amount_off.nil? ? "#{c.percent_off}%" : number_to_currency(c.amount_off) %>
+															<%= c.amount_off.nil? ? "#{c.percent_off}%" : number_to_currency(c.amount_off / 100) %>
 														</td>
 														<td class="text-center">
 															<%= c.duration %>

@@ -11,8 +11,7 @@ class CouponsController < ApplicationController
 	def create
 		@user = current_user
 		@company = @user.company
-		amount_off_stripe = params[:coupon][:amount_off].empty? ? nil : params[:coupon][:amount_off].to_i * 100
-		amount_off = params[:coupon][:amount_off].empty? ? nil : params[:coupon][:amount_off].to_i
+		amount_off = params[:coupon][:amount_off].empty? ? nil : Money.new((params[:coupon][:amount_off].to_f * 100).to_i, "USD")
 		percent_off = params[:coupon][:percent_off].empty? ? nil : params[:coupon][:percent_off]
 		duration_in_months = params[:coupon][:duration_in_months].empty? ? nil : params[:coupon][:duration_in_months].to_i
 		max_redemptions = params[:coupon][:max_redemptions].empty? ? nil : params[:coupon][:max_redemptions].to_i
@@ -21,9 +20,9 @@ class CouponsController < ApplicationController
 		@coupon = Coupon.new(name: params[:coupon][:name], duration: params[:coupon][:duration], amount_off: amount_off, currency: "usd", duration_in_months: duration_in_months, max_redemptions: max_redemptions, percent_off: percent_off, redeem_by: redeem_by_date, company_id: @company.id)
 		if @coupon.valid?
 			Stripe.api_key = @company.access_code
-			stripe_coupon = Stripe::Coupon.create(id: params[:coupon][:name], amount_off: amount_off_stripe, currency: "usd", duration: params[:coupon][:duration], duration_in_months: duration_in_months, max_redemptions: max_redemptions, percent_off: percent_off, redeem_by: redeem_by_date_stripe)
+			stripe_coupon = Stripe::Coupon.create(id: params[:coupon][:name], amount_off: amount_off.cents, currency: "usd", duration: params[:coupon][:duration], duration_in_months: duration_in_months, max_redemptions: max_redemptions, percent_off: percent_off, redeem_by: redeem_by_date_stripe)
 			if stripe_coupon.id.present?
-				@coupon = Coupon.create(name: params[:coupon][:name], duration: params[:coupon][:duration], amount_off: amount_off, currency: "usd", duration_in_months: duration_in_months, max_redemptions: max_redemptions, percent_off: percent_off, redeem_by: redeem_by_date, company_id: @company.id, user_id: @user.id)
+				@coupon = Coupon.create(name: params[:coupon][:name], duration: params[:coupon][:duration], amount_off: amount_off.cents, currency: "usd", duration_in_months: duration_in_months, max_redemptions: max_redemptions, percent_off: percent_off, redeem_by: redeem_by_date, company_id: @company.id, user_id: @user.id)
 				flash[:success] = "#{@coupon.name} created"
 				redirect_to coupons_path
 			else
@@ -50,20 +49,20 @@ class CouponsController < ApplicationController
 	end
 
 	def destroy
-	  @user = current_user
-	  @company = @user.company
-	  Stripe.api_key = @company.access_code
-	  response = Stripe::Coupon.retrieve(@coupon.name).delete
-	  if response[:deleted] == true
-		@coupon = Coupon.find(params[:id])
-		@coupon.active = false
-		@coupon.save
-		flash[:success] = "Coupon De-Activated."
-		redirect_to coupons_path
-	  else
-	  	flash[:danger] = "We couldn't delete your coupon right now. Please try again soon"
-	  	redirect_to coupons_path
-	  end
+	  	@user = current_user
+		@company = @user.company
+		Stripe.api_key = @company.access_code
+		response = Stripe::Coupon.retrieve(@coupon.name).delete
+		if response[:deleted] == true
+		  @coupon = Coupon.find(params[:id])
+		  @coupon.active = false
+		  @coupon.save
+		  flash[:success] = "Coupon De-Activated."
+		  redirect_to coupons_path
+		else
+		  flash[:danger] = "We couldn't delete your coupon right now. Please try again soon"
+		  redirect_to coupons_path
+		end
 	end
 
     private

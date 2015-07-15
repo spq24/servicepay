@@ -11,28 +11,31 @@ class RefundsController < ApplicationController
 	end
 
 	def create
-		refund_amount = params[:refund][:amount].gsub(/\D/, '').to_i * 100
-		payment = Payment.find(params[:refund][:payment_id])
-		company = payment.company
-		ch = Stripe::Charge.retrieve(payment.stripe_charge_id, stripe_account: company.uid)
-		@refund = Refund.create(refund_params)
+		@user = current_user
+		@refund_amount = Money.new((params[:refund][:amount].to_f * 100).to_i, "USD")	
+		@payment = Payment.find(params[:refund][:payment_id])
+		@company = @payment.company
+		@customer = @payment.customer
+		Stripe.api_key = @company.access_code
+		stripe_charge = Stripe::Charge.retrieve(@payment.stripe_charge_id, stripe_account: @company.uid)
+		@refund = Refund.new(amount: @refund_amount.cents, payment_id: @payment.id, company_id: @company.id, user_id: @user.id, customer_id: @customer.id, reason: params[:refund][:reason])
+		binding.pry
 		if @refund.valid?
-			@result = ch.refunds.create(amount: refund_amount)
+			@result = stripe_charge.refunds.create(amount: @refund_amount.cents)
 		    if @result.present?
-			  @refund.stripe_refund_id = @result.id
-			  @refund.save
-			  payment.refunded = true
-			  payment.stripe_refund_id = @result.id
-			  payment.save
+		      @refund = Refund.create(amount: @refund_amount.cents, payment_id: @payment.id, company_id: @company.id, user_id: @user.id, customer_id: @customer.id, reason: params[:refund][:reason], stripe_refund_id: @result.id)
+			  @payment.refunded = true
+			  @payment.stripe_refund_id = @result.id
+			  @payment.save
 			  track_cio
-		      flash[:success] = "Successfully Refunded Payment"
-		      redirect_to company_path(company)
+		      flash[:success] = "Successfully Refunded #{Money.new((@refund.amount).to_i, "USD").format} to #{@customer.customer_name}"
+		      redirect_to company_path(@company)
 		    else
 		      flash[:danger] = @result.error_message
 		      render :new
 		    end
 		else
-			flash[:danger] = "There was a problem with your refund. Please make sure all required fields are filled out."
+			flash[:danger] = "There was a problem with your refund. Please make sure all required fields are filled out and try again."
 			redirect_to refund_payment_path(payment)
 		end
 	end

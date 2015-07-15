@@ -31,7 +31,7 @@
 									<span class="headline">Refunded Amount</span>
 									<span class="value">
 										<span class="timer" data-from="83" data-to="2562" data-speed="900" data-refresh-interval="60">
-										  <%= number_to_currency(@refund_amount.sum) %>
+										  <%= number_to_currency(@refund_amount.sum / 100) %>
 										</span>
 									</span>
 								</div>
@@ -60,13 +60,13 @@
 							                                <%= link_to r.customer.customer_name, r.customer %>
 														</td>
 														<td>
-															<%= number_to_currency(r.amount) %>
+															<%= number_to_currency(r.amount / 100) %>
 														</td>
 														<td>
 															<%= r.created_at.strftime("%m/%d/%Y") %>
 														</td>
 														<td>
-															<%= mail_to r.user.email, r.user.first_name, target: "_blank" %>
+															<%= mail_to r.user.email, "#{r.user.first_name} #{r.user.last_name}", target: "_blank" %>
 														</td>
 														<td style="width: 20%;">
 															<%= link_to r, class: "table-link" do %>

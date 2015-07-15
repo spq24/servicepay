@@ -7,11 +7,11 @@ StripeEvent.configure do |events|
   	stripe_customer = Stripe::Customer.retrieve(event.data.object.customer)
     discount = event.data.object.discount
     coupon = Coupon.find_by_name(discount[:coupon][:id]) if discount.present?
-    binding.pry
   	stripe_sub = stripe_customer.subscriptions.retrieve(event.data.object.subscription)
   	plan = Subscription.find_by_stripe_subscription_id(stripe_sub.id).plan_id
+    amount = Money.new((event.data.object.total.to_f).to_i, "USD")
     if discount.present?
-      Payment.create(amount: event.data.object.total, customer: customer, company: customer.company, last_4: stripe_customer.sources.retrieve(stripe_customer[:default_source])[:last4], subscription: true, plan_id: plan, coupon_id: coupon.id)
+      Payment.create(amount: amount.cents , customer: customer, company: customer.company, stripe_charge_id: event.data.object.charge, last_4: stripe_customer.sources.retrieve(stripe_customer[:default_source])[:last4], subscription: true, plan_id: plan, coupon_id: coupon.id)
     else
       Payment.create(amount: event.data.object.total, customer: customer, company: customer.company, stripe_charge_id: event.data.object.charge, last_4: charge[:source][:last4], subscription: true, plan_id: plan)
   	end

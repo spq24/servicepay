@@ -26,7 +26,7 @@
 												<i class="fa fa-clock-o"></i> Refund Date: <%= @refund.created_at.strftime("%m/%d/%Y") %>
 											</div>
 											<div class="story-author">
-												Refund Amount: <%= number_to_currency(@refund.amount) %>
+												Refund Amount: <%= number_to_currency(@refund.amount / 100) %>
 											</div><br />
 											<div class="story-author">
 												Refunded by: <%= link_to @refund.user.email, target: "_blank" do %>
