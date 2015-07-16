@@ -10,6 +10,10 @@
 							<h1>Company Profile</h1>
 						</div>
 					</div>
+
+									<% unless @company.quickbooks_token %>
+								      <ipp:connectToIntuit></ipp:connectToIntuit>
+								    <% end %>
 					
 					<div class="row" id="user-profile">
 						<div class="col-lg-3 col-md-4 col-sm-4">
@@ -33,6 +37,8 @@
 									<ul class="nav nav-tabs">
 										<li class="active"><a href="#tab-newsfeed" data-toggle="tab">Company Info</a></li>
 									</ul>
+
+
 									
 									<div class="tab-content">
 										<div class="tab-pane fade in active" id="tab-newsfeed">
@@ -98,3 +104,11 @@
 	</div>
 </div>
 </div>
+
+<%= render 'shared/empty_morris_div' %>
+
+<script type="text/javascript" src="https://appcenter.intuit.com/Content/IA/intuit.ipp.anywhere.js"></script>
+
+<script>
+    intuit.ipp.anywhere.setup({menuProxy: '/path/to/blue-dot', grantUrl: '<%= authenticate_companies_path %>'});
+</script>

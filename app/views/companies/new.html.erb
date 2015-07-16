@@ -20,7 +20,7 @@
             <!-- =========================================
                  Navigation
             ========================================== -->
-            <nav class="navbar-front navbar-fixed-top" role="navigation">
+            <nav class="navbar navbar-fixed-top" role="navigation">
                 <div class="container-front">
                     <div class="row">
                         <div class="col-md-12">
@@ -80,8 +80,8 @@
 
                                     <% else %>    
                                         <!-- Welcome - Hero Message -->
-                                        <h1 class="text-white hero-title">Get Paid, Get Reviewed, Grow Your Business</h1>
-                                        <p class="text-white hero-title">A Payments Service & Review System All Wrapped Into One</p>
+                                        <h1 class="text-white hero-title">Payments & Marketing Automation</h1>
+                                        <p class="text-white hero-title">Accept Payments Wherever Your Customers Are and Start a Long Lasting Relationship</p>
                                     <div class="col-sm-12">                                    
                                         <div class="fast-reg-box">
                                             <%= form_for @company, html: { id: "fast-reg", role: "form"} do |f| %>
@@ -137,9 +137,16 @@
                             <i class="fa fa-lock fa-4"></i>
                         </div>
                         <h4>Clear Pricing & Security</h4>
-                        <p>3.9% flat rate for all cards. Our system is built on top of Stripe, one of the leading payment processors in the world today. It powers payments for many of today's largest brands such as Apple, Facebook, and Lyft.</p>
+                        <p>3.2% For Visa/Mastercard/etc. 3.5% for American Express. Our system is built on top of Stripe, one of the leading payment processors in the world today. It powers payments for many of today's largest brands such as Apple, Facebook, and Lyft.</p>
                     </div>
                 </div><!-- /End Row -->
+                <div class="row">
+                    <div class="col-md-12">
+                        <center>
+                            <%= link_to "Learn More", learn_more_path, class: "btn btn-lg btn-success col-md-8 learn-btn" %>
+                        </center>
+                    </div>
+                </div>
             </div><!-- /End Wrapper -->
         </div><!-- /End Container -->
     </section>

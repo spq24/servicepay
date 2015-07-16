@@ -19,7 +19,6 @@ class RefundsController < ApplicationController
 		Stripe.api_key = @company.access_code
 		stripe_charge = Stripe::Charge.retrieve(@payment.stripe_charge_id, stripe_account: @company.uid)
 		@refund = Refund.new(amount: @refund_amount.cents, payment_id: @payment.id, company_id: @company.id, user_id: @user.id, customer_id: @customer.id, reason: params[:refund][:reason])
-		binding.pry
 		if @refund.valid?
 			@result = stripe_charge.refunds.create(amount: @refund_amount.cents)
 		    if @result.present?

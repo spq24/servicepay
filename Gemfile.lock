@@ -287,6 +287,12 @@ GEM
     netrc (0.10.3)
     nokogiri (1.6.6.2)
       mini_portile (~> 0.6.0)
+    oauth (0.4.7)
+    oauth-plugin (0.5.1)
+      multi_json
+      oauth (~> 0.4.4)
+      oauth2 (>= 0.5.0)
+      rack
     oauth2 (1.0.0)
       faraday (>= 0.8, < 0.10)
       jwt (~> 1.0)
@@ -317,6 +323,12 @@ GEM
       slop (~> 3.4)
     pry-nav (0.2.4)
       pry (>= 0.9.10, < 0.11.0)
+    quickbooks-ruby (0.2.3)
+      activemodel
+      multipart-post
+      nokogiri
+      oauth (= 0.4.7)
+      roxml (= 3.3.1)
     rack (1.5.2)
     rack-test (0.6.3)
       rack (>= 1.0)
@@ -356,6 +368,9 @@ GEM
       http-cookie (>= 1.0.2, < 2.0)
       mime-types (>= 1.16, < 3.0)
       netrc (~> 0.7)
+    roxml (3.3.1)
+      activesupport (>= 2.3.0)
+      nokogiri (>= 1.3.3)
     rspec-core (3.3.1)
       rspec-support (~> 3.3.0)
     rspec-expectations (3.3.0)
@@ -468,11 +483,13 @@ DEPENDENCIES
   mini_magick
   money
   morrisjs-rails
+  oauth-plugin
   omniauth-stripe-connect
   paranoia (~> 2.0)
   pg
   pry
   pry-nav
+  quickbooks-ruby
   rails (= 4.1.0)
   rails_12factor
   raphael-rails

@@ -16,6 +16,7 @@ class PaymentsController < ApplicationController
 		@customer = Customer.find_by_customer_email_and_company_id(params[:payment][:customer_attributes][:customer_email], params[:payment][:company_id])
 		@payment = Payment.new(amount: params[:payment][:amount], company_id: params[:payment][:company_id])
 		@card_brand = Stripe::Token.retrieve(params[:stripeToken])[:card][:brand]
+		binding.pry
 		if @payment.valid?
 			if @coupon.present?
 				count = @coupon.redeemed_count
@@ -32,7 +33,7 @@ class PaymentsController < ApplicationController
 			if @customer.nil?
 				stripe_customer = StripeWrapper::Customer.create(source: params[:stripeToken], customer_email: params[:payment][:customer_attributes][:customer_email], uid: @company.uid)
 				if stripe_customer.successful?
-				    @customer = Customer.create(customer_email: params[:payment][:customer_attributes][:customer_email], customer_name: params[:payment][:customer_attributes][:customer_name], company_id: @company.id, stripe_token: stripe_customer.response.id)	
+				    @customer = Customer.create(customer_email: params[:payment][:customer_attributes][:customer_email], customer_name: params[:payment][:customer_attributes][:customer_name], company_id: @company.id, stripe_token: stripe_customer.response.id, address_one: params[:payment][:customer_attributes][:address_one], address_two: params[:payment][:customer_attributes][:address_two], city: params[:payment][:customer_attributes][:city], postcode: params[:payment][:customer_attributes][:postcode], state: params[:payment][:customer_attributes][:state], phone: params[:payment][:customer_attributes][:phone])	
 				    add_cio
 					result = StripeWrapper::Charge.create(customer: @customer.stripe_token, uid: @company.uid, amount: amount_to_charge.cents,  fee: app_fee.cents)
 					if result.successful?
@@ -42,7 +43,7 @@ class PaymentsController < ApplicationController
 							@payment.save
 						end
 						track_cio
-					    flash[:success] = @coupon.present? ? "Your Payment of #{ActionController::Base.helpers.number_to_currency(@payment.amount)} Was Successful! #{@coupon.name} was applied to your payment!" : "Your Payment of #{ActionController::Base.helpers.number_to_currency(@payment.amount)} Was Successful!"
+					    flash[:success] = @coupon.present? ? "Your Payment of #{ActionController::Base.helpers.number_to_currency(@payment.amount / 100)} Was Successful! #{@coupon.name} was applied to your payment!" : "Your Payment of #{ActionController::Base.helpers.number_to_currency(@payment.amount / 100)} Was Successful!"
 					    redirect_to payment_path(@payment)
 				    else
 				      flash[:danger] = result.error_message
@@ -67,7 +68,7 @@ class PaymentsController < ApplicationController
 						@payment.save
 					end
 					track_cio
-				    flash[:success] = @coupon.present? ? "Your Payment of #{ActionController::Base.helpers.number_to_currency(@payment.amount)} Was Successful! #{@coupon.name} was applied to your payment!" : "Your Payment of #{ActionController::Base.helpers.number_to_currency(@payment.amount)} Was Successful!"
+				    flash[:success] = @coupon.present? ? "Your Payment of #{ActionController::Base.helpers.number_to_currency(@payment.amount / 100)} Was Successful! #{@coupon.name} was applied to your payment!" : "Your Payment of #{ActionController::Base.helpers.number_to_currency(@payment.amount / 100)} Was Successful!"
 				    redirect_to payment_path(@payment)
 			    else
 			      flash[:danger] = result.error_message

@@ -1748,8 +1748,9 @@ h3 .small {
 }
 
 .alert-notice {
-  border-color: #27ae60;
-  color: #27ae60;
+  background-color:#dff0d8;
+  border-color:#d6e9c6;
+  color:#3c763d
 }
 
 .alert-info {
@@ -3332,11 +3333,11 @@ input[type="radio"] {
 }
 
 #login-full-wrapper {
-  background: image-url("login-img.jpg") no-repeat center center;
+  background: image-url("ac.jpg") no-repeat center center;
   background-size: cover;
   width: 100%;
   height: 100%;
-  position: absolute;
+ /* position: absolute; */
 }
 @media (max-height: 605px) {
   #login-full-wrapper {
@@ -8672,8 +8673,43 @@ section{
   text-shadow: 2px 1px #000;
 }
 
-.hero-section {
+.hero-section-learn {
   margin-left: 30%;
+}
+
+.hero-section-learn h1 {
+    font-family: 'Open Sans', "Helvetica Neue", Helvetica, Arial, sans-serif;
+    margin: 0 0 20px;
+    letter-spacing: -1px;
+    font-size: 36px;
+    line-height: 52px;
+    font-weight: 300;
+}
+
+.hero-section-learn h2 {
+    font-family: 'Open Sans', "Helvetica Neue", Helvetica, Arial, sans-serif;
+    margin: 0 0 20px;
+    letter-spacing: -1px;
+    font-size: 42px;
+    line-height: 52px;
+    font-weight: 300;
+}
+
+.hero-section-learn p {
+  font-size: 21px;
+  line-height: 27px;
+  letter-spacing: -1px;
+  margin-bottom: 35px;
+  margin-left: 8%;
+}
+
+.hero-section-learn .btn {
+  margin-bottom: 0;
+}
+
+.hero-section-learn .btn-box {
+  padding: 20px 0;
+  margin-left: 20%;
 }
 
 .hero-section h1 {
@@ -9628,4 +9664,9 @@ section{
   margin: 0px; 
   width: 647px; 
   height: 143px;
+}
+
+.learn-btn {
+  margin-top: 5%;
+  margin-left: 20%;
 }

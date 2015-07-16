@@ -195,56 +195,32 @@ $('.start-charts').waypoint(function(direction){
         else {
             var doughnutData = [
                 {
-                    value: 26933,
+                    value: 88,
                     color:"#B91004",
                     highlight: "#EA402F",
-                    label: "Service Calls"
+                    label: "% of People Read Online Reviews"
                 },
                 {
-                    value: 5409,
+                    value: 12,
                     color: "#323A45",
                     highlight: "#4C5B70",
-                    label: "New System Quotes"
-                },
-                {
-                    value: 1003,
-                    color: "#949FB1",
-                    highlight: "#A8B3C5",
-                    label: "Non-HVAC Service Calls"
-                },
-                {
-                    value: 15501,
-                    color: "#27AE60",
-                    highlight: "#29C36A",
-                    label: "Other Call Types"
+                    label: "% Of People Don't"
                 }
 
             ];
 
             var doughnut2Data = [
                 {
-                    value: 20878,
+                    value: 86,
                     color:"#C0392B",
                     highlight: "#EA402F",
-                    label: "New Opportunities"
+                    label: "% Of Make Decisions From Online Reviews"
                 },
                 {
-                    value: 13000,
+                    value: 14,
                     color: "#323A45",
                     highlight: "#4C5B70",
-                    label: "Existing Opportunities"
-                },
-                {
-                    value: 796,
-                    color: "#2980B9",
-                    highlight: "#2F97DC",
-                    label: "Referred Opportunities"
-                },
-                {
-                    value: 7203,
-                    color: "#949FB1",
-                    highlight: "#A8B3C5",
-                    label: "Other"
+                    label: "% Of People Don't"
                 }
             ];
 

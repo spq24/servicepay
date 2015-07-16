@@ -70,7 +70,7 @@ class CustomersController < ApplicationController
 	private
 	  
 	def customer_params
-	    params.require(:customer).permit(:customer_email, :customer_name, :company_id, :deleted_at, subscription_attributes: [:stripe_subscription_id])
+	    params.require(:customer).permit(:customer_email, :customer_name, :company_id, :address_one, :address_two, :city, :country, :postcode, :state, :phone, :deleted_at, subscription_attributes: [:stripe_subscription_id])
 	end
 
 	def allowed_user

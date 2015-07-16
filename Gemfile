@@ -32,6 +32,8 @@ gem 'sdoc', '~> 0.4.0',          group: :doc
 gem 'fabrication'
 gem 'faker'
 gem 'country_select', github: 'stefanpenner/country_select'
+gem 'quickbooks-ruby'
+gem 'oauth-plugin'
 
 group :development do
 	gem 'sqlite3'

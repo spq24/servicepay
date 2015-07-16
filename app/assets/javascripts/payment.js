@@ -19,3 +19,8 @@ var stripeResponseHandler = function(status, response) {
     $form.get(0).submit();
   }
 };
+
+$(function () {  
+  //masked inputs
+  $("#maskedPhone").mask("(999) 999-9999");
+});

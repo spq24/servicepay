@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150713161637) do
+ActiveRecord::Schema.define(version: 20150716174930) do
 
   create_table "active_admin_comments", force: true do |t|
     t.string   "namespace"
@@ -71,6 +71,9 @@ ActiveRecord::Schema.define(version: 20150713161637) do
     t.boolean  "terms"
     t.text     "description"
     t.float    "application_fee",           default: 0.8
+    t.string   "quickbooks_token"
+    t.string   "quickbooks_secret"
+    t.string   "quickbooks_realm_id"
   end
 
   add_index "companies", ["deleted_at"], name: "index_companies_on_deleted_at"
@@ -101,6 +104,13 @@ ActiveRecord::Schema.define(version: 20150713161637) do
     t.datetime "deleted_at"
     t.string   "encrypted_stripe_token"
     t.integer  "coupon_id"
+    t.string   "address_one"
+    t.string   "address_two"
+    t.string   "city"
+    t.string   "state"
+    t.string   "country",                default: "usa"
+    t.string   "postcode"
+    t.string   "phone"
   end
 
   add_index "customers", ["deleted_at"], name: "index_customers_on_deleted_at"

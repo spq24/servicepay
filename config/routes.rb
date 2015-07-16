@@ -8,6 +8,10 @@ Rails.application.routes.draw do
 
   resources :companies do
       resources :company_steps, controller: 'companies/company_steps'
+      collection do
+        get :authenticate
+        get :oauth_callback
+      end
   end
 
   resources :users, only: [:index, :show]

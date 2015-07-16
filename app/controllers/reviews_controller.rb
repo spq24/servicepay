@@ -71,6 +71,9 @@ class ReviewsController < ApplicationController
 	    @company = @payment.company
 	    @customer = @payment.customer
 	    @review = Review.find_by(payment_id: @payment.id)
+	    @google = @company.google.include?("http") ? @company.google : "https://"+@company.google
+	    @yelp = @company.yelp.include?("http") ? @company.yelp : "http://"+@company.yelp
+	    @facebook = @company.facebook.include?("http") ? @company.facebook : "http://"+@company.facebook
 	end
 
 	def okay
