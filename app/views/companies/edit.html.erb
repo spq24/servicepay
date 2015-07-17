@@ -11,9 +11,9 @@
 						</div>
 					</div>
 
-									<% unless @company.quickbooks_token %>
-								      <ipp:connectToIntuit></ipp:connectToIntuit>
-								    <% end %>
+					<% if @company.quickbooks_token.nil? %>
+				      <ipp:connectToIntuit></ipp:connectToIntuit>
+				    <% end %>
 					
 					<div class="row" id="user-profile">
 						<div class="col-lg-3 col-md-4 col-sm-4">
@@ -107,8 +107,12 @@
 
 <%= render 'shared/empty_morris_div' %>
 
-<script type="text/javascript" src="https://appcenter.intuit.com/Content/IA/intuit.ipp.anywhere.js"></script>
+<% if @company.quickbooks_token.nil? %>
 
-<script>
-    intuit.ipp.anywhere.setup({menuProxy: '/path/to/blue-dot', grantUrl: '<%= authenticate_companies_path %>'});
-</script>
+	<script type="text/javascript" src="https://appcenter.intuit.com/Content/IA/intuit.ipp.anywhere.js"></script>
+
+	<script>
+	    intuit.ipp.anywhere.setup({menuProxy: '/path/to/blue-dot', grantUrl: '<%= authenticate_companies_url %>'});
+	</script>
+
+<% end %>

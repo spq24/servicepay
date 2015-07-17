@@ -3,6 +3,9 @@ class Company < ActiveRecord::Base
   attr_encrypted :uid, :key => 'cOko1MRaIF'
   attr_encrypted :access_code, :key => 'qzH7QaFvzB'
   attr_encrypted :publishable_key, :key => 'w5rBp5WDkO'
+  attr_encrypted :quickbooks_token, :key => '8U0tPdF0ZL'
+  attr_encrypted :quickbooks_secret, :key => 'fBTb76HU0C'
+  attr_encrypted :quickbooks_realm, :key => 'uh4qRJgn8n'
   mount_uploader :logo, LogoUploader
   
   has_many :users, dependent: :destroy
