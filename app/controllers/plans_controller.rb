@@ -23,10 +23,11 @@ class PlansController < ApplicationController
 				redirect_to plans_path
 			else
 				flash[:danger] = "There was a problem creating your plan. #{result.error_message}"
+				redirect_to new_plan_path
 			end
 		else
 		  flash[:danger] = "There was a problem creating your plan. #{@plan.errors.full_messages.to_sentence}"
-		  render :new
+		  redirect_to new_plan_path
 		end		
 	end
 
