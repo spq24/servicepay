@@ -1,0 +1,85 @@
+<script type="text/javascript" src="https://js.stripe.com/v2/"></script>
+
+<script type="text/javascript">
+  // This identifies your website in the createToken call below
+  Stripe.setPublishableKey('<%= @company.publishable_key %>');
+  // ...
+</script>
+
+<%= render 'shared/nav_top' %>
+	<div class="row">
+		<%= render 'shared/left_nav' %>
+		<div id="content-wrapper">
+			<div class="row">
+				<div class="col-lg-12">
+					<%= render 'shared/messages' %>
+					<div class="row">
+						<div class="col-lg-12">							
+							<h1>Create A Customer</h1>
+						</div>
+					</div>
+					<div class="row" id="user-profile">						
+						<div class="col-lg-9 col-md-8 col-sm-8">
+							<div class="main-box clearfix">
+								<div class="tabs-wrapper profile-tabs">
+									<ul class="nav nav-tabs">
+										<li class="active"><a href="#tab-newsfeed" data-toggle="tab">Customer Info</a></li>
+									</ul>
+									
+									<div class="tab-content">
+										<div class="tab-pane fade in active" id="tab-newsfeed">
+											<%= form_for @customer, html: {id: "payment-form"} do |f| %>
+												<%= f.hidden_field :currency, value: "usd" %>
+												<div class="row">
+													<div class="col-md-6">
+														<h2>Person's Info</h2>
+														<%= f.label :customer_name %>
+														<%= f.text_field :customer_name, placeholder: "Customer Name", class: "form-control", required: true %><br />
+														<%= f.label :customer_email, "Customer Email" %>
+														<%= f.text_field :customer_email, placeholder: "Customer Email", class: "form-control", required: true %><br />
+														<%= f.label :address_one, "Address One" %>
+														<%= f.text_field :address_one, placeholder: "Address One", class: "form-control", required: true %><br />
+														<%= f.label :address_two, "Address Two" %>
+														<%= f.text_field :address_two, placeholder: "Address Two", class: "form-control" %><br />
+														<%= f.label :city, "City" %>
+														<%= f.text_field :city, placeholder: "City", class: "form-control", required: true%><br />
+														<%= f.label :state %>
+														<%= f.select :state, options_for_select(us_states), {}, class: "form-control", required: true %><br />
+														<%= f.label :postcode %>
+														<%= f.text_field :postcode, placeholder: "Postal Code", class: "form-control", required: true %><br />
+														<%= f.label :postcode %>
+														<%= f.text_field :postcode, placeholder: "Postal Code", class: "form-control", required: true %><br />
+														<%= f.label :phone %>
+														<%= f.text_field :phone, placeholder: "Postal Code", class: "form-control", required: true %><br />
+													</div>
+													<div class="col-sm-6">
+									                    <h2>Credit Card Info</h2>
+									                      <label for="number">Credit Card Number</label>
+									                      <input class="form-control" data-stripe="number" maxlength="20" placeholder="Credit Card Number" type="text" required></input><br />
+									                      <label for="number">Security Number</label>
+									                      <input class="form-control" data-stripe="cvc" size="10" placeholder="Security Number" type="text" required></input><br />
+									                      <ul class="dates">
+									                        <label for="expiration">Expiration Date</label><br />
+									                        <li><%= select_month(Date.today, {add_month_numbers: true},  class: 'form-control', data: {stripe: "exp-month"}, style: "height: 46px;", required: true) %></li>
+									                        <li><%= select_year(Date.today.year, {start_year: Date.today.year, end_year: Date.today.year + 4}, class: 'form-control', data: {stripe: "exp-year"}, style: "height: 46px;", required: true)%></li>
+									                      </ul>
+									                  </div>
+													<div class="col-md-12">
+														<%= f.submit "Create Customer", class: "btn btn-success pull-right" %>
+													</div>
+												</div>
+											<% end %>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		  <%= render 'shared/footer' %>
+		</div>
+	</div>
+</div>
+</div>
+<%= render 'shared/empty_morris_div' %>

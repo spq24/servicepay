@@ -31,7 +31,7 @@
                     <h2>Your Info</h2>
                     <div class="input-group">
                       <span class="input-group-addon"><i class="fa fa-user"></i></span>
-                      <input class="form-control" id="payment_customer_attributes_customer_email" name="payment[customer_attributes][customer_email]" placeholder="Your Email (For Receipt)" type="text" required>
+                      <input class="form-control" id="payment_customer_attributes_customer_email" name="payment[customer_attributes][customer_email]" placeholder="Your Email (For Receipt)" type="text" required autofocus>
                     </div>
                     <div class="input-group">
                       <span class="input-group-addon"><i class="fa fa-user"></i></span>
@@ -120,7 +120,7 @@
                     <h2>Payment Info</h2>
                     <div class="input-group">
                       <span class="input-group-addon"><i class="fa fa-user"></i></span>
-                        <%= f.text_field :invoice_number, autofocus: true, placeholder: "Invoice Number", class: "form-control" %>
+                        <%= f.text_field :invoice_number, placeholder: "Invoice Number", class: "form-control" %>
                     </div>
                     <% if @company.coupons.any? %>
                       <div class="input-group">
@@ -153,7 +153,7 @@
                       <%= f.submit "Submit Payment", class: "btn btn-success col-xs-3 pull-right" %>
                       </div>
                     </div>
-                  <% end %>
+                <% end %>
               </div>
             </div>
           </div>

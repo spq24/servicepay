@@ -3,11 +3,30 @@ class CustomersController < ApplicationController
 	before_filter :allowed_user, only: [:show, :edit, :update, :destroy]
 
 	def new
+		@user = current_user
+		@company = @user.company
 		@customer = Customer.new
 	end
 
 	def create
-	    @customer = Customer.create(customer_params)
+		@user = current_user
+		@company = @user.company
+		@customer = Customer.new(customer_email: params[:customer][:customer_email], customer_name: params[:customer][:customer_name], company_id: @company.id, address_one: params[:customer][:address_one], address_two: params[:customer][:address_two], city: params[:customer][:city], postcode: params[:customer][:postcode], state: params[:customer][:state], phone: params[:customer][:phone])
+		if @customer.valid?
+			stripe_customer = StripeWrapper::Customer.create(source: params[:stripeToken], customer_email: params[:customer][:customer_email], uid: @company.uid)
+			if stripe_customer.successful?
+				@customer = Customer.create(customer_email: params[:customer][:customer_email], customer_name: params[:customer][:customer_name], company_id: @company.id, stripe_token: stripe_customer.response.id, address_one: params[:customer][:address_one], address_two: params[:customer][:address_two], city: params[:customer][:city], postcode: params[:customer][:postcode], state: params[:customer][:state], phone: params[:customer][:phone])
+				add_cio
+				flash[:success] = "#{@customer.customer_name.titleize} has been added!"
+				redirect_to customers_path
+			else
+				flash[:danger] = stripe_customer.error_message
+				render :new
+			end
+		else
+			flash[:danger] = "#{@customer.errors.full_messages.to_sentence}"
+			render :new
+		end
 	end
 
 	def edit
@@ -79,4 +98,18 @@ class CustomersController < ApplicationController
     	redirect_to root_path unless @company.users.include?(current_user)
     	flash[:danger] = "You are not authorized to view that account. Please login as a user associated with that company" unless @company.users.include?(current_user)
     end
+
+	def add_cio
+    	$customerio.identify(
+		  id: @customer.id,
+		  created_at: @customer.created_at,
+		  email: @customer.customer_email,
+		  name: @customer.customer_name,
+		  company_name: Company.find(@customer.company_id).company_name,
+		  company_id: Company.find(@customer.company_id).id,
+		  customer: true,
+		  reviewed: false
+		)
+		$customerio.track(@customer.id, "new customer")
+	end
 end

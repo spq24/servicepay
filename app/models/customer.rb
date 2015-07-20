@@ -10,4 +10,13 @@ class Customer < ActiveRecord::Base
 	has_many :plans, -> { uniq }, through: :subscriptions, dependent: :delete_all
 
 	accepts_nested_attributes_for :subscriptions
+
+	validate :unique_customer_for_company
+
+	def unique_customer_for_company
+		customer = Customer.find_by_customer_email_and_company_id(customer_email, company_id)
+		if customer.present?
+    		errors.add(:customer_id, "already exists. Customers are identified by their email and a customer with this email already exists.")
+    	end
+    end
 end
