@@ -32,7 +32,14 @@
 																Customer: <%= @customer.customer_name %>
 															</div><br />
 															<div class="story-author">
-																Email: <%= mail_to @customer.customer_email, @customer.customer_email, target: "_blank" %>
+																Email: <%= mail_to @customer.customer_email, @customer.customer_email, target: "_blank" %> <small><i class="fa fa-external-link"></i></small>
+															</div><br />
+															<div class="story-author">
+
+																Address: 
+																<%= link_to "https://www.google.com/maps/place/#{@customer.address_one}+#{@customer.city},+#{@customer.state}+#{@customer.postcode}", target: "_blank" do %>
+																	<%= @customer.address_one %> <%= @customer.address_two %> <%= @customer.city %>, <%= @customer.state %> <%= @customer.postcode %> <small><i class="fa fa-external-link"></i></small>
+																<% end %>
 															</div><br />
 															<div class="story-author">
 																Default Credit Card: <%= @brand %> | <%= @default_last_4 %>

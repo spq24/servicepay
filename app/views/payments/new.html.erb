@@ -20,11 +20,14 @@
               <header id="signup-header">
                 <div id="login-logo">
                   <%= image_tag @company.logo if @company.logo.present? %>
-                  <h4 style="color:#fff;">Thank you For Your Business From <%= @company.company_name %></h4>
+                  <h4 style="color:#fff;">Thank you For Your Business From <br /> <%= @company.company_name %></h4>
                 </div>
               </header>
               <div id="signup-box-inner">
                 <%= render 'shared/messages' %>
+                <% if @coupon.present? %>
+                  <center><h3>You Are Getting <%= @coupon.amount_off.nil? ? number_to_percentage(@coupon.percent_off, precision: 0) : number_to_currency(@coupon.amount_off) %> By Using Coupon <%= @coupon.name %>!</h3></center>
+                <% end %>
                 <%= form_for @payment, html: {id: "payment-form"} do |f| %>
                     <%= f.hidden_field :company_id, value: @company.id %>
                   <div class="col-sm-6">
@@ -35,7 +38,7 @@
                     </div>
                     <div class="input-group">
                       <span class="input-group-addon"><i class="fa fa-user"></i></span>
-                      <input class="form-control" id="payment_customer_attributes_customer_name" name="payment[customer_attributes][customer_name]" placeholder="Your Name" type="text" required>
+                      <input class="form-control" id="payment_customer_attributes_customer_name" name="payment[customer_attributes][customer_name]" placeholder="Your Full Name" type="text" required>
                     </div>
                     <div class="input-group">
                       <span class="input-group-addon"><i class="fa fa-user"></i></span>
@@ -125,7 +128,7 @@
                     <% if @company.coupons.any? %>
                       <div class="input-group">
                         <span class="input-group-addon"><i class="fa fa-user"></i></span>
-                        <%= text_field_tag :coupon_code, nil, placeholder: "Coupon Code", class: "form-control" %>
+                        <%= text_field_tag :coupon_code, nil, placeholder: "Coupon Code", value: params[:coupon], class: "form-control" %>
                       </div>
                     <% end %>
                     <div class="input-group">

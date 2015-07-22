@@ -7,22 +7,8 @@ class Payment < ActiveRecord::Base
 	has_many   :reviews
 	belongs_to :coupon
 
-
+	accepts_nested_attributes_for :customer, reject_if: :unique_customer_for_company
 
 	validates_presence_of :amount, :company_id
 
-
-	def self.handle_coupon(options={})
-		coupon = Coupon.find_by_name(options[:coupon])
-		money = options[:money]
-		if coupon.present
-				count = coupon.redeemed_count + 1 
-				coupon.save
-				money_percent = money * coupon.percent_off.to_f / 100
-				money_off = coupon.percent_off.nil? ? Money.new((coupon.amount_off.to_s.to_f * 100).to_i, "USD") : Money.new((money_percent.to_s.to_f * 100).to_i, "USD")
-				amount_to_charge = money - money_off
-		else
-			return nil
-		end
-	end
 end

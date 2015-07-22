@@ -14,9 +14,9 @@ class Customer < ActiveRecord::Base
 	validate :unique_customer_for_company
 
 	def unique_customer_for_company
-		customer = Customer.find_by_customer_email_and_company_id(customer_email, company_id)
+		customer = Customer.find_by_customer_name_and_customer_email_and_company_id(customer_email, customer_name, company_id)
 		if customer.present?
-    		errors.add(:customer_id, "already exists. Customers are identified by their email and a customer with this email already exists.")
+    		errors.add(:customer_id, "already exists. Customers are identified by their email, name, and address and a customer with these traits already exists.")
     	end
     end
 end

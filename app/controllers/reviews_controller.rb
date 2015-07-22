@@ -49,7 +49,7 @@ class ReviewsController < ApplicationController
 	def update
 		@review = Review.find(params[:id])
 		@company = @review.company
-		@customer = @company.customers.last
+		@customer = @review.customer
 	    if @review.update_attributes(review_params)
 	      $customerio.track(@review.customer_id, "review comments", comments: @review.comments, customer_name: @review.customer.customer_name, company_user_email: User.find_by(company_id: @review.company_id).email, reviewed: true, company_name: @review.company.company_name)
 	      flash[:success] = "Thank You For Your Comments"

@@ -1,6 +1,7 @@
 class CustomersController < ApplicationController
 	before_action :authenticate_user!, if: :user_signed_in?
 	before_filter :allowed_user, only: [:show, :edit, :update, :destroy]
+	before_action :set_qb_service, only: [:index, :edit, :update, :create, :destroy]
 
 	def new
 		@user = current_user
@@ -17,6 +18,7 @@ class CustomersController < ApplicationController
 			if stripe_customer.successful?
 				@customer = Customer.create(customer_email: params[:customer][:customer_email], customer_name: params[:customer][:customer_name], company_id: @company.id, stripe_token: stripe_customer.response.id, address_one: params[:customer][:address_one], address_two: params[:customer][:address_two], city: params[:customer][:city], postcode: params[:customer][:postcode], state: params[:customer][:state], phone: params[:customer][:phone])
 				add_cio
+				add_to_quickbooks unless @company.quickbooks_token.nil?
 				flash[:success] = "#{@customer.customer_name.titleize} has been added!"
 				redirect_to customers_path
 			else
@@ -66,7 +68,9 @@ class CustomersController < ApplicationController
 		@user = current_user
 		@company = @user.company
 		@customers = @company.customers.reverse
-		@payments = @company.payments	
+		@payments = @company.payments
+		@qbcustomers = @qb_customer.query().entries
+		@qbcustomer = @qb_customer.fetch_by_id("1")
 	end
 
 	def destroy
@@ -89,7 +93,7 @@ class CustomersController < ApplicationController
 	private
 	  
 	def customer_params
-	    params.require(:customer).permit(:customer_email, :customer_name, :company_id, :address_one, :address_two, :city, :country, :postcode, :state, :phone, :deleted_at, subscription_attributes: [:stripe_subscription_id])
+	    params.require(:customer).permit(:customer_email, :customer_name, :company_id, :address_one, :address_two, :city, :country, :postcode, :state, :phone, :deleted_at, :quickbooks_customer_id , subscription_attributes: [:stripe_subscription_id])
 	end
 
 	def allowed_user
@@ -112,4 +116,36 @@ class CustomersController < ApplicationController
 		)
 		$customerio.track(@customer.id, "new customer")
 	end
+
+	def add_to_quickbooks
+		customer = Quickbooks::Model::Customer.new
+		binding.pry
+		unique_name = @customer.customer_name + " " + @customer.customer_email
+		customer.given_name = unique_name[0..24]
+		customer.fully_qualified_name = @customer.customer_name
+		phone = Quickbooks::Model::TelephoneNumber.new
+		phone.free_form_number = @customer.phone
+		customer.primary_phone = phone
+		customer.email_address = @customer.customer_email
+		address = Quickbooks::Model::PhysicalAddress.new
+		address.line1 = @customer.address_one
+		address.line2 = @customer.address_two
+		address.city = @customer.city
+		address.country_sub_division_code = @customer.state
+		address.postal_code = @customer.postcode
+		customer.billing_address = address
+		response = @qb_customer.create(customer)
+		if response.id.present?
+			@customer.update_attribute(:quickbooks_customer_id, response.id)
+		end
+	end
+
+ 	def set_qb_service
+ 	  @user = current_user
+ 	  @company = @user.company
+      oauth_client = OAuth::AccessToken.new($qb_oauth_consumer, @company.quickbooks_token, @company.quickbooks_secret)
+      @qb_customer = Quickbooks::Service::Customer.new
+      @qb_customer.access_token = oauth_client
+      @qb_customer.company_id = @company.quickbooks_realm_id
+    end
 end
