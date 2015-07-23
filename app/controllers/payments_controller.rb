@@ -15,7 +15,6 @@ class PaymentsController < ApplicationController
 		Stripe.api_key = @company.access_code
 		@money = Money.new((params[:payment][:amount].to_f * 100).to_i, "USD")	
 		@coupon = Coupon.find_by_name(params[:coupon_code])
-		binding.pry
 		@customer = Customer.find_by_customer_name_and_customer_email_and_company_id(params[:payment][:customer_attributes][:customer_name], params[:payment][:customer_attributes][:customer_email], @company.id)
 		@customer_by_email = Customer.find_by_customer_email_and_company_id(params[:payment][:customer_attributes][:customer_email], @company.id)
 		@payment = Payment.new(amount: params[:payment][:amount], company_id: params[:payment][:company_id])
@@ -41,12 +40,13 @@ class PaymentsController < ApplicationController
 				    add_customer_to_quickbooks unless @company.quickbooks_token.nil?
 					result = StripeWrapper::Charge.create(customer: @customer.stripe_token, uid: @company.uid, amount: amount_to_charge.cents,  fee: app_fee.cents)
 					if result.successful?
-						@payment = Payment.create(company_id: @company.id, amount: amount_to_charge.cents, invoice_number: params[:payment][:invoice_number], customer_id: @customer.id, stripe_charge_id: result.response.id, last_4: result.response.source.last4)
+						@payment = Payment.create(company_id: @company.id, amount: amount_to_charge.cents, invoice_number: params[:payment][:invoice_number], customer_id: @customer.id, stripe_charge_id: result.response.id, last_4: result.response.source.last4, app_fee: app_fee.cents)
 						if @coupon.present?
 							@payment.coupon_id = @coupon.id
 							@payment.save
 						end
 						track_cio
+						add_payment_to_quickbooks unless @company.quickbooks_token.nil?
 					    flash[:success] = @coupon.present? ? "Your Payment of #{ActionController::Base.helpers.number_to_currency(@payment.amount / 100)} Was Successful! #{@coupon.name} was applied to your payment!" : "Your Payment of #{ActionController::Base.helpers.number_to_currency(@payment.amount / 100)} Was Successful!"
 					    redirect_to payment_path(@payment)
 				    else
@@ -59,6 +59,9 @@ class PaymentsController < ApplicationController
 				end
 			else
 				@customer = @customer_by_email unless @customer.present?
+        if @customer.quickbooks_customer_id.nil?
+          add_customer_to_quickbooks unless @company.quickbooks_token.nil?
+        end
 				if Stripe::Customer.retrieve(@customer.stripe_token)[:default_source] != Stripe::Token.retrieve(params[:stripeToken])[:card][:id]
 					stripe_customer = Stripe::Customer.retrieve(@customer.stripe_token)
 					stripe_customer.source = params[:stripeToken]
@@ -67,12 +70,13 @@ class PaymentsController < ApplicationController
 
 				result = StripeWrapper::Charge.create(customer: @customer.stripe_token, uid: @company.uid, amount: amount_to_charge.cents,  fee: app_fee.cents)
 				if result.successful?
-					@payment = Payment.create(company_id: @company.id, amount: amount_to_charge.cents, invoice_number: params[:payment][:invoice_number], customer_id: @customer.id, stripe_charge_id: result.response.id, last_4: result.response.source.last4)
+					@payment = Payment.create(company_id: @company.id, amount: amount_to_charge.cents, invoice_number: params[:payment][:invoice_number], customer_id: @customer.id, stripe_charge_id: result.response.id, last_4: result.response.source.last4, app_fee: app_fee.cents)
 					if @coupon.present?
 						@payment.coupon_id = @coupon.id
 						@payment.save
 					end
 					track_cio
+					add_payment_to_quickbooks unless @company.quickbooks_token.nil?
 				    flash[:success] = @coupon.present? ? "Your Payment of #{ActionController::Base.helpers.number_to_currency(@payment.amount / 100)} Was Successful! #{@coupon.name} was applied to your payment!" : "Your Payment of #{ActionController::Base.helpers.number_to_currency(@payment.amount / 100)} Was Successful!"
 				    redirect_to payment_path(@payment)
 			    else
@@ -152,6 +156,53 @@ class PaymentsController < ApplicationController
 		end
 	end
 
+	def add_payment_to_quickbooks
+        amount_to_charge = Money.new(@payment.amount, "USD").format.delete('$')
+        invoice = Quickbooks::Model::Invoice.new
+        invoice.customer_id = @payment.customer.quickbooks_customer_id
+        invoice.txn_date = @payment.created_at
+        invoice.doc_number = @payment.invoice_number
+        invoice.private_note = "Invoice Number Entered By Customer: " + @payment.invoice_number + " " + "Customer name: " + @payment.customer.customer_name + " " + "Service Pay Customer ID: " + @payment.customer.id.to_s
+        line_item = Quickbooks::Model::InvoiceLineItem.new
+        line_item.amount = amount_to_charge
+        line_item.description = "Services Rendered"
+        line_item.detail_type = "SalesItemLineDetail"
+        line_item.sales_item! do |detail|
+          detail.unit_price = amount_to_charge.delete('$')
+          detail.quantity = 1
+        end
+
+        invoice.line_items << line_item
+
+        created_invoice = @qb_invoice.create(invoice)
+    
+        if created_invoice.present?
+          @payment.update_attribute(:quickbooks_invoice_id, created_invoice.id)
+        end                		
+        binding.pry
+		payment = Quickbooks::Model::Payment.new
+		line = Quickbooks::Model::Line.new
+		line.amount = amount_to_charge
+        line.linked_transactions << set_linked_transaction(@payment.quickbooks_invoice_id)
+        payment.line_items << line
+        payment.customer_id = @customer.quickbooks_customer_id
+		payment.total = amount_to_charge
+        payment.private_note = @payment.invoice_number + " " + @payment.customer.customer_name
+
+        response = @qb_payment.create(payment)
+
+		if response.present?
+          @customer.update_attribute(:quickbooks_customer_id, response.customer_ref.value)
+		end
+	end
+
+	def set_linked_transaction(qbo_id)
+	  linked_transaction = Quickbooks::Model::LinkedTransaction.new
+	  linked_transaction.txn_id = qbo_id
+	  linked_transaction.txn_type = 'Invoice'
+	  linked_transaction
+	end
+
  	def set_qb_service
  	  @user = current_user
  	  @company = @user.company
@@ -159,5 +210,11 @@ class PaymentsController < ApplicationController
       @qb_customer = Quickbooks::Service::Customer.new
       @qb_customer.access_token = oauth_client
       @qb_customer.company_id = @company.quickbooks_realm_id
-    end
+      @qb_payment = Quickbooks::Service::Payment.new
+      @qb_payment.access_token = oauth_client
+      @qb_payment.company_id = @company.quickbooks_realm_id
+      @qb_invoice = Quickbooks::Service::Invoice.new
+      @qb_invoice.access_token = oauth_client
+      @qb_invoice.company_id = @company.quickbooks_realm_id
+  end
 end

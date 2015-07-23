@@ -70,4 +70,13 @@ class RefundsController < ApplicationController
 	redirect_to root_path unless @company.users.include?(current_user)
 	flash[:danger] = "You are not authorized to view that account. Please login as a user associated with that company" unless @company.users.include?(current_user)
   end
+  
+ 	def set_qb_service
+ 	  @user = current_user
+ 	  @company = @user.company
+    oauth_client = OAuth::AccessToken.new($qb_oauth_consumer, @company.quickbooks_token, @company.quickbooks_secret)
+    @qb_refund = Quickbooks::Service::RefundReceipt.new
+    @qb_refund.access_token = oauth_client
+    @qb_refund.company_id = @company.quickbooks_realm_id
+  end
 end

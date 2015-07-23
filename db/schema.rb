@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150721213413) do
+ActiveRecord::Schema.define(version: 20150722194158) do
 
   create_table "active_admin_comments", force: true do |t|
     t.string   "namespace"
@@ -133,6 +133,9 @@ ActiveRecord::Schema.define(version: 20150721213413) do
     t.integer  "plan_id"
     t.boolean  "subscription"
     t.integer  "coupon_id"
+    t.integer  "quickbooks_customer_id"
+    t.float    "app_fee"
+    t.integer  "quickbooks_invoice_id"
   end
 
   add_index "payments", ["deleted_at"], name: "index_payments_on_deleted_at"
