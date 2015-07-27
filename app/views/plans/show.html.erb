@@ -63,7 +63,9 @@
 												</div><br />									
 												<div class="story-author">
 													Statement Descriptor: <%= @plan.statement_descriptor %>
-												</div>
+												</div><br />
+                        <div class="story-author">
+                          Renew Rules: <%= @plan.subscription_cancel == true ? "Customer is not charged automatically you will have to manually renew customer on a #{@plan.interval == "day" ? "daily" : @plan.interval + "ly"} basis." : "Customer is charged $#{@plan.amount / 100 } automatically on a #{@plan.interval == "day" ? "daily" : @plan.interval + "ly"} basis until you remove them from the plan." %>
 											</header>
 											<%= link_to "Delete Plan", @plan, method: :delete, class: "pull-right", style: "color: red;" %>
 										</div>
@@ -103,7 +105,7 @@
 															<span class="fa-stack">
 																<i class="fa fa-square fa-stack-2x"></i>
 																<i class="fa fa-search-plus fa-stack-1x fa-inverse"></i>
-															</span>
+															</span>			
 														<% end %>
 													</td>
 												</tr>

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150722194158) do
+ActiveRecord::Schema.define(version: 20150727155316) do
 
   create_table "active_admin_comments", force: true do |t|
     t.string   "namespace"
@@ -114,6 +114,7 @@ ActiveRecord::Schema.define(version: 20150722194158) do
     t.string   "postcode"
     t.string   "phone"
     t.integer  "quickbooks_customer_id"
+    t.string   "unique_name"
   end
 
   add_index "customers", ["deleted_at"], name: "index_customers_on_deleted_at"
@@ -153,6 +154,7 @@ ActiveRecord::Schema.define(version: 20150722194158) do
     t.integer  "company_id"
     t.integer  "user_id"
     t.datetime "deleted_at"
+    t.boolean  "subscription_cancel"
   end
 
   create_table "refunds", force: true do |t|

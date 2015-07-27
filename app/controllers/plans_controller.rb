@@ -12,12 +12,12 @@ class PlansController < ApplicationController
 		@user = current_user
 		@company = @user.company
 		@money = Money.new((params[:plan][:amount].to_f * 100).to_i, "USD")
-		@plan = Plan.new(amount: @money.cents, name: params[:plan][:name], user_id: @user.id, company_id: @company.id, interval: params[:plan][:interval], statement_descriptor: params[:plan][:statement_descriptor], currency: params[:plan][:currency])
+		@plan = Plan.new(amount: @money.cents, name: params[:plan][:name], user_id: @user.id, company_id: @company.id, interval: params[:plan][:interval], statement_descriptor: params[:plan][:statement_descriptor], currency: params[:plan][:currency], subscription_cancel: params[:plan][:subscription_cancel])
 		if @plan.valid?
 			Stripe.api_key = @company.access_code
 			stripe_plan = Stripe::Plan.create(amount: @money.cents, name: params[:plan][:name], id: params[:plan][:name], interval: params[:plan][:interval], statement_descriptor: params[:plan][:statement_descriptor], currency: params[:plan][:currency])
 			if stripe_plan.id.present?
-				@plan = Plan.create(amount: @money.cents, name: params[:plan][:name], user_id: @user.id, company_id: @company.id, interval: params[:plan][:interval], statement_descriptor: params[:plan][:statement_descriptor], currency: params[:plan][:currency])
+				@plan = Plan.create(amount: @money.cents, name: params[:plan][:name], user_id: @user.id, company_id: @company.id, interval: params[:plan][:interval], statement_descriptor: params[:plan][:statement_descriptor], currency: params[:plan][:currency], subscription_cancel: params[:plan][:subscription_cancel])
 				track_cio
 				flash[:success] = "#{@plan.name} created"
 				redirect_to plans_path
@@ -68,7 +68,7 @@ class PlansController < ApplicationController
     private
 
     def plan_params
-      params.require(:plan).permit(:name, :amount, :company_id, :user_id, :statement_descriptor, :currency, :interval)
+      params.require(:plan).permit(:name, :amount, :company_id, :user_id, :statement_descriptor, :currency, :interval, :subscription_cancel)
     end
 
 	def allowed_user

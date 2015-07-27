@@ -12,21 +12,29 @@ class CustomersController < ApplicationController
 	def create
 		@user = current_user
 		@company = @user.company
+		binding.pry
+		@customer = Customer.find_by_customer_name_and_customer_email_and_company_id(params[:customer][:customer_name], params[:customer][:customer_email], @company.id)
+		@customer_by_email = Customer.find_by_customer_email_and_company_id(params[:customer][:customer_email], @company.id)
 		@customer = Customer.new(customer_email: params[:customer][:customer_email], customer_name: params[:customer][:customer_name], company_id: @company.id, address_one: params[:customer][:address_one], address_two: params[:customer][:address_two], city: params[:customer][:city], postcode: params[:customer][:postcode], state: params[:customer][:state], phone: params[:customer][:phone])
 		if @customer.valid?
-			stripe_customer = StripeWrapper::Customer.create(source: params[:stripeToken], customer_email: params[:customer][:customer_email], uid: @company.uid)
-			if stripe_customer.successful?
-				@customer = Customer.create(customer_email: params[:customer][:customer_email], customer_name: params[:customer][:customer_name], company_id: @company.id, stripe_token: stripe_customer.response.id, address_one: params[:customer][:address_one], address_two: params[:customer][:address_two], city: params[:customer][:city], postcode: params[:customer][:postcode], state: params[:customer][:state], phone: params[:customer][:phone])
-				add_cio
-				add_to_quickbooks unless @company.quickbooks_token.nil?
-				flash[:success] = "#{@customer.customer_name.titleize} has been added!"
-				redirect_to customers_path
+			if @customer.nil? && @customer_by_email.nil?
+				stripe_customer = StripeWrapper::Customer.create(source: params[:stripeToken], customer_email: params[:customer][:customer_email], uid: @company.uid)
+				if stripe_customer.successful?
+					@customer = Customer.create(customer_email: params[:customer][:customer_email], customer_name: params[:customer][:customer_name], company_id: @company.id, stripe_token: stripe_customer.response.id, address_one: params[:customer][:address_one], address_two: params[:customer][:address_two], city: params[:customer][:city], postcode: params[:customer][:postcode], state: params[:customer][:state], phone: params[:customer][:phone])
+					add_cio
+					add_to_quickbooks unless @company.quickbooks_token.nil?
+					flash[:success] = "#{@customer.customer_name.titleize} has been added!"
+					redirect_to customers_path
+				else
+					flash[:danger] = stripe_customer.error_message
+					render :new
+				end
 			else
-				flash[:danger] = stripe_customer.error_message
+				flash[:danger] = "Customer's are identified by a unique email and name. A customer with this email already exists"
 				render :new
 			end
 		else
-			flash[:danger] = "#{@customer.errors.full_messages.to_sentence}"
+			flash[:danger] = @customer.errors.full_messages.to_sentence
 			render :new
 		end
 	end
@@ -93,7 +101,7 @@ class CustomersController < ApplicationController
 	private
 	  
 	def customer_params
-	    params.require(:customer).permit(:customer_email, :customer_name, :company_id, :address_one, :address_two, :city, :country, :postcode, :state, :phone, :deleted_at, :quickbooks_customer_id , subscription_attributes: [:stripe_subscription_id])
+	    params.require(:customer).permit(:customer_email, :customer_name, :company_id, :address_one, :address_two, :city, :country, :postcode, :state, :phone, :deleted_at, :quickbooks_customer_id, :unique_name , subscription_attributes: [:stripe_subscription_id])
 	end
 
 	def allowed_user
@@ -120,8 +128,16 @@ class CustomersController < ApplicationController
 	def add_to_quickbooks
 		customer = Quickbooks::Model::Customer.new
 		binding.pry
-		unique_name = @customer.customer_name + " " + @customer.customer_email
-		customer.given_name = unique_name[0..24]
+		customer_name_in_db = Customer.where(customer_name: @customer.customer_name, company_id: @company.id).to_a
+		if customer_name_in_db.count > 0
+			customer_count = customer_name_in_db.count + 1
+			unique_name = @customer.customer_name + " " + customer_count.to_s
+			unique_name = unique_name.length > 24 ? unique_name[0..23] + " " + customer_count.to_s : unique_name
+		else
+			unique_name = @customer.customer_name[0..24]
+		end
+		@customer.update_attribute(:unique_name, unique_name)
+		customer.given_name = unique_name
 		customer.fully_qualified_name = @customer.customer_name
 		phone = Quickbooks::Model::TelephoneNumber.new
 		phone.free_form_number = @customer.phone

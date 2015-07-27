@@ -29,7 +29,7 @@
 																<i class="fa fa-clock-o"></i> <%= @customer.company.company_name %> customer since: <%= @customer.created_at.strftime("%b %Y") %>
 															</div>									
 															<div class="story-author">
-																Customer: <%= @customer.customer_name %>
+																Customer: <%= @customer.customer_name %> <%= @customer.unique_name == @customer.customer_name || @customer.unique_name.blank? ? nil : "(Unique Name: #{@customer.unique_name})" %>
 															</div><br />
 															<div class="story-author">
 																Email: <%= mail_to @customer.customer_email, @customer.customer_email, target: "_blank" %> <small><i class="fa fa-external-link"></i></small>
@@ -46,7 +46,7 @@
 															</div><br />
 															
 														</header>
-														<h3>All Credit Cards</h3>
+														<h3>All Credit Cards <a href="#" class="pull-right md-trigger" data-toggle="modal" data-target="#modal-14">Add A Card</a></h3>
 														<% @all_cards.each do |c| %>
 															<div class="story-inner-content">
 																<%= c[:last4] %> | <%= c[:brand] %>
@@ -291,3 +291,5 @@
 	</div>
 </div>
 </div>
+
+	<%= render "shared/empty_morris_div" %>

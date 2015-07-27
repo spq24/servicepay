@@ -59,9 +59,9 @@ class PaymentsController < ApplicationController
 				end
 			else
 				@customer = @customer_by_email unless @customer.present?
-        if @customer.quickbooks_customer_id.nil?
-          add_customer_to_quickbooks unless @company.quickbooks_token.nil?
-        end
+		        if @customer.quickbooks_customer_id.nil?
+		          add_customer_to_quickbooks unless @company.quickbooks_token.nil?
+		        end
 				if Stripe::Customer.retrieve(@customer.stripe_token)[:default_source] != Stripe::Token.retrieve(params[:stripeToken])[:card][:id]
 					stripe_customer = Stripe::Customer.retrieve(@customer.stripe_token)
 					stripe_customer.source = params[:stripeToken]
@@ -136,8 +136,17 @@ class PaymentsController < ApplicationController
 
 	def add_customer_to_quickbooks
 		customer = Quickbooks::Model::Customer.new
-		unique_name = @customer.customer_name + " " + @customer.customer_email
-		customer.given_name = unique_name[0..24]
+		binding.pry
+		customer_name_in_db = Customer.where(customer_name: @customer.customer_name, company_id: @company.id).to_a
+		if customer_name_in_db.count > 0
+			customer_count = customer_name_in_db.count + 1
+			unique_name = @customer.customer_name + " " + customer_count.to_s
+			unique_name = unique_name.length > 24 ? unique_name[0..23] + " " + customer_count.to_s : unique_name
+		else
+			unique_name = @customer.customer_name[0..24]
+		end
+		@customer.update_attribute(:unique_name, unique_name)
+		customer.given_name = unique_name
 		customer.fully_qualified_name = @customer.customer_name
 		phone = Quickbooks::Model::TelephoneNumber.new
 		phone.free_form_number = @customer.phone
@@ -162,7 +171,7 @@ class PaymentsController < ApplicationController
         invoice.customer_id = @payment.customer.quickbooks_customer_id
         invoice.txn_date = @payment.created_at
         invoice.doc_number = @payment.invoice_number
-        invoice.private_note = "Invoice Number Entered By Customer: " + @payment.invoice_number + " " + "Customer name: " + @payment.customer.customer_name + " " + "Service Pay Customer ID: " + @payment.customer.id.to_s
+        invoice.private_note = @payment.invoice_number + " " + @payment.customer.customer_name
         line_item = Quickbooks::Model::InvoiceLineItem.new
         line_item.amount = amount_to_charge
         line_item.description = "Services Rendered"
@@ -178,8 +187,7 @@ class PaymentsController < ApplicationController
     
         if created_invoice.present?
           @payment.update_attribute(:quickbooks_invoice_id, created_invoice.id)
-        end                		
-        binding.pry
+        end           
 		payment = Quickbooks::Model::Payment.new
 		line = Quickbooks::Model::Line.new
 		line.amount = amount_to_charge
