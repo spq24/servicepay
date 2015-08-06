@@ -10,7 +10,6 @@ StripeEvent.configure do |events|
   	stripe_sub = stripe_customer.subscriptions.retrieve(event.data.object.subscription)
   	plan = Subscription.find_by_stripe_subscription_id(stripe_sub.id).plan_id
     amount = Money.new((event.data.object.total.to_f).to_i, "USD")
-    
     if discount.present?
       payment = Payment.create(amount: amount.cents , customer: customer, company: customer.company, stripe_charge_id: event.data.object.charge, last_4: stripe_customer.sources.retrieve(stripe_customer[:default_source])[:last4], subscription: true, plan_id: plan, coupon_id: coupon.id)
     else
@@ -27,17 +26,51 @@ StripeEvent.configure do |events|
       qb_invoice = Quickbooks::Service::Invoice.new
       qb_invoice.access_token = oauth_client
       qb_invoice.company_id = customer.company.quickbooks_realm_id
-    
+      qb_customer = Quickbooks::Service::Customer.new
+      qb_customer.access_token = oauth_client
+      qb_customer.company_id = customer.company.quickbooks_realm_id
+
+      if customer.quickbooks_customer_id.nil?
+          qb_cust = Quickbooks::Model::Customer.new
+          customer_name_in_db = Customer.where(customer_name: customer.customer_name, company_id: customer.company.id).to_a
+          if customer_name_in_db.count > 0
+            customer_count = customer_name_in_db.count + 1
+            unique_name = customer.customer_name + " " + customer_count.to_s
+            unique_name = unique_name.length > 24 ? unique_name[0..23] + " " + customer_count.to_s : unique_name
+          else
+            unique_name = customer.customer_name[0..24]
+          end
+          customer.update_attribute(:unique_name, unique_name)
+          qb_cust.given_name = unique_name
+          qb_cust.fully_qualified_name = customer.customer_name
+          phone = Quickbooks::Model::TelephoneNumber.new
+          phone.free_form_number = customer.phone
+          qb_cust.primary_phone = phone
+          qb_cust.email_address = customer.customer_email
+          address = Quickbooks::Model::PhysicalAddress.new
+          address.line1 = customer.address_one
+          address.line2 = customer.address_two
+          address.city = customer.city
+          address.country_sub_division_code = customer.state
+          address.postal_code = customer.postcode
+          qb_cust.billing_address = address
+          response = qb_customer.create(qb_cust)
+          if response.id.present?
+            customer.update_attribute(:quickbooks_customer_id, response.id)
+          end
+      end
+
+
+
       amount_charged = amount.format.delete('$')
       invoice = Quickbooks::Model::Invoice.new
-      invoice.customer_id = payment.customer.quickbooks_customer_id
+      invoice.customer_id = customer.quickbooks_customer_id
       invoice.txn_date = payment.created_at
-      invoice.doc_number = payment.invoice_number
-      invoice.private_note =  payment.customer.customer_name
+      invoice.private_note =  customer.customer_name + " " + "Payment For #{Plan.find(plan).name} for #{payment.created_at.strftime("%m/%Y")}"
       line_item = Quickbooks::Model::InvoiceLineItem.new
       line_item.amount = amount_charged
       line_item.description = "Customer Payment for: " + Plan.find(plan).name
-      line_item.detail_type = "Customer Payment for: " + Plan.find(plan).name
+      line_item.detail_type = "SalesItemLineDetail"
       line_item.sales_item! do |detail|
         detail.unit_price = amount_charged
         detail.quantity = 1
@@ -62,12 +95,12 @@ StripeEvent.configure do |events|
       qb_pay.line_items << line
       qb_pay.customer_id = customer.quickbooks_customer_id
       qb_pay.total = amount_charged
-      qb_pay.private_note = payment.customer.customer_name
+      qb_pay.private_note = customer.customer_name + " " + "Payment For #{Plan.find(plan).name} for #{payment.created_at.strftime("%m/%Y")}"
 
       response = qb_payment.create(qb_pay)
 
       if response.present?
-            customer.update_attribute(:quickbooks_customer_id, response.customer_ref.value)
+        payment.update_attribute(:quickbooks_customer_id, response.customer_ref.value)
       end
     end 
   end

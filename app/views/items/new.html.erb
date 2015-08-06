@@ -1,0 +1,56 @@
+<%= render 'shared/nav_top' %>
+	<div class="row">
+		<%= render 'shared/left_nav' %>
+		<div id="content-wrapper">
+			<div class="row">
+				<div class="col-lg-12">
+					<%= render 'shared/messages' %>
+					<div class="row">
+						<div class="col-lg-12">							
+							<h1>Create A New Item</h1>
+						</div>
+					</div>
+					<div class="row" id="user-profile">						
+						<div class="col-lg-9 col-md-8 col-sm-8">
+							<div class="main-box clearfix">
+								<div class="tabs-wrapper profile-tabs">
+									<ul class="nav nav-tabs">
+										<li class="active"><a href="#tab-newsfeed" data-toggle="tab">Item Info</a></li>
+									</ul>
+									
+									<div class="tab-content">
+										<div class="tab-pane fade in active" id="tab-newsfeed">
+                      <%= form_for @item do |f| %>
+												<div class="row">
+													<div class="col-md-6">
+                            <%= f.label :name, "Name Of The Product Or Service" %>
+                            <%= f.text_field :name, placeholder: "Service Job", class: "form-control", required: true %><br />
+                            <%= f.label :description, "Description of This Item" %>
+                            <%= f.text_area :description, placeholder: "Description of new item", cols: 20, rows: 4, class: "form-control", required: true %><br />
+													</div>
+													<div class="col-md-6">
+                            <%= f.label :unit_cost, "Default Amount Per Unit. This can be changed on a case by case basis" %>
+														<%= f.text_field :unit_cost, data: {autonumeric: true, aSign: 'USD'}, placeholder: "10.00", class: "form-control", required: true %><br />
+                            <%= f.label :quantity, "How much of this product you have in stock (optional)" %>
+                            <%= f.text_field :quantity, class: "form-control" %><br />
+                            
+													</div>
+													<div class="col-md-12">
+                            <%= f.submit "Create Item", class: "btn btn-success pull-right" %>
+													</div>
+												</div>
+											<% end %>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		  <%= render 'shared/footer' %>
+		</div>
+	</div>
+</div>
+</div>
+<%= render 'shared/empty_morris_div' %>

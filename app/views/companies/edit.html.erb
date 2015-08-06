@@ -53,7 +53,10 @@
 														<%= f.label :logo %>
 														<%= f.file_field :logo, class: "form-control" %><br />
 
-														<%= image_tag(@company.logo, size: "150x150") if @company.logo.present? %>
+														<%= image_tag(@company.logo, size: "150x150") if @company.logo.present? %><br /><br /><br />
+
+														<%= f.label :default_invoice_terms %><br />
+														<%= f.text_area :default_invoice_terms, cols: 20, rows: 4, class: "form-control" %>
 													</div>
 													<div class="col-md-6">
 														<%= f.label :address_one %>

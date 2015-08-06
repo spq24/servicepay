@@ -35,11 +35,14 @@
 																Email: <%= mail_to @customer.customer_email, @customer.customer_email, target: "_blank" %> <small><i class="fa fa-external-link"></i></small>
 															</div><br />
 															<div class="story-author">
-
 																Address: 
 																<%= link_to "https://www.google.com/maps/place/#{@customer.address_one}+#{@customer.city},+#{@customer.state}+#{@customer.postcode}", target: "_blank" do %>
 																	<%= @customer.address_one %> <%= @customer.address_two %> <%= @customer.city %>, <%= @customer.state %> <%= @customer.postcode %> <small><i class="fa fa-external-link"></i></small>
 																<% end %>
+															</div><br />
+															<div class="story-author">
+																Phone Number: 
+																<%= number_to_phone(@customer.phone, area_code: true) %>
 															</div><br />
 															<div class="story-author">
 																Default Credit Card: <%= @brand %> | <%= @default_last_4 %>
@@ -291,5 +294,11 @@
 	</div>
 </div>
 </div>
+<%= render "shared/empty_morris_div" %>
+<script>
+$(function () {
 
-	<%= render "shared/empty_morris_div" %>
+	$("#maskedPhone").mask("(999) 999-9999");
+
+});
+</script>

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150727155316) do
+ActiveRecord::Schema.define(version: 20150804172252) do
 
   create_table "active_admin_comments", force: true do |t|
     t.string   "namespace"
@@ -76,6 +76,7 @@ ActiveRecord::Schema.define(version: 20150727155316) do
     t.string   "encrypted_quickbooks_realm_id"
     t.datetime "quickbooks_token_expires_at",   default: '2016-01-17 00:06:33'
     t.datetime "quickbooks_reconnect_token_at", default: '2015-12-17 00:06:33'
+    t.text     "default_invoice_terms"
   end
 
   add_index "companies", ["deleted_at"], name: "index_companies_on_deleted_at"
@@ -118,6 +119,52 @@ ActiveRecord::Schema.define(version: 20150727155316) do
   end
 
   add_index "customers", ["deleted_at"], name: "index_customers_on_deleted_at"
+
+  create_table "invoice_items", force: true do |t|
+    t.integer  "unit_cost"
+    t.integer  "quantity"
+    t.integer  "price"
+    t.integer  "invoice_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.string   "description"
+  end
+
+  create_table "invoices", force: true do |t|
+    t.integer  "customer_id"
+    t.integer  "user_id"
+    t.integer  "company_id"
+    t.string   "invoice_number",      default: "00000001"
+    t.datetime "issue_date"
+    t.text     "private_notes"
+    t.text     "customer_notes"
+    t.text     "payment_terms"
+    t.boolean  "draft"
+    t.string   "status"
+    t.float    "discount"
+    t.string   "po_number"
+    t.boolean  "recurring"
+    t.string   "interval"
+    t.datetime "recurring_send_date"
+    t.boolean  "auto_paid"
+    t.string   "contact_type"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.boolean  "send_by_post"
+    t.boolean  "send_by_email"
+    t.integer  "total"
+  end
+
+  create_table "items", force: true do |t|
+    t.string   "name"
+    t.text     "description"
+    t.integer  "quantity"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "company_id"
+    t.integer  "user_id"
+    t.integer  "unit_cost"
+  end
 
   create_table "payments", force: true do |t|
     t.integer  "company_id"
@@ -168,6 +215,7 @@ ActiveRecord::Schema.define(version: 20150727155316) do
     t.string   "reason"
     t.integer  "customer_id"
     t.datetime "deleted_at"
+    t.integer  "quickbooks_refund_id"
   end
 
   add_index "refunds", ["deleted_at"], name: "index_refunds_on_deleted_at"

@@ -4,9 +4,7 @@ class PaymentsController < ApplicationController
 
 	def new
 		@company = Company.find(params[:id])
-		@user = @company.users.first
 		@payment = Payment.new
-		@customer = @company.customers.last
 		@coupon = Coupon.find_by_name_and_company_id(params[:coupon], @company.id)
 	end
 
@@ -15,8 +13,7 @@ class PaymentsController < ApplicationController
 		Stripe.api_key = @company.access_code
 		@money = Money.new((params[:payment][:amount].to_f * 100).to_i, "USD")	
 		@coupon = Coupon.find_by_name(params[:coupon_code])
-		@customer = Customer.find_by_customer_name_and_customer_email_and_company_id(params[:payment][:customer_attributes][:customer_name], params[:payment][:customer_attributes][:customer_email], @company.id)
-		@customer_by_email = Customer.find_by_customer_email_and_company_id(params[:payment][:customer_attributes][:customer_email], @company.id)
+		@customer = Customer.find_by_customer_email_and_company_id(params[:payment][:customer_attributes][:customer_email], @company.id)
 		@payment = Payment.new(amount: params[:payment][:amount], company_id: params[:payment][:company_id])
 		@card_brand = Stripe::Token.retrieve(params[:stripeToken])[:card][:brand]
 		if @payment.valid?
@@ -32,7 +29,7 @@ class PaymentsController < ApplicationController
 			end
 			app_fee = @card_brand == "American Express" ? Money.new((0).to_i, "USD"): amount_to_charge  * (@company.application_fee / 100)
 			
-			if @customer.nil? && @customer_by_email.nil?
+			if @customer.nil?
 				stripe_customer = StripeWrapper::Customer.create(source: params[:stripeToken], customer_email: params[:payment][:customer_attributes][:customer_email], uid: @company.uid)
 				if stripe_customer.successful?
 				    @customer = Customer.create(customer_email: params[:payment][:customer_attributes][:customer_email], customer_name: params[:payment][:customer_attributes][:customer_name], company_id: @company.id, stripe_token: stripe_customer.response.id, address_one: params[:payment][:customer_attributes][:address_one], address_two: params[:payment][:customer_attributes][:address_two], city: params[:payment][:customer_attributes][:city], postcode: params[:payment][:customer_attributes][:postcode], state: params[:payment][:customer_attributes][:state], phone: params[:payment][:customer_attributes][:phone])	
@@ -47,7 +44,7 @@ class PaymentsController < ApplicationController
 						end
 						track_cio
 						add_payment_to_quickbooks unless @company.quickbooks_token.nil?
-					    flash[:success] = @coupon.present? ? "Your Payment of #{ActionController::Base.helpers.number_to_currency(@payment.amount / 100)} Was Successful! #{@coupon.name} was applied to your payment!" : "Your Payment of #{ActionController::Base.helpers.number_to_currency(@payment.amount / 100)} Was Successful!"
+					    flash[:success] = @coupon.present? ? "Your Payment of #{Money.new(@payment.amount, "USD").format} Was Successful! #{@coupon.name} was applied to your payment!" : "Your Payment of #{Money.new(@payment.amount, "USD").format} Was Successful!"
 					    redirect_to payment_path(@payment)
 				    else
 				      flash[:danger] = result.error_message
@@ -58,10 +55,11 @@ class PaymentsController < ApplicationController
 					render :new
 				end
 			else
-				@customer = @customer_by_email unless @customer.present?
+
 		        if @customer.quickbooks_customer_id.nil?
 		          add_customer_to_quickbooks unless @company.quickbooks_token.nil?
 		        end
+
 				if Stripe::Customer.retrieve(@customer.stripe_token)[:default_source] != Stripe::Token.retrieve(params[:stripeToken])[:card][:id]
 					stripe_customer = Stripe::Customer.retrieve(@customer.stripe_token)
 					stripe_customer.source = params[:stripeToken]
@@ -77,7 +75,7 @@ class PaymentsController < ApplicationController
 					end
 					track_cio
 					add_payment_to_quickbooks unless @company.quickbooks_token.nil?
-				    flash[:success] = @coupon.present? ? "Your Payment of #{ActionController::Base.helpers.number_to_currency(@payment.amount / 100)} Was Successful! #{@coupon.name} was applied to your payment!" : "Your Payment of #{ActionController::Base.helpers.number_to_currency(@payment.amount / 100)} Was Successful!"
+				    flash[:success] = @coupon.present? ? "Your Payment of #{Money.new(@payment.amount, "USD").format} Was Successful! #{@coupon.name} was applied to your payment!" : "Your Payment of #{Money.new(@payment.amount, "USD").format} Was Successful!"
 				    redirect_to payment_path(@payment)
 			    else
 			      flash[:danger] = result.error_message
@@ -93,7 +91,6 @@ class PaymentsController < ApplicationController
 	def show
 		@payment = Payment.find(params[:id])
 		@company = @payment.company
-		@user = @company.users.first
 		@review = Review.new
 		@customer = @payment.customer
 	end
@@ -136,7 +133,6 @@ class PaymentsController < ApplicationController
 
 	def add_customer_to_quickbooks
 		customer = Quickbooks::Model::Customer.new
-		binding.pry
 		customer_name_in_db = Customer.where(customer_name: @customer.customer_name, company_id: @company.id).to_a
 		if customer_name_in_db.count > 0
 			customer_count = customer_name_in_db.count + 1
@@ -177,7 +173,7 @@ class PaymentsController < ApplicationController
         line_item.description = "Services Rendered"
         line_item.detail_type = "SalesItemLineDetail"
         line_item.sales_item! do |detail|
-          detail.unit_price = amount_to_charge.delete('$')
+          detail.unit_price = amount_to_charge
           detail.quantity = 1
         end
 
@@ -200,7 +196,7 @@ class PaymentsController < ApplicationController
         response = @qb_payment.create(payment)
 
 		if response.present?
-          @customer.update_attribute(:quickbooks_customer_id, response.customer_ref.value)
+          @payment.update_attribute(:quickbooks_customer_id, response.customer_ref.value)
 		end
 	end
 

@@ -9,5 +9,7 @@ class User < ActiveRecord::Base
   has_many :refunds
   has_many :plans
   has_many :coupons
+  has_many :invoices
+  has_many :items
   
 end

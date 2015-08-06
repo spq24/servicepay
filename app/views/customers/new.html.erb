@@ -47,10 +47,7 @@
 														<%= f.select :state, options_for_select(us_states), {}, class: "form-control", required: true %><br />
 														<%= f.label :postcode %>
 														<%= f.text_field :postcode, placeholder: "Postal Code", class: "form-control", required: true %><br />
-														<%= f.label :postcode %>
-														<%= f.text_field :postcode, placeholder: "Postal Code", class: "form-control", required: true %><br />
-														<%= f.label :phone %>
-														<%= f.text_field :phone, placeholder: "Postal Code", class: "form-control", required: true %><br />
+														<%= f.text_field :phone, placeholder: "Phone Number", class: "form-control", id: "maskedPhone", required: true %><br />
 													</div>
 													<div class="col-sm-6">
 									                    <h2>Credit Card Info</h2>
@@ -63,7 +60,7 @@
 									                        <li><%= select_month(Date.today, {add_month_numbers: true},  class: 'form-control', data: {stripe: "exp-month"}, style: "height: 46px;", required: true) %></li>
 									                        <li><%= select_year(Date.today.year, {start_year: Date.today.year, end_year: Date.today.year + 4}, class: 'form-control', data: {stripe: "exp-year"}, style: "height: 46px;", required: true)%></li>
 									                      </ul>
-									                  </div>
+									                </div>
 													<div class="col-md-12">
 														<%= f.submit "Create Customer", class: "btn btn-success pull-right" %>
 													</div>
@@ -83,3 +80,10 @@
 </div>
 </div>
 <%= render 'shared/empty_morris_div' %>
+<script>
+$(function () {
+	
+	$("#maskedPhone").mask("(999) 999-9999");
+
+});
+</script>

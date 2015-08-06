@@ -79,7 +79,7 @@ class CompaniesController < ApplicationController
   private
   
   def company_params
-      params.require(:company).permit(:company_name, :logo, :description, :phonenumber, :website_url, :address_one, :address_two, :city, :state, :postcode, :facebook, :google, :yelp, :quickbooks_token, :quickbooks_secret, :quickbooks_realm_id, users_attributes: [:id, :email, :first_name, :last_name, :password])
+      params.require(:company).permit(:company_name, :logo, :description, :phonenumber, :website_url, :address_one, :address_two, :city, :state, :postcode, :facebook, :google, :yelp, :quickbooks_token, :quickbooks_secret, :quickbooks_realm_id, :default_invoice_terms, users_attributes: [:id, :email, :first_name, :last_name, :password])
   end
 
   def correct_user

@@ -36,6 +36,12 @@
 		 					<span>Payments</span>
 		 					<% end %>
 	 					</li>
+						<li class="<%= 'active' if current_page?(invoices_path) %>">
+		 					<%= link_to invoices_path do %>
+		 					<i class="fa fa-file-text-o"></i>
+		 					<span>Invoices</span>
+		 					<% end %>
+	 					</li>
 						<li class="<%= 'active' if current_page?(plans_path) %>">
 		 					<%= link_to plans_path do %>
 		 					<i class="fa fa-calendar-o"></i>

@@ -34,11 +34,14 @@ gem 'faker'
 gem 'country_select', github: 'stefanpenner/country_select'
 gem 'quickbooks-ruby'
 gem 'oauth-plugin'
+gem 'prawn'
+
 
 group :development do
 	gem 'sqlite3'
 	gem 'pry'
 	gem 'pry-nav'
+  gem 'better_errors'
 end
 
 group :development, :test do

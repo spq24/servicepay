@@ -36,20 +36,20 @@
 														<%= f.select :interval, options_for_select([["Yearly", "year"], ["Monthly", "month"], ["Daily", "day"]], "year"), {}, class: "form-control", required: true %><br />
                             
 													</div>
-                          <div class="col-md-12">
-                            <br /><br />
-                            <center>
-                              <h4>Renew Rules:</h4>
-                              <div class="btn-group" data-toggle="buttons">
-                                <label class="btn btn-primary active" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="The customer's subscription will automatically renew and charge their credit card at the interval you set. ">
-                                  <%= f.radio_button(:subscription_cancel, false, id: "option1") %> Auto Renew
-                                </label>
-                                <label class="btn btn-primary" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Customer's subscription will cancel at the end of the interval and you'll have to manually re-subscribe the customer to the plan in order to renew. Notifications will be sent to you and the customer.">
-                                  <%= f.radio_button(:subscription_cancel, true, id: "option2") %> Cancel & Notify
-                                </label>
-                              </div>
-                            </center>
-                          </div>
+							                          <div class="col-md-12">
+							                            <br /><br />
+							                            <center>
+							                              <h4>Renew Rules:</h4>
+							                              <div class="btn-group" data-toggle="buttons">
+							                                <label class="btn btn-primary active" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="The customer's subscription will automatically renew and charge their credit card at the interval you set. ">
+							                                  <%= f.radio_button(:subscription_cancel, false, id: "option1") %> Auto Renew
+							                                </label>
+							                                <label class="btn btn-primary" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Customer's subscription will cancel at the end of the interval and you'll have to manually re-subscribe the customer to the plan in order to renew. Notifications will be sent to you and the customer.">
+							                                  <%= f.radio_button(:subscription_cancel, true, id: "option2") %> Cancel & Notify
+							                                </label>
+							                              </div>
+							                            </center>
+							                          </div>
 													<div class="col-md-12">
 														<%= f.submit "Create Plan", class: "btn btn-success pull-right" %>
 													</div>
