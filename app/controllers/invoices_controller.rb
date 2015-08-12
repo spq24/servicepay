@@ -16,6 +16,14 @@ class InvoicesController < ApplicationController
 		@customer = @invoice.customer
 		@user = current_user
 		@company = @user.company
+
+		respond_to do |format|
+			format.html
+			format.pdf do
+				pdf = InvoicePdf.new(@invoice)
+				send_data pdf.render, filename: "invoice_#{@invoice.created_at.strftime("%m/%d/%Y")}.pdf", type: "application/pdf"
+			end
+		end
 	end
 
 	def index

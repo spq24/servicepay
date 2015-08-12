@@ -39,25 +39,33 @@ class CustomersController < ApplicationController
 	end
 
 	def update
-	    @customer = Customer.find(params[:id])
+		binding.pry
 
-	    if @customer.customer_email != params[:customer][:customer_email]
-	    	stripe_customer = Stripe::Customer.retrieve(@customer.stripe_token)
-	    	stripe_customer.email = params[:customer][:customer_email]
-	    	stripe_customer.save
-	    end
+		if URI(request.referer).path == edit_customer_path
+		    @customer = Customer.find(params[:id])
 
-	    if @customer.company.quickbooks_token.present?
-	    	update_qbo_customer
-	    end
+		    if @customer.customer_email != params[:customer][:customer_email]
+		    	stripe_customer = Stripe::Customer.retrieve(@customer.stripe_token)
+		    	stripe_customer.email = params[:customer][:customer_email]
+		    	stripe_customer.save
+		    end
 
-	    if @customer.update_attributes(customer_params)
-	      flash[:success] = "You have successfully edited #{@customer.customer_name.titleize}"
-	      redirect_to edit_customer_path
-	    else
-	      @error_message = "Oops something went wrong. Please check the information you entered"
-	      self
-	    end
+		    if @customer.company.quickbooks_token.present?
+		    	update_qbo_customer
+		    end
+
+		    if @customer.update_attributes(customer_params)
+		      flash[:success] = "You have successfully edited #{@customer.customer_name.titleize}"
+		      redirect_to edit_customer_path
+		    else
+		      @error_message = "Oops something went wrong. Please check the information you entered"
+		      self
+		    end
+		else
+			stripe_customer = Stripe::Customer.retrieve(@customer.stripe_token)
+			stripe_customer.sources.create(source: params[:stripeToken])
+			redirect_to customer_path(@customer)
+		end
 	end
 
 	def show

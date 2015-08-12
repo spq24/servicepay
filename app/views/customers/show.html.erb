@@ -49,7 +49,8 @@
 															</div><br />
 															
 														</header>
-														<h3>All Credit Cards <a href="#" class="pull-right md-trigger" data-toggle="modal" data-target="#modal-14">Add A Card</a></h3>
+														
+														<h3>All Credit Cards <a class="pull-right" data-toggle="modal" data-target="#myModal" data-backdrop="true">Add A Card</a></h3>
 														<% @all_cards.each do |c| %>
 															<div class="story-inner-content">
 																<%= c[:last4] %> | <%= c[:brand] %>
@@ -295,6 +296,12 @@
 </div>
 </div>
 <%= render "shared/empty_morris_div" %>
+
+<table class="balance">
+<th></th>
+<td><span></span></td>
+</table>
+
 <script>
 $(function () {
 
@@ -302,3 +309,50 @@ $(function () {
 
 });
 </script>
+
+<script type="text/javascript" src="https://js.stripe.com/v2/"></script>
+
+<script type="text/javascript">
+  // This identifies your website in the createToken call below
+  Stripe.setPublishableKey('<%= @company.publishable_key %>');
+  // ...
+</script>
+
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+      </div>
+        <%= form_for @customer, html: {id: "payment-form"} do |f| %>
+      		<div class="modal-body">
+
+	      	<div class="col-sm-8">
+		        <div class="input-group">
+		          <span class="input-group-addon"><i class="fa fa-user"></i></span>
+		          <input class="form-control" data-stripe="number" maxlength="20" placeholder="Credit Card Number" type="text" required></input>
+		        </div>
+		    </div>
+		    <div class="col-sm-4">
+		        <div class="input-group">
+		          <span class="input-group-addon"><i class="fa fa-user"></i></span>
+		          <input class="form-control" data-stripe="cvc" size="10" placeholder="Security Number" type="text" required></input>
+		        </div>
+		    </div><br /><br />
+	        <div class="input-group">
+	          <ul class="dates">
+	            <p>Expiration Date</p>
+	            <li><%= select_month(Date.today, {add_month_numbers: true},  class: 'form-control', data: {stripe: "exp-month"}, style: "height: 46px;")%></li>
+	            <li><%= select_year(Date.today.year, {start_year: Date.today.year, end_year: Date.today.year + 4}, class: 'form-control', data: {stripe: "exp-year"}, style: "height: 46px;") %></li>
+	          </ul>
+	        </div>
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+	        <%= f.submit "Save Changes", class: "btn btn-success" %>
+	      </div>
+      	<% end %>
+    </div>
+  </div>
+</div>
