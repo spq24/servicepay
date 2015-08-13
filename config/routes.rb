@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+
+
   devise_for :admin_users, ActiveAdmin::Devise.config
   ActiveAdmin.routes(self)
   
@@ -17,7 +19,9 @@ Rails.application.routes.draw do
   resources :users, only: [:index, :show]
   resources :payments
   resources :refunds
-  resources :customers
+  resources :customers do
+    resources :contacts
+  end
   resources :reviews
   resources :invoices
   resources :items

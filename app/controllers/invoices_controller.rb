@@ -39,6 +39,7 @@ class InvoicesController < ApplicationController
 		@company = @user.company
 		@items = @company.items
 		@invoice.invoice_items.build
+		@contacts = @customer.contacts
 	end
 
 	def update

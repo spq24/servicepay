@@ -1,0 +1,64 @@
+<%= render 'shared/nav_top' %>
+	<div class="row">
+		<%= render 'shared/left_nav' %>
+		<div id="content-wrapper">
+			<div class="row">
+				<div class="col-lg-12">
+					<%= render 'shared/messages' %>
+					<div class="row">
+						<div class="col-lg-12">							
+							<h1>Create A Customer</h1>
+						</div>
+					</div>
+					<div class="row" id="user-profile">						
+						<div class="col-lg-9 col-md-8 col-sm-8">
+							<div class="main-box clearfix">
+								<div class="tabs-wrapper profile-tabs">
+									<ul class="nav nav-tabs">
+										<li class="active"><a href="#tab-newsfeed" data-toggle="tab">Customer Info</a></li>
+									</ul>
+									
+									<div class="tab-content">
+										<div class="tab-pane fade in active" id="tab-newsfeed">
+                      <%= form_for [@customer, @contact] do |f| %>
+												  <div class="col-sm-6">
+												    <%= f.hidden_field :customer_id, value: @customer.id %>
+
+												    <%= f.label :name %>
+												    <%= f.text_field :name, placeholder: "Contact Name", class: "form-control", required: true %><br />
+												  </div>
+												  <div class="col-sm-6">
+														<%= f.label :email %>
+														<%= f.text_field :email, placeholder: "Contact Email", class: "form-control", required: true %><br />
+													
+														<%= f.label :number, "Phone Number" %>
+														<%= f.text_field :number, placeholder: "Phone Number", class: "form-control", id: "maskedPhone", required: true %><br />
+												  </div>
+												  <div class="col-md-12">
+												    <%= f.submit "Create Contact", class: "btn btn-success pull-right" %><br /><br />
+												  </div>
+												<% end %>
+											</div>
+
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		  <%= render 'shared/footer' %>
+		</div>
+	</div>
+</div>
+</div>
+<%= render 'shared/empty_morris_div' %>
+<script>
+$(function () {
+	
+	$("#maskedPhone").mask("(999) 999-9999");
+
+});
+</script>
+

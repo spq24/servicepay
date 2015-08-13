@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150812121954) do
+ActiveRecord::Schema.define(version: 20150812160841) do
 
   create_table "active_admin_comments", force: true do |t|
     t.string   "namespace"
@@ -80,6 +80,15 @@ ActiveRecord::Schema.define(version: 20150812121954) do
   end
 
   add_index "companies", ["deleted_at"], name: "index_companies_on_deleted_at"
+
+  create_table "contacts", force: true do |t|
+    t.string   "name"
+    t.string   "email"
+    t.string   "number"
+    t.integer  "customer_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "coupons", force: true do |t|
     t.string   "name"

@@ -16,7 +16,9 @@
 							<div class="main-box clearfix">
 								<div class="tabs-wrapper profile-tabs">
 									<ul class="nav nav-tabs">
+
 										<li class="active"><a href="#tab-newsfeed" data-toggle="tab">Customer Info</a></li>
+										<li><a href="#tab-activity" data-toggle="tab">Contacts</a></li>
 									</ul>
 									
 									<div class="tab-content">
@@ -50,7 +52,7 @@
 															
 														</header>
 														
-														<h3>All Credit Cards <a class="pull-right" data-toggle="modal" data-target="#myModal" data-backdrop="true">Add A Card</a></h3>
+														<h3>All Credit Cards <a href="#" class="pull-right" data-toggle="modal" data-target="#myModal" data-backdrop="true">Add A Card</a></h3>
 														<% @all_cards.each do |c| %>
 															<div class="story-inner-content">
 																<%= c[:last4] %> | <%= c[:brand] %>
@@ -60,7 +62,64 @@
 													</div>
 												</div>
 											</div>
-										<%= link_to "Edit Customer", edit_customer_path(@customer), class: "pull-right" %>
+											<%= link_to "Edit Customer", edit_customer_path(@customer), class: "pull-right" %>
+										</div>
+
+										<div class="tab-pane fade" id="tab-activity">
+											<% if @customer.contacts.any? %>
+												<div class="table-responsive">
+													<table class="table user-list table-hover">
+														<thead>
+															<tr>
+																<th class="text-center"><span>Name</span></th>
+																<th class="text-center"><span>Email</span></th>
+																<th class="text-center"><span>Phone</span></th>
+																<th class="text-center"><span>Created At</span></th>
+																<th>&nbsp;</th>
+															</tr>
+														</thead>
+														<tbody>
+														  <% @contacts.each do |c| %>
+															<tr>
+																<td class="text-center">
+									                                <%= c.name.titleize %>
+																</td>
+																<td class="text-center">
+																	<%= mail_to c.email, c.email, target: "_blank" %>
+																</td>
+																<td class="text-center">
+																	<%= c.number %>
+																</td>
+																<td class="text-center">
+																	<%= c.created_at.strftime("%m/%d/%Y") %>
+																</td>
+                                <td style="width: 20%;">
+                                  <%= link_to edit_customer_contact_path(@customer, c), class: "table-link" do %>
+                                  <span class="fa-stack">
+                                    <i class="fa fa-square fa-stack-2x"></i>
+                                    <i class="fa fa-pencil fa-stack-1x fa-inverse"></i>
+                                  </span>
+                                  <% end %>																
+                                  <%= link_to customer_contact_path(@customer, c), method: :delete, data: {confirm: "Are you sure you want to delete this contact?"}, class: "table-link danger" do %>
+                                  <span class="fa-stack">
+                                    <i class="fa fa-square fa-stack-2x"></i>
+                                    <i class="fa fa-trash-o fa-stack-1x fa-inverse"></i>
+                                  </span>
+                                  <% end %>
+                                </td>
+															</tr>
+														  <% end %>
+														</tbody>
+													</table>
+													<%= paginate @payments %>
+												</div>
+											<% else %>
+												<br /><br />
+													<center>
+														<%= link_to "Create A New Contact For This Customer", "#{@customer.id}/contacts/new", class: "btn btn-lrg btn-success" %>
+													</center>
+												<br /><br />
+											<% end %>											
 										</div>
 									</div>
 								</div>
@@ -103,7 +162,13 @@
 						                                <% end %>
 													</td>
 													<td class="text-center">
-														<%= Plan.find(p.plan_id).name unless p.plan_id.nil? %>
+														<% if p.plan_id.nil? == false %>
+															<% if Plan.exists?(p.plan_id) == false %>
+																<p>Plan Deleted</p>
+															<% else %>
+																<%= Plan.find(p.plan_id).name  %>
+															<% end %>
+														<% end %>
 													</td>
 													<td class="text-center">
 														<%= p.created_at.strftime("%m/%d/%Y") %>
@@ -330,13 +395,13 @@ $(function () {
 
 	      	<div class="col-sm-8">
 		        <div class="input-group">
-		          <span class="input-group-addon"><i class="fa fa-user"></i></span>
+		          <span class="input-group-addon"><i class="fa fa-credit-card"></i></span>
 		          <input class="form-control" data-stripe="number" maxlength="20" placeholder="Credit Card Number" type="text" required></input>
 		        </div>
 		    </div>
 		    <div class="col-sm-4">
 		        <div class="input-group">
-		          <span class="input-group-addon"><i class="fa fa-user"></i></span>
+		          <span class="input-group-addon"><i class="fa fa-lock"></i></span>
 		          <input class="form-control" data-stripe="cvc" size="10" placeholder="Security Number" type="text" required></input>
 		        </div>
 		    </div><br /><br />

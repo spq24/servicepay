@@ -166,11 +166,21 @@ tr:hover .cut { opacity: 1; }
 			<div class="checkbox-nice">
 				<%= f.check_box :send_by_email, checked: true %>
 				<%= f.label :send_by_email, "Send By Email" %>
-			</div>
+			</div><br />
+
 			<div class="checkbox-nice">
 				<%= f.check_box :send_by_post %>
 				<%= f.label :send_by_post, "Send By Mail ($0.99 extra)" %>
-			</div>
+			</div><br />
+
+			<label>Who do you want to send this invoice to?</label><br />
+			<label>(This will automatically be sent to the main customer email)</label>
+			<% @contacts.each do |c| %>
+				<div class="checkbox-nice">
+					<%= check_box_tag "contact_#{c.id}" %>
+					<%= label "contacts", c.name.titleize %>
+				</div><br />
+			<% end %>
 		</div>	
 
 		<br /><br />

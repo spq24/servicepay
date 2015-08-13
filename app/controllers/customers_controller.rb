@@ -39,8 +39,6 @@ class CustomersController < ApplicationController
 	end
 
 	def update
-		binding.pry
-
 		if URI(request.referer).path == edit_customer_path
 		    @customer = Customer.find(params[:id])
 
@@ -79,6 +77,7 @@ class CustomersController < ApplicationController
 		@brand = stripe_customer.sources.retrieve(default_card)[:brand]
 		@all_cards = stripe_customer.sources.all(:object => "card")
 		@stripe_invoices = Stripe::Invoice.all(customer: stripe_customer.id)
+		@contacts = @customer.contacts
 	end
 
 	def index
