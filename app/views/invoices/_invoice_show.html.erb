@@ -150,9 +150,10 @@ tr:hover .cut { opacity: 1; }
 
 <div class="col-lg-10 bg-white invoice-inside">
 	<header>
-		<h1>&nbsp;&nbsp;&nbsp;Invoice <%= @invoice.draft? ? " - DRAFT NOT SENT YET" : nil %> <span class="pull-right" style="margin-right: 1em;">Invoice Created by: <%= @invoice.user.first_name.titleize %>&nbsp;<%= @invoice.user.last_name.titleize %></span></h1>
+		<h1>&nbsp;&nbsp;&nbsp;Invoice #<%= @invoice.invoice_number %> <%= @invoice.draft? ? " - DRAFT NOT SENT YET" : nil %> <span class="pull-right" style="margin-right: 1em;">Invoice Created by: <%= @invoice.user.first_name.titleize %>&nbsp;<%= @invoice.user.last_name.titleize %></span></h1>
 		<span><%= image_tag @company.logo %></span>
 		<address>
+			<h4>Customer Info:</h4>
 			<p><%= @customer.customer_name.titleize %></p>
 			<p><%= @customer.address_one %><%= @customer.address_two.present? ? "<br />".html_safe + @customer.address_two : nil %><br><%= @customer.city.titleize %>, <%= @customer.state %> <%= @customer.postcode %></p>
 			<p><%= number_to_phone(@customer.phone, area_code: true) %></p>
@@ -160,25 +161,23 @@ tr:hover .cut { opacity: 1; }
 	</header>
 	<article>
 		<div class="form-group">
-			<label>How Was This Invoice Sent?</label><br />
-			<% if @invoice.send_by_email? %>
-				Sent by Email <br /><br />
-			<% end %>
+			<div class="col-sm-8">
+				<div class="col-sm-4">
+					<label>How Was This Invoice Sent?</label><br />
+					<% if @invoice.send_by_email? %>
+						Sent by Email <br /><br />
+					<% end %>
 
-			<% if @invoice.send_by_post? %>
-				Sent By Snail Mail
-			<% end %>
+					<% if @invoice.send_by_post? %>
+						Sent By Snail Mail
+					<% end %>
+				</div>
+				<div class="col-sm-4">
+					<label>Is This A Recurring Invoice?</label><br />
+					<%= @invoice.recurring? ? "Yes, this is a recurring invoice" : "No, this is not a recurring invoice" %>
+				</div>
+			</div>
 		</div>
-		<br /><br />
-		<div class="form-group">
-			<label>Is This A Recurring Invoice?</label><br />
-			<% if @invoice.recurring? %>
-				Yes, this is a recurring invoice 
-			<% else %>
-				No, this is not a recurring invoice
-			<% end %>
-		</div>
-
 	</article>
 	<article>
 		<table class="meta">
@@ -254,5 +253,8 @@ tr:hover .cut { opacity: 1; }
 	</div>
 	<div class="col-md-12 submit">
 		<%= link_to "Edit Invoice", edit_invoice_path(@invoice), class: "btn btn-info pull-right" %>
+		<%= link_to invoice_path(@invoice, format: "pdf"), class: "btn btn-success pull-right", style: "margin-right: 20px;" do %> 
+			Download Invoice&nbsp;&nbsp; <i class="fa fa-file-pdf-o"></i>&nbsp;&nbsp;<i class="fa fa-download"></i>
+		<% end %>
 	</div>
 </div>

@@ -55,8 +55,8 @@ class ContactsController < InheritedResources::Base
     end
 
     def set_up_basics
-		@user = current_user
-		@company = @user.company
+		  @user = current_user
+		  @company = @user.company
     end
 end
 

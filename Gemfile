@@ -35,6 +35,8 @@ gem 'country_select', github: 'stefanpenner/country_select'
 gem 'quickbooks-ruby'
 gem 'oauth-plugin'
 gem 'prawn'
+gem 'prawn-table'
+
 
 
 group :development do
