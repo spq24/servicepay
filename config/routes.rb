@@ -44,6 +44,7 @@ Rails.application.routes.draw do
    get '/tc' => 'static_pages#tc'
    get '/learn-more' => 'static_pages#learn'
    get '/vision' => 'static_pages#vision'
+   get '/invoices/:id/customer-invoice' => 'invoices#customer_show', as: "customer_invoice"
    mount StripeEvent::Engine => '/stripe_events'
 
 end

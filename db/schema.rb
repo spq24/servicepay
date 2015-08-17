@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150814004521) do
+ActiveRecord::Schema.define(version: 20150815203458) do
 
   create_table "active_admin_comments", force: true do |t|
     t.string   "namespace"
@@ -163,6 +163,7 @@ ActiveRecord::Schema.define(version: 20150814004521) do
     t.boolean  "send_by_email"
     t.integer  "total"
     t.string   "info"
+    t.datetime "payment_date"
   end
 
   create_table "items", force: true do |t|

@@ -8,6 +8,12 @@ class Invoice < ActiveRecord::Base
 
 	accepts_nested_attributes_for :invoice_items
 
+	validate :non_zero_or_negative
 
+	def non_zero_or_negative
+		if total <= 0
+			errors.add(:invoice_id, "total must be greater than zero.")
+		end
+	end
 
 end

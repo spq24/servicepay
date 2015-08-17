@@ -175,12 +175,9 @@ tr:hover .cut { opacity: 1; }
 
 			<label>Who do you want to send this invoice to?</label><br />
 			<label>(This will automatically be sent to the main customer email)</label>
-			<% @contacts.each do |c| %>
-				<div class="checkbox-nice">
-					<%= check_box_tag "contact_#{c.id}" %>
-					<%= label "contacts", c.name.titleize %>
-				</div><br />
-			<% end %>
+			<div class="checkbox-nice">
+				<%= collection_check_boxes(:customer, :contact_ids, @contacts, :id, :name) %>
+			</div>
 		</div>	
 
 		<br /><br />

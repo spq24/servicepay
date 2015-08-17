@@ -1,5 +1,5 @@
 class InvoicesController < ApplicationController
-	before_action :authenticate_user!
+	before_action :authenticate_user!, except: [:customer_show]
 	before_filter :allowed_user, only: [:show, :edit, :update, :destroy]
 	before_action :set_qb_service, only: [:index, :edit, :update, :create, :destroy]
 
@@ -46,10 +46,14 @@ class InvoicesController < ApplicationController
 		@invoice = Invoice.find(params[:id])
 		@user = current_user
 		@company = @user.company
+		@customer = @invoice.customer
 		issue_date = Date.strptime(params[:invoice][:issue_date], "%m/%d/%Y")
 		amount_of_invoice = Money.new(params[:invoice][:total].gsub(/\D/, ''), "USD").cents
+		contacts = params[:customer][:contact_ids].map { |c| c.empty? ? nil : Contact.find(c.to_i).email }.compact
+		payment_url = "#{root_url}/companies/#{@company.id}/payment?invoice_number=#{@invoice.invoice_number}&amount=#{@invoice.total}&email=#{@customer.customer_email}&name=#{@customer.customer_name.titleize}&address_one=#{@customer.address_one}&address_two=#{@customer.address_two}&city=#{@customer.city.titleize}&state=#{@customer.state}&post=#{@customer.postcode}&phone=#{@customer.phone}"
 		if @invoice.update_attributes(total: amount_of_invoice, invoice_number: params[:invoice][:invoice_number], issue_date: issue_date, private_notes: params[:invoice][:private_notes], customer_notes: params[:invoice][:customer_notes], payment_terms: params[:invoice][:payment_terms], draft: params[:invoice][:draft], status: "sent", discount: params[:invoice][:discount], po_number: params[:invoice][:po_number], send_by_email: params[:invoice][:send_by_email], send_by_post: params[:invoice][:send_by_post], recurring: params[:invoice][:recurring])
-			flash[:success] = "Successfully created invoice for #{@invoice.customer.customer_name.titleize}"
+			$customerio.track(@customer.id,"invoice updated", customer_name: @customer.customer_name.titleize, invoice_number: @invoice.invoice_number, invoice_total: @invoice.total, company_name: @company.company_name.titleize, company_user_email: @user.email, company_logo: @company.logo, facebook_url: @company.facebook, google_url: @company.google, yelp_url: @company.yelp, contacts_emails: contacts, payment_url: payment_url)
+			flash[:success] = "Successfully updated invoice #{@invoice.invoice_number} for #{@invoice.customer.customer_name.titleize}"
 			redirect_to invoice_path(@invoice)
 		else
 			flash[:danger] = "There was a problem creating your invoice. #{@invoice.errors.full_messages.to_sentence}"
@@ -57,15 +61,32 @@ class InvoicesController < ApplicationController
 	end
 
 	def destroy
-    @invoice = Invoice.find(params[:id])
-    if @invoice.destroy
-      flash[:success] = "Invoice #{@invoice.invoice_number} successfully deleted."
-      redirect_to invoices_path
-    else
-      flash[:danger] = "Something went wrong. We can't delete invoice number #{@invoice.invoice_number}"
-      redirect_to invoices_path
-    end
+	    @invoice = Invoice.find(params[:id])
+	    if @invoice.destroy
+	      flash[:success] = "Invoice #{@invoice.invoice_number} successfully deleted."
+	      redirect_to invoices_path
+	    else
+	      flash[:danger] = "Something went wrong. We can't delete invoice number #{@invoice.invoice_number}"
+	      redirect_to invoices_path
+	    end
       
+	end
+
+	def customer_show
+		@invoice = Invoice.find(params[:id])
+		@customer = @invoice.customer
+		@user = @invoice.user
+		@company = @invoice.company
+		payments = @company.payments
+		@payments_total = payments.where(invoice_id: @invoice.id).map { |t| t.amount }.sum
+		@left_to_pay = (@invoice.total - @payments_total) / 100
+		respond_to do |format|
+	      format.html
+	      format.pdf do
+	        pdf = InvoicePdf.new(@invoice, @company, @user, @customer, @left_to_pay, view_context)
+	        send_data pdf.render, filename: "invoice_#{@invoice.created_at.strftime("%d/%m/%Y")}.pdf", type: "application/pdf"
+	      end
+	    end
 	end
 
 	private
@@ -82,18 +103,18 @@ class InvoicesController < ApplicationController
     end
 
  	def set_qb_service
- 	  @user = current_user
- 	  @company = @user.company
-      oauth_client = OAuth::AccessToken.new($qb_oauth_consumer, @company.quickbooks_token, @company.quickbooks_secret)
-      @qb_customer = Quickbooks::Service::Customer.new
-      @qb_customer.access_token = oauth_client
-      @qb_customer.company_id = @company.quickbooks_realm_id
-      @qb_payment = Quickbooks::Service::Payment.new
-      @qb_payment.access_token = oauth_client
-      @qb_payment.company_id = @company.quickbooks_realm_id
-      @qb_invoice = Quickbooks::Service::Invoice.new
-      @qb_invoice.access_token = oauth_client
-      @qb_invoice.company_id = @company.quickbooks_realm_id
-  end
+		@user = current_user
+		@company = @user.company
+		oauth_client = OAuth::AccessToken.new($qb_oauth_consumer, @company.quickbooks_token, @company.quickbooks_secret)
+		@qb_customer = Quickbooks::Service::Customer.new
+		@qb_customer.access_token = oauth_client
+		@qb_customer.company_id = @company.quickbooks_realm_id
+		@qb_payment = Quickbooks::Service::Payment.new
+		@qb_payment.access_token = oauth_client
+		@qb_payment.company_id = @company.quickbooks_realm_id
+		@qb_invoice = Quickbooks::Service::Invoice.new
+		@qb_invoice.access_token = oauth_client
+		@qb_invoice.company_id = @company.quickbooks_realm_id
+    end
 
 end

@@ -1,0 +1,34 @@
+<div id="login-full-wrapper">
+  <div class="container">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="col-lg-12">
+          <div class="main-box thanks-form">
+          </div>
+        </div>
+        <div id="signup-box">
+          <div class="row">
+            <div class="col-xs-12">
+              <header id="signup-header">
+                <div id="login-logo">
+                  
+                  <h4 style="color:#fff;">Thank you For Your Business From <br /> <%= @company.company_name %></h4>
+                </div>
+              </header>
+
+                <%= render 'shared/messages' %>
+                  <%= render 'customer_show' %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- this page specific inline scripts -->
+<script>
+$(function () {
+  $("#maskedPhone").mask("(999) 999-9999");
+});
+</script>
+<%= render 'shared/empty_morris_div' %>

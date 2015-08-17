@@ -7,8 +7,12 @@
 					<%= render 'shared/messages' %>
 					<div class="row">
 						<div class="col-lg-12">		
-						    <br /><br />					
-							<h1>Create A New Invoice</h1>
+						    <br /><br />
+						    <% if @invoice.total.present? %>
+						    	<h1>Update This Invoice</h1>
+						    <% else %>					
+								<h1>Create A New Invoice</h1>
+							<% end %>
 						</div>
 					</div>
 					

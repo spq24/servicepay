@@ -1,12 +1,13 @@
 class InvoicePdf < Prawn::Document
 	include ActionView::Helpers::NumberHelper
 
-	def initialize(invoice, company, user, customer, view)
+	def initialize(invoice, company, user, customer, left_to_pay, view)
 		super()
 		@invoice = invoice
 		@company = company
 		@user = user
 		@customer = customer
+		@left_to_pay = left_to_pay
 		header
 		content
 		footer
@@ -15,6 +16,10 @@ class InvoicePdf < Prawn::Document
 	def header
 		rectangle [0, 660], 1200, 30
 		fill
+
+		bounding_box([230,620], width: 300, height: 100) do
+			text "Status: #{@invoice.status.titleize}"
+		end
 
 		bounding_box([20, 650], width: 300, height: 200) do 
 			text "Invoice Number: #{@invoice.invoice_number}", color: 'ffffff'
@@ -65,6 +70,11 @@ class InvoicePdf < Prawn::Document
 				self.rows(0).text_color = '000000'
 			end
 		end
+
+		bounding_box([50, 200], :width => 300, :height => 200) do 
+			text "<u><link href='http://servicepay-109358.nitrousapp.com:3000/companies/#{@company.id}/payment?invoice_number=#{@invoice.invoice_number}&amount=#{@left_to_pay}&email=#{@customer.customer_email}&name=#{@customer.customer_name.titleize}&address_one=#{@customer.address_one}&address_two=#{@customer.address_two}&city=#{@customer.city.titleize}&state=#{@customer.state}&post=#{@customer.postcode}&phone=#{@customer.phone}&invoice_id=#{@invoice.id}'>Pay Online" + "</link></u>", :inline_format => true
+			text "<u><link href='http://servicepay-109358.nitrousapp.com:3000/invoices/#{@invoice.id}/customer-invoice'>View Invoice Online" + "</link></u>", :inline_format => true
+ 		end
 
 		bounding_box([400, 200], :width => 300, :height => 200) do
 			table ([["Total", "#{number_to_currency(@invoice.total.to_f / 100)}"]]) do

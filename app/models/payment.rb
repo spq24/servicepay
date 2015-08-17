@@ -12,4 +12,42 @@ class Payment < ActiveRecord::Base
 
 	validates_presence_of :amount, :company_id
 
+	validate :invoice_unpaid, on: :create
+
+	validate :non_zero_or_negative
+
+	validate :no_more_than_invoice_amount
+
+	def invoice_unpaid
+		if invoice_number.present?
+			invoice = Invoice.find_by_invoice_number_and_company_id(invoice_number, company_id)
+			if invoice.present? 
+				if invoice.status == 'paid'
+		    	  errors.add(:payment_id, "error. This invoice has already been paid")
+		    	end
+		    end
+		end
+	end
+
+	def no_more_than_invoice_amount
+		if invoice_number.present?
+			invoice = Invoice.find_by_invoice_number_and_company_id(invoice_number, company_id)
+			company = invoice.company
+			payments_total = Payment.where(invoice_id: invoice.id).map { |t| t.amount }.sum
+			left_to_pay = invoice.total - (payments_total)
+			if invoice.present?
+				if (amount * 100) > left_to_pay
+					errors.add(:payment_id, "error. You're paying more than what this invoice is for. There is only #{Money.new(left_to_pay, "USD").format} left to pay")
+				end
+			end
+		end
+	end
+
+	def non_zero_or_negative
+		if amount <= 0
+			errors.add(:payment_id, "total must be greater than zero.")
+		end
+	end
+
+
 end
