@@ -8,7 +8,7 @@ class Invoice < ActiveRecord::Base
 
 	accepts_nested_attributes_for :invoice_items
 
-	validate :non_zero_or_negative
+  validate :non_zero_or_negative, on: :update
 
 	def non_zero_or_negative
 		if total <= 0

@@ -151,6 +151,7 @@ tr:hover .cut { opacity: 1; }
 <div class="col-lg-10 bg-white invoice-inside">
 	<header>
 		<h1>&nbsp;&nbsp;&nbsp;Invoice #<%= @invoice.invoice_number %> <%= @invoice.draft? ? " - DRAFT NOT SENT YET" : nil %> <span class="pull-right" style="margin-right: 1em;">Invoice Created by: <%= @invoice.user.first_name.titleize %>&nbsp;<%= @invoice.user.last_name.titleize %></span></h1>
+    <center><h2>Status: <%= @invoice.status.titleize %>  <%= @invoice.status == "partial" ? " - #{number_to_currency(@payments_total / 100)} of #{number_to_currency(@invoice.total / 100)} paid so far" : "" %> <%= @invoice.status == "paid" ? " | Payment Date: #{@invoice.payment_date.strftime("%m/%d/%Y")}" : "" %></h2></center>
 		<span><%= image_tag @company.logo %></span>
 		<address>
 			<h4>Customer Info:</h4>

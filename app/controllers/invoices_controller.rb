@@ -42,7 +42,7 @@ class InvoicesController < ApplicationController
 	end
 
 	def update
-		binding.pry
+    binding.pry
 		@invoice = Invoice.find(params[:id])
 		@user = current_user
 		@company = @user.company
@@ -51,12 +51,14 @@ class InvoicesController < ApplicationController
 		amount_of_invoice = Money.new(params[:invoice][:total].gsub(/\D/, ''), "USD").cents
 		contacts = params[:customer][:contact_ids].map { |c| c.empty? ? nil : Contact.find(c.to_i).email }.compact
 		payment_url = "#{root_url}/companies/#{@company.id}/payment?invoice_number=#{@invoice.invoice_number}&amount=#{@invoice.total}&email=#{@customer.customer_email}&name=#{@customer.customer_name.titleize}&address_one=#{@customer.address_one}&address_two=#{@customer.address_two}&city=#{@customer.city.titleize}&state=#{@customer.state}&post=#{@customer.postcode}&phone=#{@customer.phone}"
+    pdf_url = "#{root_url}/invoices/#{@invoice.id}/customer-invoice.pdf"
 		if @invoice.update_attributes(total: amount_of_invoice, invoice_number: params[:invoice][:invoice_number], issue_date: issue_date, private_notes: params[:invoice][:private_notes], customer_notes: params[:invoice][:customer_notes], payment_terms: params[:invoice][:payment_terms], draft: params[:invoice][:draft], status: "sent", discount: params[:invoice][:discount], po_number: params[:invoice][:po_number], send_by_email: params[:invoice][:send_by_email], send_by_post: params[:invoice][:send_by_post], recurring: params[:invoice][:recurring])
-			$customerio.track(@customer.id,"invoice updated", customer_name: @customer.customer_name.titleize, invoice_number: @invoice.invoice_number, invoice_total: @invoice.total, company_name: @company.company_name.titleize, company_user_email: @user.email, company_logo: @company.logo, facebook_url: @company.facebook, google_url: @company.google, yelp_url: @company.yelp, contacts_emails: contacts, payment_url: payment_url)
+			$customerio.track(@customer.id,"invoice updated", customer_name: @customer.customer_name.titleize, invoice_number: @invoice.invoice_number, invoice_total: @invoice.total, company_name: @company.company_name.titleize, company_user_email: @user.email, company_logo: @company.logo, facebook_url: @company.facebook, google_url: @company.google, yelp_url: @company.yelp, contacts_emails: contacts, payment_url: payment_url, status: @invoice.status.titleize, pdf_url: pdf_url)
 			flash[:success] = "Successfully updated invoice #{@invoice.invoice_number} for #{@invoice.customer.customer_name.titleize}"
 			redirect_to invoice_path(@invoice)
 		else
 			flash[:danger] = "There was a problem creating your invoice. #{@invoice.errors.full_messages.to_sentence}"
+      redirect_to edit_invoice_path(@invoice)
 		end
 	end
 
