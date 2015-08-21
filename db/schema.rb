@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150815203458) do
+ActiveRecord::Schema.define(version: 20150821125743) do
 
   create_table "active_admin_comments", force: true do |t|
     t.string   "namespace"
@@ -77,9 +77,33 @@ ActiveRecord::Schema.define(version: 20150815203458) do
     t.datetime "quickbooks_token_expires_at",   default: '2016-01-17 00:06:33'
     t.datetime "quickbooks_reconnect_token_at", default: '2015-12-17 00:06:33'
     t.text     "default_invoice_terms"
+    t.integer  "companyplan_id"
+    t.integer  "stripe_kinertia_company"
+    t.string   "stripe_company_id"
   end
 
   add_index "companies", ["deleted_at"], name: "index_companies_on_deleted_at"
+
+  create_table "companypayments", force: true do |t|
+    t.float    "amount"
+    t.integer  "company_id"
+    t.string   "stripe_charge_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "companyplan_id"
+  end
+
+  create_table "companyplans", force: true do |t|
+    t.string   "name"
+    t.float    "amount"
+    t.integer  "user_id"
+    t.text     "statement_descriptor"
+    t.string   "currency"
+    t.string   "interval"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.boolean  "custom"
+  end
 
   create_table "contacts", force: true do |t|
     t.string   "name"
@@ -143,7 +167,7 @@ ActiveRecord::Schema.define(version: 20150815203458) do
     t.integer  "customer_id"
     t.integer  "user_id"
     t.integer  "company_id"
-    t.string   "invoice_number",      default: "00000001"
+    t.string   "invoice_number",             default: "00000001"
     t.datetime "issue_date"
     t.text     "private_notes"
     t.text     "customer_notes"
@@ -164,6 +188,9 @@ ActiveRecord::Schema.define(version: 20150815203458) do
     t.integer  "total"
     t.string   "info"
     t.datetime "payment_date"
+    t.string   "lob_letter_id"
+    t.string   "lob_to_address_id"
+    t.datetime "lob_expected_delivery_date"
   end
 
   create_table "items", force: true do |t|

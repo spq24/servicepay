@@ -21,6 +21,8 @@
 								<div class="main-box-body clearfix">
 									<div class="profile-since">
 										Service Pay Company since: <%= @company.created_at.strftime("%b %Y") %>
+										Current Plan: <%= @company.companyplan.name.titleize %> <%= number_to_currency(@company.companyplan.amount / 100) %>/<%= @company.companyplan.interval %>
+										<%= link_to "Change Your Plan", companyplan_upgrade_path(@company) %>
 									</div>
 								</div>
 								

@@ -1,6 +1,10 @@
 Rails.application.routes.draw do
 
 
+  resources :companypayments
+
+  resources :companyplans
+
   devise_for :admin_users, ActiveAdmin::Devise.config
   ActiveAdmin.routes(self)
   
@@ -45,6 +49,7 @@ Rails.application.routes.draw do
    get '/learn-more' => 'static_pages#learn'
    get '/vision' => 'static_pages#vision'
    get '/invoices/:id/customer-invoice' => 'invoices#customer_show', as: "customer_invoice"
+   get 'companies/:id/companyplan/upgrade' => 'companyplans#upgrade', as: "companyplan_upgrade"
    mount StripeEvent::Engine => '/stripe_events'
 
 end

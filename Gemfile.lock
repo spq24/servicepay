@@ -270,6 +270,8 @@ GEM
       activesupport (>= 3.0.0)
     launchy (2.4.3)
       addressable (~> 2.3)
+    lob (2.1.1)
+      rest-client (~> 1.8)
     mail (2.5.4)
       mime-types (~> 1.16)
       treetop (~> 1.4.8)
@@ -492,6 +494,7 @@ DEPENDENCIES
   jquery-rails
   kaminari
   launchy
+  lob
   mini_magick
   money
   morrisjs-rails

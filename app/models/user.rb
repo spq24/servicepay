@@ -11,5 +11,6 @@ class User < ActiveRecord::Base
   has_many :coupons
   has_many :invoices
   has_many :items
+  has_many :companyplans
   
 end

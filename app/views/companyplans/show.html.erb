@@ -1,0 +1,126 @@
+<%= render 'shared/nav_top' %>
+	<div class="row">
+		<%= render 'shared/left_nav' %>
+		<div id="content-wrapper">
+			<div class="row">
+				<div class="col-lg-12">
+					<%= render 'shared/messages' %>
+					<div class="row">
+						<div class="col-lg-12">							
+							<h1><%= @company_plan.name %></h1>
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="col-lg-3 col-sm-6 col-xs-12">
+							<div class="main-box infographic-box">
+								<i class="fa fa-shopping-cart emerald-bg"></i>
+								<span class="headline">Payments From This Plan</span>
+								<span class="value">
+									<span class="timer" data-from="0" data-to="2562" data-speed="800" data-refresh-interval="10">
+										<%= @payments_count.count %>
+									</span>
+								</span>
+							</div>
+						</div>
+						<div class="col-lg-3 col-sm-6 col-xs-12">
+							<div class="main-box infographic-box">
+								<i class="fa fa-money green-bg"></i>
+								<span class="headline">Net Revenue From this Plan</span>
+								<span class="value">
+									<span class="timer" data-from="83" data-to="2562" data-speed="900" data-refresh-interval="60">
+									  <%= @revenue %>
+									</span>
+								</span>
+							</div>
+						</div>
+					</div>
+					
+					<div class="row" id="user-profile">						
+						<div class="col-lg-9 col-md-8 col-sm-8">
+							<div class="main-box clearfix">
+								<div class="tabs-wrapper profile-tabs">
+									<ul class="nav nav-tabs">
+										<li class="active"><a href="#tab-newsfeed" data-toggle="tab">Company Plan Info</a></li>
+									</ul>
+									
+									<div class="tab-content">
+										<div class="tab-pane fade in active" id="tab-newsfeed">
+											<header class="story-header">
+												<div class="story-time pull-right">
+													<i class="fa fa-clock-o"></i> Created: <%= @company_plan.created_at.strftime("%m/%d/%Y") %><br />
+												</div>
+												<div class="story-author">
+													Amount Charged to Customer: <%= number_to_currency(@company_plan.amount / 100) %>
+												</div><br />
+												<div class="story-author">
+													Created by: <%= link_to @company_plan.user.email, target: "_blank" do %>
+														<%= @company_plan.user.first_name %>&nbsp;<%= @company_plan.user.last_name %>
+													<% end %>
+												</div><br />									
+												<div class="story-author">
+													Interval: <%= @company_plan.interval %>
+												</div><br />									
+												<div class="story-author">
+													Statement Descriptor: <%= @company_plan.statement_descriptor %>
+												</div>
+											</header>
+											<%= link_to "Delete Plan", @company_plan, method: :delete, data: {confirm: "Are you sure?"}, class: "pull-right", style: "color: red;" %>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<h1>Companies In This Plan</h1>
+
+					<div class="row">
+						<div class="col-lg-12">
+							<div class="main-box no-header clearfix">
+								<div class="main-box-body clearfix">
+									<div class="table-responsive">
+										<table class="table user-list table-hover">
+											<thead>
+												<tr>
+													<th><span>Company Name</span></th>
+													<th><span>User Email</span></th>
+													<th>&nbsp;</th>
+												</tr>
+											</thead>
+											<tbody>
+											  <% @company_plan_companies.each do |c| %>
+												<tr>
+													<td>
+						                                <%= link_to c.company_name, c %>
+													</td>
+													<td>
+														<%= mail_to "#{c.users.first.first_name} #{c.users.first.first_name}", c.users.first.email, target: "_blank" %>
+													</td>
+													<td style="width: 20%;">
+														<%= link_to c, class: "table-link" do %>
+															<span class="fa-stack">
+																<i class="fa fa-square fa-stack-2x"></i>
+																<i class="fa fa-search-plus fa-stack-1x fa-inverse"></i>
+															</span>			
+														<% end %>
+													</td>
+												</tr>
+											  <% end %>
+											</tbody>
+										</table>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					
+				</div>
+			</div>
+		  <%= render 'shared/footer' %>
+		</div>
+	</div>
+</div>
+</div>
+
+<%= content_tag :div, "", id: "payments_chart", class: "graph", style: "display: none;" %>

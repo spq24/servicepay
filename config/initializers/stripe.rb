@@ -104,7 +104,14 @@ StripeEvent.configure do |events|
       end
     end 
   end
-  
+    
+   events.subscribe 'charge.succeeded' do |event|
+     company = Company.find_by_stripe_company_id(event.data.object.customer)
+     plan = Plan.find_by_name(event.data.object.plan)
+     Companypayment.create(company_id: company.id, amount: event.data.object.amount, stripe_charge_id: event.data.object.id, companyplan_id: plan.id)
+   end
+
+
    events.subscribe 'charge.failed' do |event|
   	user = User.where(customer_token: event.data.object.customer).first
     user.deactivate!

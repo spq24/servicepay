@@ -1,0 +1,52 @@
+    <div class="bg-white">
+        <!-- =============================
+             PRICING SECTION
+        ============================== -->
+        <section class="pricing" id="pricing">
+            <div class="container">
+                <div class="wrapper-lg">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <h2>Get Started Today</h2>
+                            <p class="large">Choose the plan that suits you best. 30 Days Free Trial with all plans.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Pricing Tabs-->
+                    <div class="row grid-md">
+
+                        <% @plans.each do |p| %>
+                            <div class="col-sm-4">
+                                <div class="pricing-tab">
+                                    <p class="price">$19<span>/mo</span></p>
+                                    <h4>Small</h4>
+                                    <ul class="pricing-features">
+                                        <li>30 GB storage</li>
+                                        <li>200 GB bandwidth<span>(approx lorem ipsum)</span></li>
+                                        <li>10 email accounts</li>
+                                        <li>10 MySql databases</li>
+                                        <li>3 support tickets per month</li>
+                                    </ul>
+                                    <a href="#canvas-bg" class="btn btn-color scrollto">Subscribe</a>
+                                </div>
+                            </div>
+                        <% end %>
+
+
+                        <!-- Pricing Footer -->
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <div class="pricing-more">
+                                    <p><strong>Looking for more?</strong> &mdash; Tell us what you need. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Deserunt nesciunt sed molestiae quos, dolor eaque quis facilis tempora consequuntur doloribus omnis cumque fugiat. Qui rerum quis mollitia incidunt reprehenderit expedita, non cumque tenetur deleniti! <strong> <a href="mailto:support@themedept.com">Contact us <i class="icon arrow_carrot-right_alt2"></i></a></strong> </p>
+                                </div>
+                            </div>
+                        </div><!-- /End Row Pricing Footer -->
+                    
+                    </div><!-- /End Row Pricing Tab -->
+                </div><!-- /End Wrapper -->
+            </div><!-- /End Container -->
+        </section>
+        <!-- =============================
+             /END PRICING SECTION 
+        ============================== -->
+    </div>

@@ -36,6 +36,7 @@ gem 'quickbooks-ruby'
 gem 'oauth-plugin'
 gem 'prawn'
 gem 'prawn-table'
+gem 'lob'
 
 
 

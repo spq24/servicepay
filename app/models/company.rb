@@ -17,6 +17,8 @@ class Company < ActiveRecord::Base
   has_many :coupons, dependent: :destroy
   has_many :invoices, dependent: :destroy
   has_many :items, dependent: :destroy
+  has_many :companypayments
+  belongs_to :companyplan
   
   accepts_nested_attributes_for :users, :reject_if => :all_blank, :allow_destroy => true
 

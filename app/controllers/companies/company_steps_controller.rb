@@ -6,20 +6,32 @@ class Companies::CompanyStepsController < ApplicationController
   def show
     @user = current_user
     @company = Company.find(params[:company_id])
+    @plans = Companyplan.where.not(custom: true)
     render_wizard
   end
   
   def update
     @user = current_user
   	@company = Company.find(params[:company_id])
+    @plans = Companyplan.all
+
     case step
     when :company_info
       if @company
-        @company.update_attributes(company_params)
-        @company.status = true if step == :company_info
-        @company.save
-        flash[:success] = "Awesome, just some info about you and we'll be ready to go!"
-        render_wizard @company
+        binding.pry
+        plan = Companyplan.find(params[:company][:companyplan_id])
+        stripe_company = StripeWrapper::Company.create(source: params[:stripeToken], description: @company.company_name, plan: plan.name)
+
+        if stripe_company.successful?
+            @company.update_attributes(company_params)
+            @company.update_attribute(:stripe_company_id, stripe_company.response.id)
+            @company.update_attribute(:status, true) if step == :company_info
+            flash[:success] = "Awesome, just some info about you and we'll be ready to go!"
+            render_wizard @company
+        else
+            flash[:danger] = stripe_company.error_message
+            render :company_info
+        end
       else
         @error_message = "Oops something went wrong. Please check the information you entered"
         self
@@ -36,7 +48,7 @@ class Companies::CompanyStepsController < ApplicationController
   	end
 
     def company_params
-        params.require(:company).permit(:company_name, :description, :logo, :phonenumber, :website_url, :address_one, :address_two, :city, :state, :postcode, :facebook, :google, :yelp, :status, :terms, users_attributes: [:id, :email, :first_name, :last_name, :password])
+        params.require(:company).permit(:company_name, :description, :logo, :phonenumber, :website_url, :address_one, :address_two, :city, :state, :postcode, :facebook, :google, :yelp, :status, :terms, :companyplan_id, :stripe_company_id, users_attributes: [:id, :email, :first_name, :last_name, :password])
     end
 
 

@@ -52,10 +52,10 @@ class PlansController < ApplicationController
 	def destroy
 	  @user = current_user
 	  @company = @user.company
-	  Stripe.api_key = @company.access_code
+	  @plan = Plan.find(params[:id])
 	  response = Stripe::Plan.retrieve(@plan.name).delete
 	  if response[:deleted] == true
-		@plan = Plan.find(params[:id]).destroy
+		@plan.destroy
 		flash[:success] = "#{@plan.name} Deleted."
 		redirect_to plans_path
 	  else

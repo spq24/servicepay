@@ -1,3 +1,11 @@
+<script type="text/javascript" src="https://js.stripe.com/v2/"></script>
+
+<script type="text/javascript">
+  // This identifies your website in the createToken call below
+  Stripe.setPublishableKey("pk_yljBi4IiWmMlLe3HTOiUzR45aOwke");
+  // ...
+</script>
+
 <div id="login-full-wrapper">
 	<div class="container">
 		<div class="row">
@@ -21,8 +29,13 @@
 										</ul>
 									</div>
 								</div><br /><br />
-								<%= form_for @company, url: wizard_path, html: {id: "edit_company_#{@company.id}"} do |f| %>
+								<%= form_for @company, url: wizard_path, html: {id: "payment-form"} do |f| %>
+									<center><h3>Company Info:</h3></center>
 									<div class="col-sm-6">
+										<div class="input-group">
+											<span class="input-group-addon"><i class="fa fa-user"></i></span>
+											<%= f.text_field :company_name, placeholder: "Company Name", class: "form-control", required: true%>
+										</div>
 										<div class="input-group">
 											<span class="input-group-addon"><i class="fa fa-user"></i></span>
 											<%= f.text_field :phonenumber, placeholder: "Company Phone Number", class: "form-control", id: "maskedPhone", required: true%>
@@ -55,16 +68,54 @@
 										</div>
 										<div class="input-group">
 											<span class="input-group-addon"><i class="fa fa-lock"></i></span>
-											<%= f.select :state, options_for_select(us_states), {}, class: "form-control", required: true %>
+											<%= f.select :state, options_for_select(us_states, @company.state), {}, class: "form-control", required: true %>
 										</div>
 										<div class="input-group">
 											<span class="input-group-addon"><i class="fa fa-lock"></i></span>
 											<%= f.text_field :postcode, placeholder: "Zip Code", class: "form-control", required: true %>
 										</div>
-									  </div>
+									</div>
 									  <br />
+									
+									  <div class="row">
+									  	<div class="col-sm-12">
+									  		<center>
+									  		<h3>What Plan Do You Want To Sign Up For?</h3>
+											<div class="btn-group" data-toggle="buttons">
+												<% @plans.each do |p| %>
+													<label class="btn btn-primary">
+														<%= f.radio_button :companyplan_id, p.id %> <%= p.name.titleize %>
+													</label>
+												<% end %>
+											</div>
+											<h3>Payment Info:</h3>
+											</center>
+											<div class="col-sm-6">
+							                    <div class="input-group">
+							                      <span class="input-group-addon"><i class="fa fa-user"></i></span>
+							                      <input class="form-control" data-stripe="number" maxlength="20" placeholder="Credit Card Number" type="text" required></input>
+							                    </div>
+							                    <div class="input-group">
+							                      <span class="input-group-addon"><i class="fa fa-user"></i></span>
+							                      <input class="form-control" data-stripe="cvc" size="10" placeholder="Security Number" type="text" required></input>
+							                    </div>
+							                </div>
+							                <div class="col-sm-6">
+							                    <div class="input-group">
+							                      <ul class="dates">
+							                        <p>Expiration Date</p>
+							                        <li><%= select_month(Date.today, {add_month_numbers: true},  class: 'form-control', data: {stripe: "exp-month"}, style: "height: 46px;")%></li>
+							                        <li><%= select_year(Date.today.year, {start_year: Date.today.year, end_year: Date.today.year + 4}, class: 'form-control', data: {stripe: "exp-year"}, style: "height: 46px;") %></li>
+							                      </ul>
+							                    </div>
+							                </div>
+					                	</div>
+					                  </div><br />
 									  <div class="row">
 										  <div class="col-xs-12">
+										  	<center>
+										  		<h3>Social Media Listings So We Can Get Reviews For You:</h3>
+										  	</center>
 										  	<div class="col-sm-6">
 												<div class="input-group">
 													<span class="input-group-addon"><i class="fa fa-user"></i></span>
@@ -84,7 +135,7 @@
 						                          <div class="row">
 						                            <div class="col-xs-12">
 						                              <div class="checkbox-nice">
-						                              	<%= f.check_box :terms, checked: "checked", id: "terms-cond", required: "true" %>
+						                              	<%= f.check_box :terms, checked: "checked", id: "terms-cond", required: true %>
 						                                <label for="terms-cond">
 						                                  I accept the <%= link_to "terms and conditions", "/tc", target: "_blank" %>
 						                                </label>
@@ -121,4 +172,4 @@ $(function () {
 	$("#maskedPhoneExt").mask("(999) 999-9999? x99999");
 });
 </script>
-<%= content_tag :div, "", id: "payments_chart", class: "graph", style: "display:none;" %>
+<%= render 'shared/empty_morris_div' %>
