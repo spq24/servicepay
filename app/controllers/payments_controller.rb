@@ -14,10 +14,10 @@ class PaymentsController < ApplicationController
 		@money = Money.new((params[:payment][:amount].to_f * 100).to_i, "USD")	
 		@coupon = Coupon.find_by_name(params[:coupon_code])
 		@customer = Customer.find_by_customer_email_and_company_id(params[:payment][:payment_customer][:customer_email], @company.id)
-		@payment = Payment.new(amount: params[:payment][:amount], company_id: params[:payment][:company_id], invoice_number: params[:payment][:invoice_number])
+		
 		card_brand = Stripe::Token.retrieve(params[:stripeToken])[:card][:brand]
-		invoice = Invoice.find_by_invoice_number(params[:payment][:invoice_number])
-		if @payment.valid?
+		invoice = Invoice.find_by_invoice_number_and_company_id(params[:payment][:invoice_number], @company.id)
+		
 			if @coupon.present?
 				count = @coupon.redeemed_count
 				@coupon.redeemed_count = count + 1
@@ -29,7 +29,9 @@ class PaymentsController < ApplicationController
 				amount_to_charge = @money
 			end
 			app_fee = card_brand == "American Express" ? Money.new((0).to_i, "USD"): amount_to_charge  * (@company.application_fee / 100)
-			
+
+		@payment = Payment.new(amount: amount_to_charge.cents, company_id: @company.id, invoice_number: params[:payment][:invoice_number])	
+		if @payment.valid?	
 			if @customer.nil?
 				stripe_customer = StripeWrapper::Customer.create(source: params[:stripeToken], customer_email: params[:payment][:payment_customer][:customer_email], uid: @company.uid)
 				if stripe_customer.successful?
@@ -43,14 +45,18 @@ class PaymentsController < ApplicationController
 							@payment.coupon_id = @coupon.id
 							@payment.save
 						end
+
 						if invoice.present?
-							if @payment.amount == invoice.total
+							payments_total = @company.payments.where(invoice_id: invoice.id).map { |t| t.amount }.sum
+							left_to_pay = invoice.total - payments_total
+							if left_to_pay == 0
 								invoice.update_attribute(:status, "paid")
 								invoice.update_attribute(:payment_date, Date.today)
 							else
 								invoice.update_attribute(:status, "partial")
 							end
 						end
+
 						track_cio
 						add_payment_to_quickbooks unless @company.quickbooks_token.nil?
 					    flash[:success] = @coupon.present? ? "Your Payment of #{Money.new(@payment.amount, "USD").format} Was Successful! #{@coupon.name} was applied to your payment!" : "Your Payment of #{Money.new(@payment.amount, "USD").format} Was Successful!"
@@ -78,6 +84,7 @@ class PaymentsController < ApplicationController
 				result = StripeWrapper::Charge.create(customer: @customer.stripe_token, uid: @company.uid, amount: amount_to_charge.cents,  fee: app_fee.cents)
 				if result.successful?
 					@payment = Payment.create(company_id: @company.id, amount: amount_to_charge.cents, invoice_number: params[:payment][:invoice_number], customer_id: @customer.id, stripe_charge_id: result.response.id, last_4: result.response.source.last4, app_fee: app_fee.cents, invoice_id: params[:payment][:invoice_id])
+					
 					if @coupon.present?
 						@payment.coupon_id = @coupon.id
 						@payment.save
@@ -87,7 +94,7 @@ class PaymentsController < ApplicationController
 
 					if invoice.present?
 						payments_total = @company.payments.where(invoice_id: invoice.id).map { |t| t.amount }.sum
-						left_to_pay = invoice.total - (payments_total + @payment.amount)
+						left_to_pay = invoice.total - payments_total
 						if left_to_pay == 0
 							invoice.update_attribute(:status, "paid")
 							invoice.update_attribute(:payment_date, Date.today)
@@ -95,13 +102,17 @@ class PaymentsController < ApplicationController
 							invoice.update_attribute(:status, "partial")
 						end
 					end
+
 					track_cio
+					
 					add_payment_to_quickbooks unless @company.quickbooks_token.nil?
+				    
 				    flash[:success] = @coupon.present? ? "Your Payment of #{Money.new(@payment.amount, "USD").format} Was Successful! #{@coupon.name} was applied to your payment!" : "Your Payment of #{Money.new(@payment.amount, "USD").format} Was Successful!"
+				    
 				    redirect_to payment_path(@payment)
 			    else
-			      flash[:danger] = result.error_message
-			      render :new
+			        flash[:danger] = result.error_message
+			        render :new
 		    	end
 			end
 		else
@@ -230,8 +241,7 @@ class PaymentsController < ApplicationController
 	end
 
  	def set_qb_service
- 	  @user = current_user
- 	  @company = @user.company
+ 	  @company = Company.find(params[:payment][:company_id])
       oauth_client = OAuth::AccessToken.new($qb_oauth_consumer, @company.quickbooks_token, @company.quickbooks_secret)
       @qb_customer = Quickbooks::Service::Customer.new
       @qb_customer.access_token = oauth_client

@@ -36,7 +36,7 @@ class Payment < ActiveRecord::Base
 			payments_total = Payment.where(invoice_id: invoice.id).map { |t| t.amount }.sum
 			left_to_pay = invoice.total - (payments_total)
 			if invoice.present?
-				if (amount * 100) > left_to_pay
+				if (amount) > left_to_pay
 					errors.add(:payment_id, "error. You're paying more than what this invoice is for. There is only #{Money.new(left_to_pay, "USD").format} left to pay")
 				end
 			end

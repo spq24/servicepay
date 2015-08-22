@@ -37,7 +37,7 @@ gem 'oauth-plugin'
 gem 'prawn'
 gem 'prawn-table'
 gem 'lob'
-
+gem 'twilio-ruby'
 
 
 group :development do

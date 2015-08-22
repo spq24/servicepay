@@ -2139,6 +2139,13 @@ blockquote.pull-right:before {
   color: #c0392b;
 }
 
+.table a.table-link.success {
+  color: #2ecc71;
+}
+.table a.table-link.success:hover {
+  color: #27ae60;
+}
+
 .dataTable thead th:hover {
   color: #3498db;
 }

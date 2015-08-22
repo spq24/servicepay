@@ -42,7 +42,7 @@
 														<%= number_to_currency(i.total.to_f / 100) %>
 													</td>
 													<td class="text-center">
-                            <%= i.issue_date.strftime("%m/%d/%Y") unless i.issue_date.blank? %>
+                            							<%= i.issue_date.strftime("%m/%d/%Y") unless i.issue_date.blank? %>
 													</td>
 													<td class="text-center">
 														<%= i.status %>
@@ -58,6 +58,12 @@
 															<span class="fa-stack">
 																<i class="fa fa-square fa-stack-2x"></i>
 																<i class="fa fa-pencil fa-stack-1x fa-inverse"></i>
+															</span>
+														<% end %>
+														<%= link_to customer_invoice_path(i), target: "_blank", class: "table-link" do %>
+															<span class="fa-stack">
+																<i class="fa fa-user fa-stack-2x"></i>
+																<i class="fa fa-user fa-stack-1x fa-inverse"></i>
 															</span>
 														<% end %>																
 														<%= link_to i, method: :delete, data: {confirm: "Are you sure?"}, class: "table-link danger" do %>

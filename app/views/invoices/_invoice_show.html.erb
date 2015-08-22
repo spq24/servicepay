@@ -172,6 +172,10 @@ tr:hover .cut { opacity: 1; }
 					<% if @invoice.send_by_post? %>
 						Sent By Snail Mail
 					<% end %>
+
+					<% if @invoice.send_by_text? %>
+						Sent By Text Message
+					<% end %>
 				</div>
 				<div class="col-sm-4">
 					<label>Is This A Recurring Invoice?</label><br />
@@ -257,6 +261,9 @@ tr:hover .cut { opacity: 1; }
 		<%= link_to "Edit Invoice", edit_invoice_path(@invoice), class: "btn btn-info pull-right" %>
 		<%= link_to invoice_path(@invoice, format: "pdf"), class: "btn btn-success pull-right", style: "margin-right: 20px;" do %> 
 			Download Invoice&nbsp;&nbsp; <i class="fa fa-file-pdf-o"></i>&nbsp;&nbsp;<i class="fa fa-download"></i>
+		<% end %>
+		<%= link_to customer_invoice_path(@invoice), target: "_blank", class: "btn btn-info pull-right", style: "margin-right: 20px;" do %> 
+			Customer View&nbsp;&nbsp; <i class="fa fa-user"></i>
 		<% end %>
 	</div>
 </div>
