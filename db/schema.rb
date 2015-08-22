@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150821125743) do
+ActiveRecord::Schema.define(version: 20150822042718) do
 
   create_table "active_admin_comments", force: true do |t|
     t.string   "namespace"
@@ -80,6 +80,7 @@ ActiveRecord::Schema.define(version: 20150821125743) do
     t.integer  "companyplan_id"
     t.integer  "stripe_kinertia_company"
     t.string   "stripe_company_id"
+    t.string   "stripe_subscription_id"
   end
 
   add_index "companies", ["deleted_at"], name: "index_companies_on_deleted_at"

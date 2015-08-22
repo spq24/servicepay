@@ -20,11 +20,13 @@ class Companies::CompanyStepsController < ApplicationController
       if @company
         binding.pry
         plan = Companyplan.find(params[:company][:companyplan_id])
+
         stripe_company = StripeWrapper::Company.create(source: params[:stripeToken], description: @company.company_name, plan: plan.name)
 
         if stripe_company.successful?
             @company.update_attributes(company_params)
             @company.update_attribute(:stripe_company_id, stripe_company.response.id)
+            @company.update_attribute(:stripe_subscription_id, stripe_company.response[:subscriptions][:data][0][:id])
             @company.update_attribute(:status, true) if step == :company_info
             flash[:success] = "Awesome, just some info about you and we'll be ready to go!"
             render_wizard @company

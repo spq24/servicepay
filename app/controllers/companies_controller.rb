@@ -25,12 +25,29 @@ class CompaniesController < ApplicationController
   end
   
   def update
+    binding.pry
     @user = current_user
     @company = Company.find(params[:id])
       if @company.update_attributes(company_params)
         if URI(request.referer).path == edit_company_path
+          
           flash[:success] = "You have successfully edited your account"
           redirect_to edit_company_path
+        elsif URI(request.referer).path == companyplan_upgrade_path
+          plan = Companyplan.find(params[:company][:companyplan_id])
+          stripe_customer = Stripe::Customer.retrieve(@company.stripe_company_id)
+          stripe_subscription = stripe_customer.subscriptions.retrieve(@company.stripe_subscription_id)
+          stripe_subscription.plan = plan.name
+          response = stripe_subscription.save
+          if response.id.present?
+            plan = Companyplan.find(params[:company][:companyplan_id])
+            @company.update_attribute(:stripe_subscription_id, response.id)
+            flash[:success] = "You Have Successfully Changed Your Plan to #{plan.name.titleize}"
+            redirect_to edit_company_path
+          else
+            flash[:danger] = "Problem"
+            redirect_to edit_company_path
+          end
         else
           flash[:success] = "Awesome, just a little bit more info about your company"
           redirect_to wizard_path(:company_info)

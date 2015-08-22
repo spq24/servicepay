@@ -8,7 +8,6 @@ class CompanyplansController < InheritedResources::Base
 	end
 
   	def create
-      binding.pry
 		@user = current_user
 		@company = @user.company
 		@money = Money.new((params[:companyplan][:amount].to_f * 100).to_i, "USD")
@@ -67,6 +66,7 @@ class CompanyplansController < InheritedResources::Base
 		@user = current_user
 		@company = @user.company
 		@plans = Companyplan.where.not(custom: true)
+		@current_plan = @company.companyplan
 	end
 
   private
