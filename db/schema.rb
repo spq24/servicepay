@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150822062047) do
+ActiveRecord::Schema.define(version: 20150917210842) do
 
   create_table "active_admin_comments", force: true do |t|
     t.string   "namespace"
@@ -193,6 +193,11 @@ ActiveRecord::Schema.define(version: 20150822062047) do
     t.string   "lob_to_address_id"
     t.datetime "lob_expected_delivery_date"
     t.boolean  "send_by_text"
+    t.integer  "number_of_invoices"
+    t.integer  "invoice_interval_number"
+    t.integer  "recurringinvoice_id"
+    t.string   "pdf_url"
+    t.string   "pdf"
   end
 
   create_table "items", force: true do |t|
@@ -243,6 +248,31 @@ ActiveRecord::Schema.define(version: 20150822062047) do
     t.integer  "user_id"
     t.datetime "deleted_at"
     t.boolean  "subscription_cancel"
+  end
+
+  create_table "recurringinvoices", force: true do |t|
+    t.integer  "customer_id"
+    t.integer  "company_id"
+    t.string   "invoice_number"
+    t.text     "private_notes"
+    t.text     "customer_notes"
+    t.text     "payment_terms"
+    t.string   "status"
+    t.float    "discount"
+    t.string   "po_number"
+    t.boolean  "discontinue"
+    t.string   "interval"
+    t.datetime "next_send_date"
+    t.boolean  "auto_paid"
+    t.boolean  "send_by_post"
+    t.boolean  "send_by_text"
+    t.boolean  "send_by_email"
+    t.integer  "total"
+    t.integer  "invoice_interval_number"
+    t.integer  "number_of_invoices"
+    t.integer  "number_sent"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "refunds", force: true do |t|

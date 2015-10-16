@@ -38,7 +38,11 @@ gem 'prawn'
 gem 'prawn-table'
 gem 'lob'
 gem 'twilio-ruby'
-
+gem 'sidekiq'
+gem 'sinatra', require: false
+gem 'slim'
+gem 'httparty'
+gem 'nokogiri'
 
 group :development do
 	gem 'sqlite3'

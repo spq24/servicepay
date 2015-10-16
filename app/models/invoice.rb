@@ -1,8 +1,9 @@
 class Invoice < ActiveRecord::Base
-
+  
 	belongs_to :company
 	belongs_to :customer
 	belongs_to :user
+  belongs_to :recurringinvoice
 	has_many   :payments
 	has_many   :invoice_items, dependent: :destroy
 
@@ -15,5 +16,6 @@ class Invoice < ActiveRecord::Base
 			errors.add(:invoice_id, "total must be greater than zero.")
 		end
 	end
+ 
 
 end

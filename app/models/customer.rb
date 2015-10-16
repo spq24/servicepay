@@ -10,6 +10,7 @@ class Customer < ActiveRecord::Base
 	has_many :plans, -> { uniq }, through: :subscriptions, dependent: :delete_all
 	has_many :invoices
 	has_many :contacts, dependent: :destroy
+  has_many :recurringinvoices
 
 	accepts_nested_attributes_for :subscriptions
 

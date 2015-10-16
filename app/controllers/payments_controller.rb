@@ -90,8 +90,6 @@ class PaymentsController < ApplicationController
 						@payment.save
 					end
 
-							binding.pry
-
 					if invoice.present?
 						payments_total = @company.payments.where(invoice_id: invoice.id).map { |t| t.amount }.sum
 						left_to_pay = invoice.total - payments_total

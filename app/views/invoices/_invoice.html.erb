@@ -190,9 +190,18 @@ tr:hover .cut { opacity: 1; }
 		<div class="form-group">
 			<label>Do You Want To Make This a Recurring Invoice?</label>
 			<div class="checkbox-nice">
-				<%= f.check_box :recurring %>
+        <%= f.check_box :recurring, class: "recurring-check" %>
 				<%= f.label :recurring, "Make This A Recurring Invoice" %>
-			</div>
+			</div><br /><br />
+      <div class="col-sm-6" id="recurring-fields">
+        <div class="form-group">
+          <%= f.label :interval, "Send this invoice every:" %><br />
+          <%= f.number_field :invoice_interval_number, value: '1', min: 1, class: "form-control" %><br />
+          <%= f.select :interval, options_for_select([["Year(s)", "year"], ["Month(s)", "month"], ["Day(s)", "day"]]), {}, class: "form-control" %><br />
+          <%= f.label :number_of_invoices, "How Many Should We Send? (Leave blank to send an infinite #)" %><br />
+          <%= f.number_field :number_of_invoices, min: 0, class: "form-control" %>
+        </div>
+      </div>
 		</div>
 	</article>
 	<article>
@@ -302,4 +311,16 @@ tr:hover .cut { opacity: 1; }
 
 	$('#sel2').select2();
 
+</script>
+
+<script type="text/javascript">
+  $( document ).ready(function() {
+    var elem = document.getElementById('recurring-fields'),
+      checkBox = document.getElementByClass('recurring-check');
+      checkBox.checked = false;
+      checkBox.onchange = function() {
+          elem.style.display = this.checked ? 'block' : 'none';
+      };
+      checkBox.onchange();
+   });
 </script>

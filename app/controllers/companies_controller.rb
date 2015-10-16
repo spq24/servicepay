@@ -25,12 +25,10 @@ class CompaniesController < ApplicationController
   end
   
   def update
-    binding.pry
     @user = current_user
     @company = Company.find(params[:id])
       if @company.update_attributes(company_params)
         if URI(request.referer).path == edit_company_path
-          
           flash[:success] = "You have successfully edited your account"
           redirect_to edit_company_path
         elsif URI(request.referer).path == companyplan_upgrade_path

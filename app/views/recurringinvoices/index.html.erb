@@ -1,0 +1,88 @@
+<%= render 'shared/nav_top' %>
+	<div class="row">
+		<%= render 'shared/left_nav' %>
+		<div id="content-wrapper">
+			<div class="row">
+				<div class="col-lg-12">
+					<%= render 'shared/messages' %>
+					<div class="row">
+						<div class="col-lg-12">									
+							<div class="clearfix">
+								<h1 class="pull-left">Recurring Invoice Profiles</h1>
+							</div>
+						</div>
+					</div>
+					
+					<div class="row">
+						<div class="col-lg-12">
+							<div class="main-box no-header clearfix">
+								<div class="main-box-body clearfix">
+									<div class="table-responsive">
+										<table class="table user-list table-hover">
+											<thead>
+												<tr>
+													<th class="text-center"><span>Customer</span></th>
+													<th class="text-center"><span>Amount</span></th>
+													<th class="text-center"><span>Invoice Date</span></th>
+													<th class="text-center"><span>Status</span></th>
+													<th>&nbsp;</th>
+												</tr>
+											</thead>
+											<tbody>
+                        <% @recurringinvoices.each do |i| %>
+												<tr>
+													<td class="text-center">
+						                                <%= link_to i.customer.customer_name, i.customer, class: "user-link" unless i.customer.blank? %>
+													</td>
+													<td class="text-center">
+														<%= number_to_currency(i.total.to_f / 100) %>
+													</td>
+													<td class="text-center">
+                            							<%= i.issue_date.strftime("%m/%d/%Y") unless i.issue_date.blank? %>
+													</td>
+													<td class="text-center">
+														<%= i.status %>
+													</td>
+													<td style="width: 20%;">
+														<%= link_to i, class: "table-link" do %>
+															<span class="fa-stack">
+																<i class="fa fa-square fa-stack-2x"></i>
+																<i class="fa fa-search-plus fa-stack-1x fa-inverse"></i>
+															</span>
+														<% end %>
+														<%= link_to edit_invoice_path(i), class: "table-link" do %>
+															<span class="fa-stack">
+																<i class="fa fa-square fa-stack-2x"></i>
+																<i class="fa fa-pencil fa-stack-1x fa-inverse"></i>
+															</span>
+														<% end %>
+														<%= link_to customer_invoice_path(i), target: "_blank", class: "table-link" do %>
+															<span class="fa-stack">
+																<i class="fa fa-user fa-stack-2x"></i>
+																<i class="fa fa-user fa-stack-1x fa-inverse"></i>
+															</span>
+														<% end %>																
+														<%= link_to i, method: :delete, data: {confirm: "Are you sure?"}, class: "table-link danger" do %>
+															<span class="fa-stack">
+																<i class="fa fa-square fa-stack-2x"></i>
+																<i class="fa fa-trash-o fa-stack-1x fa-inverse"></i>
+															</span>
+														<% end %>
+													</td>
+												</tr>
+											  <% end %>
+											</tbody>
+										</table>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				
+				</div>
+			</div>
+		  <%= render 'shared/footer' %>
+		</div>
+	</div>
+</div>
+</div>

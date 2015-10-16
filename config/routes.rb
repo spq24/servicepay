@@ -1,9 +1,9 @@
 Rails.application.routes.draw do
 
+  resources :recurringinvoices
 
-  resources :companypayments
+  root 'companies#new'
 
-  resources :companyplans
 
   devise_for :admin_users, ActiveAdmin::Devise.config
   ActiveAdmin.routes(self)
@@ -23,6 +23,8 @@ Rails.application.routes.draw do
   resources :users, only: [:index, :show]
   resources :payments
   resources :refunds
+  resources :companypayments
+  resources :companyplans
   resources :customers do
     resources :contacts
   end
@@ -34,8 +36,11 @@ Rails.application.routes.draw do
     resources :subscriptions, except: [:edit, :update]
   end
 
+  require 'sidekiq/web'
+  mount Sidekiq::Web => '/sidekiq'
+
   # You can have the root of your site routed with "root"
-   root 'companies#new'
+   
 
    get '/companies/:id/payment' => 'payments#new', as: 'payment_form'
    get '/companies/:id/payment/thank_you' => 'payments#thank_you', as: 'thank_you'

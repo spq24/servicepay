@@ -1,0 +1,2 @@
+module RecurringinvoicesHelper
+end
