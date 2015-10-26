@@ -24,10 +24,11 @@ class InvoicesController < ApplicationController
 		payments = @company.payments
 		@payments_total = payments.where(invoice_id: @invoice.id).map { |t| t.amount }.sum
 		@left_to_pay = (@invoice.total - @payments_total) / 100
+    @invoice_items = InvoiceItem.where(invoice_id: @invoice.id)
 		respond_to do |format|
 	      format.html
 	      format.pdf do
-          pdf = InvoicePdf.new(@invoice, @company, @user, @customer, @left_to_pay, view_context)
+          pdf = InvoicePdf.new(@invoice, @company, @user, @customer, @left_to_pay, @invoice_items, view_context)
 	        send_data pdf.render, filename: "invoice_#{@invoice.created_at.strftime("%d/%m/%Y")}.pdf", type: "application/pdf"
 	      end
 	    end
@@ -45,52 +46,51 @@ class InvoicesController < ApplicationController
 		@user = current_user
 		@company = @user.company
 		@items = @company.items
-		@invoice.invoice_items.build
 		@contacts = @customer.contacts
+    @amount_paid = Payment.find_by_invoice_id(@invoice.id).present? ? Payment.find_by_invoice_id(@invoice.id).map { |p| p.amount } : nil
 	end
 
 	def update
-		@invoice = Invoice.find(params[:id])
-		@user = current_user
-		@company = @user.company
-		@customer = @invoice.customer
-		issue_date = Date.strptime(params[:invoice][:issue_date], "%m/%d/%Y")
-		amount_of_invoice = Money.new(params[:invoice][:total].gsub(/\D/, ''), "USD").cents
-				binding.pry
-    
-		contacts = params[:customer].present? ? params[:customer][:contact_ids].map { |c| c.empty? ? nil : Contact.find(c.to_i).email }.compact : Array.new
-		contacts << @customer.customer_email
-		payment_url = "#{root_url}/companies/#{@company.id}/payment?invoice_number=#{@invoice.invoice_number}&amount=#{@invoice.total}&email=#{@customer.customer_email}&name=#{@customer.customer_name.titleize}&address_one=#{@customer.address_one}&address_two=#{@customer.address_two}&city=#{@customer.city.titleize}&state=#{@customer.state}&post=#{@customer.postcode}&phone=#{@customer.phone}"
-	    pdf_url = "#{root_url}invoices/#{@invoice.id}/customer-invoice.pdf"
-
-		if @invoice.update_attributes(total: amount_of_invoice, invoice_number: params[:invoice][:invoice_number], issue_date: issue_date, private_notes: params[:invoice][:private_notes], customer_notes: params[:invoice][:customer_notes], payment_terms: params[:invoice][:payment_terms], draft: params[:invoice][:draft], status: "sent", discount: params[:invoice][:discount], po_number: params[:invoice][:po_number], send_by_email: params[:invoice][:send_by_email], send_by_post: params[:invoice][:send_by_post], send_by_text: params[:invoice][:send_by_text], recurring: params[:invoice][:recurring])
-			
-			$customerio.track(@customer.id,"invoice updated", customer_name: @customer.customer_name.titleize, invoice_number: @invoice.invoice_number, invoice_total: @invoice.total, company_name: @company.company_name.titleize, company_user_email: @user.email, company_logo: @company.logo, facebook_url: @company.facebook, google_url: @company.google, yelp_url: @company.yelp, contacts_emails: contacts, payment_url: payment_url, status: @invoice.status.titleize, pdf_url: pdf_url)
-		    
-      if @invoice.send_by_post == true
+    invoice = Invoice.find(params[:id])
+    company = current_user.company
+    customer = invoice.customer
+    contacts = params[:customer].present? ? params[:customer][:contact_ids].map { |c| c.empty? ? nil : Contact.find(c.to_i).email }.compact : Array.new
+    contacts << customer.customer_email
+    payment_url = "#{root_url}companies/#{company.id}/payment?invoice_number=#{invoice.invoice_number}&amount=#{invoice.total}&email=#{customer.customer_email}&name=#{customer.customer_name.titleize}&address_one=#{customer.address_one}&address_two=#{customer.address_two}&city=#{customer.city.titleize}&state=#{customer.state}&post=#{customer.postcode}&phone=#{customer.phone}"
+    pdf_url = "#{root_url}invoices/#{invoice.id}/customer-invoice.pdf"
+    binding.pry
+    params[:invoice][:total] = params[:invoice][:total].to_i
+    params[:invoice][:status] = "sent"
+    params[:invoice][:issue_date] = Date.strptime(params[:invoice][:issue_date], "%m/%d/%Y")
+    if invoice.update(invoice_params)
+      
+      $customerio.track(customer.id,"invoice updated", customer_name: customer.customer_name.titleize, invoice_number: invoice.invoice_number, invoice_total: invoice.total, company_name: company.company_name.titleize, company_user_email: current_user.email, company_logo: company.logo, facebook_url: company.facebook, google_url: company.google, yelp_url: company.yelp, contacts_emails: contacts, payment_url: payment_url, status: invoice.status.titleize, pdf_url: pdf_url)
+        
+      if invoice.send_by_post == true
         send_letter
       end
 
-		    if @invoice.send_by_text == true
-		    	invoice_url = "#{root_url}/invoices/#{@invoice.id}/customer-invoice"
-		    	to_number = @customer.phone.gsub(/\s+/, "").gsub(/[^0-9A-Za-z]/, '')
-		    	client = Twilio::REST::Client.new ENV["twilio_account_sid"], ENV["twilio_auth"]
-		    	message = client.messages.create(from: '+12158834983', to: '+1' + to_number, body: "Thank you for using Service Pay #{@customer.customer_name.titleize}. A Link to your invoice from #{@company.company_name} is below: #{invoice_url}")
-		    end
+        if invoice.send_by_text == true
+          invoice_url = "#{root_url}/invoices/#{invoice.id}/customer-invoice"
+          to_number = customer.phone.gsub(/\s+/, "").gsub(/[^0-9A-Za-z]/, '')
+          client = Twilio::REST::Client.new ENV["twilio_account_sid"], ENV["twilio_auth"]
+          message = client.messages.create(from: '+12158834983', to: '+1' + to_number, body: "Thank you for using Service Pay #{customer.customer_name.titleize}. A Link to your invoice from #{company.company_name} is below: #{invoice_url}")
+        end
       
-      if @invoice.recurring == true
-        Recurringinvoice.create(customer_id: @customer.id, company_id: @company.id, invoice_number: @invoice.invoice_number, private_notes: @invoice.private_notes, customer_notes: @invoice.customer_notes, payment_terms: @invoice.payment_terms, status: "unpaid", discount: @invoice.discount, po_number: @invoice.po_number, interval: @invoice.interval, invoice_interval_number: @invoice.invoice_interval_number, send_by_post: @invoice.send_by_post, send_by_text: @invoice.send_by_text, send_by_email: @invoice.send_by_email, total: @invoice.total, number_of_invoices: @invoice.number_of_invoices)
+      if invoice.recurring == true
+        next_send_date = invoice.invoice_interval_number.send(invoice.interval).from_now
+        Recurringinvoice.create(customer_id: customer.id, company_id: company.id, invoice_number: invoice.invoice_number, private_notes: invoice.private_notes, customer_notes: invoice.customer_notes, payment_terms: invoice.payment_terms, status: "unpaid", discount: invoice.discount, po_number: invoice.po_number, interval: invoice.interval, invoice_interval_number: invoice.invoice_interval_number, send_by_post: invoice.send_by_post, send_by_text: invoice.send_by_text, send_by_email: invoice.send_by_email, total: invoice.total, number_of_invoices: invoice.number_of_invoices, next_send_date: next_send_date)
       end
-	      	
-	      	flash[:success] = "Successfully updated invoice #{@invoice.invoice_number} for #{@invoice.customer.customer_name}"
-			
-			redirect_to invoice_path(@invoice)
-		
-		else
-			flash[:danger] = "There was a problem creating your invoice. #{@invoice.errors.full_messages.to_sentence}"
-      		redirect_to edit_invoice_path(@invoice)
-		end
-	end
+      
+          flash[:success] = "Successfully updated invoice #{invoice.invoice_number} for #{invoice.customer.customer_name} #{invoice.send_by_post? ? 'It has been sent in the mail with an expected delivery date of' + invoice.lob_expected_delivery_date.to_date.strftime('%m/%d/%Y') : nil}"
+      
+      redirect_to invoice_path(invoice)
+    
+    else
+      flash[:danger] = "There was a problem creating your invoice. #{invoice.errors.full_messages.to_sentence}"
+          redirect_to edit_invoice_path(invoice)
+    end
+  end
 
 	def destroy
 	    @invoice = Invoice.find(params[:id])
@@ -111,10 +111,11 @@ class InvoicesController < ApplicationController
 		payments = @company.payments
 		@payments_total = payments.where(invoice_id: @invoice.id).map { |t| t.amount }.sum
 		@left_to_pay = (@invoice.total - @payments_total) / 100
+    @invoice_items = InvoiceItem.where(invoice_id: @invoice.id)
 		respond_to do |format|
 	      format.html
 	      format.pdf do
-	        pdf = InvoicePdf.new(@invoice, @company, @user, @customer, @left_to_pay, view_context)
+          pdf = InvoicePdf.new(@invoice, @company, @user, @customer, @left_to_pay, @invoice_items, view_context)
 	        send_data pdf.render, filename: "invoice_#{@invoice.created_at.strftime("%d/%m/%Y")}.pdf", type: "application/pdf"
 	      end
 	    end
@@ -123,7 +124,7 @@ class InvoicesController < ApplicationController
 	private
 
 	def invoice_params
-		params.require(:invoice).permit(:customer_id, :user_id, :company_id, :invoice_number, :issue_date, :private_notes, :customer_notes, :payment_terms, :draft, :status, :discount, :po_number, :recurring, :interval, :recurring_send_date, :auto_paid, :contact_type, :total, :send_by_email, :send_by_post, :send_by_text, :pdf, invoices_items: [:quanity, :unit_cost, :description, :price])
+		params.require(:invoice).permit(:customer_id, :user_id, :company_id, :invoice_number, :issue_date, :private_notes, :customer_notes, :payment_terms, :draft, :status, :discount, :po_number, :recurring, :interval, :recurring_send_date, :auto_paid, :contact_type, :total, :send_by_email, :send_by_post, :send_by_text, :pdf, :number_of_invoices, :invoice_interval_number, invoice_items_attributes: [:id, :quantity, :unit_cost, :description, :price, :total, :name, :_destroy])
 	end
 
 	def allowed_user

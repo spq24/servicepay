@@ -1,0 +1,153 @@
+<style>
+/* reset */
+
+
+.invoice {
+	border: 0;
+	box-sizing: content-box;
+	color: inherit;
+	font-family: inherit;
+	font-size: inherit;
+	font-style: inherit;
+	font-weight: inherit;
+	line-height: inherit;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	text-decoration: none;
+	vertical-align: top;
+}
+
+/* content editable */
+
+*[contenteditable] { border-radius: 0.25em; min-width: 1em; outline: 0; }
+
+*[contenteditable] { cursor: pointer; }
+
+*[contenteditable]:hover, *[contenteditable]:focus, td:hover *[contenteditable], td:focus *[contenteditable], img.hover { background: #DEF; box-shadow: 0 0 1em 0.5em #DEF; }
+
+span[contenteditable] { display: inline-block; }
+
+.bg-white {
+	background-color: #fff;
+}
+
+.invoice-inside {
+	padding: 40px;
+}
+
+.submit {
+	margin-top: 30px;
+}
+
+/* table */
+
+.invoice table { font-size: 75%; table-layout: fixed; width: 100%; }
+.invoice table { border-collapse: separate; border-spacing: 2px; }
+.invoice th, td { border-width: 1px; padding: 0.5em; position: relative; text-align: left; }
+.invoice th, td { border-radius: 0.25em; border-style: solid; }
+.invoice th { background: #EEE; border-color: #BBB; }
+.invoice td { border-color: #DDD; }
+
+/* header */
+
+.invoice header { margin: 0 0 3em; }
+.invoice header:after { clear: both; content: ""; display: table; }
+
+.invoice header h1 { background: #000; border-radius: 0.25em; color: #FFF; margin: 0 0 1em; padding: 0.5em 0; }
+.invoice header address { float: left; font-size: 1em; font-style: normal; line-height: 1.25; margin: 0 1em 1em 0; }
+.invoice header address p { margin: 0 0 0.25em; }
+.invoice header span, header img { display: block; float: right; }
+.invoice header span { margin: 0 0 1em 1em; max-height: 25%; max-width: 60%; position: relative; }
+.invoice header img { max-height: 200px; max-width: 200px; }
+.invoice header input { cursor: pointer; -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=0)"; height: 100%; left: 0; opacity: 0; position: absolute; top: 0; width: 100%; }
+
+/* article */
+
+.invoice article, article address, table.meta, table.inventory { margin: 0 0 3em; }
+.invoice article:after { clear: both; content: ""; display: table; }
+.invoice article h1 { clip: rect(0 0 0 0); position: absolute; }
+
+.invoice article address { float: left; font-size: 125%; font-weight: bold; }
+
+/* table meta & balance */
+
+.invoice table.meta, table.balance { float: right; width: 36%; }
+.invoice table.meta:after, table.balance:after { clear: both; content: ""; display: table; }
+
+/* table meta */
+
+.invoice table.meta th { width: 40%; }
+.invoice table.meta td { width: 60%; }
+
+/* table items */
+
+.invoice table.inventory { clear: both; width: 100%; }
+.invoice table.inventory th { font-weight: bold; text-align: center; }
+
+.invoice table.inventory td:nth-child(1) { width: 24%; }
+.invoice table.inventory td:nth-child(2) { width: 35%; }
+.invoice table.inventory td:nth-child(3) { text-align: right; width: 12%; }
+.invoice table.inventory td:nth-child(4) { text-align: right; width: 12%; }
+.invoice table.inventory td:nth-child(5) { text-align: right; width: 12%; }
+.invoice table.inventory td:nth-child(6) { width: 5%; }
+/* table balance */
+
+.invoice table.balance th, table.balance td { width: 50%; }
+.invoice table.balance td { text-align: right; }
+
+/* aside */
+
+.invoice aside h1 { border: none; border-width: 0 0 1px; margin: 0 0 1em; }
+.invoice aside h1 { border-color: #999; border-bottom-style: solid; }
+
+/* javascript */
+
+.add, .cut
+{
+	border-width: 1px;
+	display: block;
+	font-size: 1.2rem;
+	padding: 0.5em 0.5em;	
+	float: left;
+	text-align: center;
+
+}
+
+.add
+{
+	background: #9AF;
+	box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+	background-image: -moz-linear-gradient(#00ADEE 5%, #0078A5 100%);
+	background-image: -webkit-linear-gradient(#00ADEE 5%, #0078A5 100%);
+	border-radius: 0.5em;
+	border-color: #0076A3;
+	color: #FFF;
+	cursor: pointer;
+	font-weight: bold;
+	text-shadow: 0 -1px 2px rgba(0,0,0,0.333);
+  position: relative;
+  top: 20px;
+}
+
+.add { margin: -2.5em 0 0; }
+
+.add:hover { background: #00ADEE; }
+
+.cut { opacity: 0; position: absolute; top: 0; left: -1.5em; margin-top: 0.75rem; }
+.cut { -webkit-transition: opacity 100ms ease-in; }
+
+tr:hover .cut { opacity: 1; }
+
+@media print {
+	* { -webkit-print-color-adjust: exact; }
+	html { background: none; padding: 0; }
+	body { box-shadow: none; margin: 0; }
+	span:empty { display: none; }
+	.add, .cut { display: none; }
+}
+
+@page { margin: 0; }
+}
+
+</style>

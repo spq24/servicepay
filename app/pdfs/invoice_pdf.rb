@@ -1,15 +1,17 @@
 class InvoicePdf < Prawn::Document
 	include ActionView::Helpers::NumberHelper
 
-	def initialize(invoice, company, user, customer, left_to_pay, view)
+  def initialize(invoice, company, user, customer, left_to_pay, invoice_items, view)
 		super()
 		@invoice = invoice
 		@company = company
 		@user = user
 		@customer = customer
 		@left_to_pay = left_to_pay
+    @invoice_items = invoice_items
 		header
 		content
+    item_table
 		footer
 	end
 
@@ -54,6 +56,11 @@ class InvoicePdf < Prawn::Document
 			text "Is This A Recurring Invoice?"
 			text "#{@invoice.recurring? ? "Yes, this is a recurring invoice" : "No, this is not a recurring invoice"}"
 		end
+    
+    bounding_box([400,500], :width => 300, :height => 200) do
+        text "<u><link href='http://servicepay-109358.nitrousapp.com:3000/companies/#{@company.id}/payment?invoice_number=#{@invoice.invoice_number}&amount=#{@left_to_pay}&email=#{@customer.customer_email}&name=#{@customer.customer_name.titleize}&address_one=#{@customer.address_one}&address_two=#{@customer.address_two}&city=#{@customer.city.titleize}&state=#{@customer.state}&post=#{@customer.postcode}&phone=#{@customer.phone}&invoice_id=#{@invoice.id}'>Pay Online" + "</link></u>", :inline_format => true
+        text "<u><link href='http://servicepay-109358.nitrousapp.com:3000/invoices/#{@invoice.id}/customer-invoice'>View Invoice Online" + "</link></u>",  :inline_format => true
+		end
 
 		bounding_box([400, 400], :width => 300, :height => 200) do
 			table ([["Invoice #", "#{@invoice.invoice_number}"], ["PO Number:", "#{@invoice.po_number}"], ["Invoice Date", "#{@invoice.issue_date.strftime("%m/%d/%Y")}"], ["Amount Due", "#{number_to_currency(@invoice.total.to_f / 100)}"]]) do
@@ -62,28 +69,24 @@ class InvoicePdf < Prawn::Document
 				columns(0).text_color = '000000'
 			end
 		end
+	end
 
+  def item_table
+    def invoice_item_rows
+      [["Item", "Description", "Unit Cost", "Quantity", "Price" ]] +
+        @invoice_items.map do |i|
+          [i.name, i.description, Money.new(i.unit_cost, "USD").format, i.quantity, Money.new(i.total, "USD").format]
+        end
+    end
+    
 		bounding_box([50, 280], :width => 300, :height => 200) do
-			table ([["Item", "Description", "Unit Cost", "Quantity", "Price" ]]), width: 500 do 
+      table (invoice_item_rows), width: 500 do 
 				self.header = true
 				self.rows(0).background_color = 'EEEEEE'
 				self.rows(0).text_color = '000000'
 			end
 		end
-
-		bounding_box([50, 200], :width => 300, :height => 200) do 
-			text "<u><link href='http://servicepay-109358.nitrousapp.com:3000/companies/#{@company.id}/payment?invoice_number=#{@invoice.invoice_number}&amount=#{@left_to_pay}&email=#{@customer.customer_email}&name=#{@customer.customer_name.titleize}&address_one=#{@customer.address_one}&address_two=#{@customer.address_two}&city=#{@customer.city.titleize}&state=#{@customer.state}&post=#{@customer.postcode}&phone=#{@customer.phone}&invoice_id=#{@invoice.id}'>Pay Online" + "</link></u>", :inline_format => true
-			text "<u><link href='http://servicepay-109358.nitrousapp.com:3000/invoices/#{@invoice.id}/customer-invoice'>View Invoice Online" + "</link></u>", :inline_format => true
- 		end
-
-		bounding_box([400, 200], :width => 300, :height => 200) do
-			table ([["Total", "#{number_to_currency(@invoice.total.to_f / 100)}"]]) do
-				cells.style(width: 80, height: 24, border: 1, border_color: '000000')
-				columns(0).background_color = 'EEEEEE'
-				columns(0).text_color = '000000'
-			end
-		end
-	end
+  end
 
 	def footer
 		
