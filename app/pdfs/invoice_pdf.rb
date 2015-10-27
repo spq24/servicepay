@@ -1,7 +1,7 @@
 class InvoicePdf < Prawn::Document
 	include ActionView::Helpers::NumberHelper
 
-  def initialize(invoice, company, user, customer, left_to_pay, invoice_items, view)
+  def initialize(invoice, company, user, customer, left_to_pay, payments_total, invoice_items, view)
 		super()
 		@invoice = invoice
 		@company = company
@@ -9,6 +9,7 @@ class InvoicePdf < Prawn::Document
 		@customer = customer
 		@left_to_pay = left_to_pay
     @invoice_items = invoice_items
+    @payments_total = payments_total
 		header
 		content
     item_table
@@ -62,8 +63,8 @@ class InvoicePdf < Prawn::Document
         text "<u><link href='http://servicepay-109358.nitrousapp.com:3000/invoices/#{@invoice.id}/customer-invoice'>View Invoice Online" + "</link></u>",  :inline_format => true
 		end
 
-		bounding_box([400, 400], :width => 300, :height => 200) do
-			table ([["Invoice #", "#{@invoice.invoice_number}"], ["PO Number:", "#{@invoice.po_number}"], ["Invoice Date", "#{@invoice.issue_date.strftime("%m/%d/%Y")}"], ["Amount Due", "#{number_to_currency(@invoice.total.to_f / 100)}"]]) do
+		bounding_box([400, 450], :width => 300, :height => 200) do
+			table ([["Invoice #", "#{@invoice.invoice_number}"], ["PO Number", "#{@invoice.po_number}"], ["Invoice Date", "#{@invoice.issue_date.strftime("%m/%d/%Y")}"], ["Total Invoice", "#{number_to_currency(@invoice.total.to_f / 100)}"], ["Amount Paid", "#{Money.new(@payments_total, "USD").format}"], ["Balance Due", "#{Money.new(@left_to_pay, "USD").format}"]]) do
 				cells.style(width: 80, height: 24, border: 1, border_color: '000000')
 				columns(0).background_color = 'EEEEEE'
 				columns(0).text_color = '000000'

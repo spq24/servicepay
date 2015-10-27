@@ -1,5 +1,47 @@
 <%= render 'invoice_css' %>
 
+	<!-- Standard Bootstrap Modal -->
+	<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <h4 class="modal-title">Enter Payment For Invoice #<%= @invoice.invoice_number %></h4>
+				</div>
+        <%= form_for @payment do |f| %>
+				<div class="modal-body">
+          <%= f.hidden_field :invoice_id, value: @invoice.id %>
+          <%= hidden_field_tag "manual", value: "manual" %>
+						<div class="form-group">
+              <%= f.label :amount %>
+              <%= f.text_field :amount, data: { autonumeric: true, aSign: 'USD' }, placeholder: "$0.00", class: "form-control" %>
+						</div>
+						<div class="form-group">
+              <div class="col-md-6 pull-left">
+                <%= f.label :method, "Payment Method" %>
+                <%= f.select :method, options_for_select(["Cash", "Check", "Bank Transfer", "Credit", "Debit", "Credit Card", "Paypal", "2Checkout", "Online Payment", "ACH"]), { include_blank: "Enter Payment Method"}, class: "form-control" %>
+              </div>
+              <div class="col-md-6 pull-right">
+                <%= f.label :payment_date %>
+                <%= f.text_field :payment_date, value: Date.today.strftime("%m/%d/%Y"), id: "datepickerDate", class: "form-control" %>
+              </div>
+						</div>
+          <br /><br />
+						<div class="form-group">
+              <br /><br />
+                <%= f.label :notes, "Notes About This Payment" %>
+                <%= f.text_area :notes, cols: 3, rows: 3, class: "form-control" %>
+						</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <%= f.submit "Create Payment", class: "btn btn-success" %>
+				</div>
+        <% end %>
+			</div><!-- /.modal-content -->
+		</div><!-- /.modal-dialog -->
+	</div><!-- /.modal -->
+
 <div class="col-lg-10 bg-white invoice-inside">
 	<header>
 		<h1>&nbsp;&nbsp;&nbsp;Invoice #<%= @invoice.invoice_number %> <%= @invoice.draft? ? " - DRAFT NOT SENT YET" : nil %> <span class="pull-right" style="margin-right: 1em;">Invoice Created by: <%= @invoice.user.first_name.titleize %>&nbsp;<%= @invoice.user.last_name.titleize %></span></h1>
@@ -51,8 +93,16 @@
 				<td class="invoice_td"><span><%= @invoice.issue_date.strftime("%m/%d/%Y") %></span></td>
 			</tr>
 			<tr>
-				<th class="invoice_th"><span>Amount Due</span></th>
-				<td class="invoice_td"><%= number_to_currency(@invoice.total.to_f / 100) %></td>
+				<th class="invoice_th"><span>Total Invoice</span></th>
+				<td class="invoice_td"><%= Money.new(@invoice.total, "USD").format %></td>
+			</tr>
+			<tr>
+				<th class="invoice_th"><span>Amount Paid</span></th>
+        <td class="invoice_td"><%= Money.new(@payments_total, "USD").format %></td>
+			</tr>
+			<tr>
+        <th class="invoice_th" style="<%= @left_to_pay == 0 ? 'background-color: red;' : 'background-color: red;' %> color: #fff;"><span>Amount Due</span></th>
+        <td class="invoice_td"><%= Money.new(@left_to_pay, "USD").format %></td>
 			</tr>
 		</table>
 		<table class="inventory">
@@ -79,7 +129,7 @@
 		</table>
 		<table class="balance">
 			<tr>
-				<th class="invoice_th"><span>Total</span></th>
+				<th class="invoice_th"><span>Total Invoice</span></th>
         <td class="invoice_td"><%= Money.new(@invoice.total, "USD").format %></td>
 			</tr>
 		</table>
@@ -112,12 +162,17 @@
 		</aside>
 	</div>
 	<div class="col-md-12 submit">
-		<%= link_to "Edit Invoice", edit_invoice_path(@invoice), class: "btn btn-info pull-right" %>
-		<%= link_to invoice_path(@invoice, format: "pdf"), class: "btn btn-success pull-right", style: "margin-right: 20px;" do %> 
+    <% if @not_paid %>
+		  <%= link_to "Edit Invoice", edit_invoice_path(@invoice), class: "btn btn-info pull-right" %>
+    <% end %>
+		<%= link_to invoice_path(@invoice, format: "pdf"), class: "btn btn-info pull-right", style: "margin-right: 20px;" do %> 
 			Download Invoice&nbsp;&nbsp; <i class="fa fa-file-pdf-o"></i>&nbsp;&nbsp;<i class="fa fa-download"></i>
 		<% end %>
 		<%= link_to customer_invoice_path(@invoice), target: "_blank", class: "btn btn-info pull-right", style: "margin-right: 20px;" do %> 
 			Customer View&nbsp;&nbsp; <i class="fa fa-user"></i>
-		<% end %>
+		<% end %>&nbsp;&nbsp;
+    <a data-toggle="modal" href="#myModal" class="btn btn-success mrg-b-lg">Enter Payment <i class="fa fa-usd"></i></a>
 	</div>
 </div>
+
+<div class="md-overlay"></div><!-- the overlay element -->

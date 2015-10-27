@@ -1,6 +1,7 @@
 class PaymentsController < ApplicationController
 	before_action :authenticate_user!, except: [:new, :create, :show]
 	before_action :set_qb_service, only: [:edit, :update, :create, :destroy]
+  
 
 	def new
 		@company = Company.find(params[:id])
@@ -8,115 +9,144 @@ class PaymentsController < ApplicationController
 		@coupon = Coupon.find_by_name_and_company_id(params[:coupon], @company.id)
 	end
 
-	def create    
-		@company = Company.find(params[:payment][:company_id])
-		Stripe.api_key = @company.access_code
-		@money = Money.new((params[:payment][:amount].to_f * 100).to_i, "USD")	
-		@coupon = Coupon.find_by_name(params[:coupon_code])
-		@customer = Customer.find_by_customer_email_and_company_id(params[:payment][:payment_customer][:customer_email], @company.id)
-		
-		card_brand = Stripe::Token.retrieve(params[:stripeToken])[:card][:brand]
-		invoice = Invoice.find_by_invoice_number_and_company_id(params[:payment][:invoice_number], @company.id)
-		
-			if @coupon.present?
-				count = @coupon.redeemed_count
-				@coupon.redeemed_count = count + 1
-				@coupon.save
-				money_percent = @money * @coupon.percent_off.to_f / 100
-				money_off = @coupon.percent_off.nil? ? Money.new((@coupon.amount_off.to_s.to_f * 100).to_i, "USD") : Money.new((money_percent.to_s.to_f * 100).to_i, "USD")
-				amount_to_charge = @money - money_off
-			else
-				amount_to_charge = @money
-			end
-			app_fee = card_brand == "American Express" ? Money.new((0).to_i, "USD"): amount_to_charge  * (@company.application_fee / 100)
+	def create
+    binding.pry
+    if params[:manual].empty? 
+        @company = Company.find(params[:payment][:company_id])
+        Stripe.api_key = @company.access_code
+        @money = Money.new((params[:payment][:amount].to_f * 100).to_i, "USD")	
+        @coupon = Coupon.find_by_name(params[:coupon_code])
+        @customer = Customer.find_by_customer_email_and_company_id(params[:payment][:payment_customer][:customer_email], @company.id)
 
-		@payment = Payment.new(amount: amount_to_charge.cents, company_id: @company.id, invoice_number: params[:payment][:invoice_number])	
-		if @payment.valid?	
-			if @customer.nil?
-				stripe_customer = StripeWrapper::Customer.create(source: params[:stripeToken], customer_email: params[:payment][:payment_customer][:customer_email], uid: @company.uid)
-				if stripe_customer.successful?
-				    @customer = Customer.create(customer_email: params[:payment][:payment_customer][:customer_email], customer_name: params[:payment][:payment_customer][:customer_name], company_id: @company.id, stripe_token: stripe_customer.response.id, address_one: params[:payment][:payment_customer][:address_one], address_two: params[:payment][:payment_customer][:address_two], city: params[:payment][:payment_customer][:city], postcode: params[:payment][:payment_customer][:postcode], state: params[:payment][:payment_customer][:state], phone: params[:payment][:payment_customer][:phone])	
-				    add_cio
-				    add_customer_to_quickbooks unless @company.quickbooks_token.nil?
-					result = StripeWrapper::Charge.create(customer: @customer.stripe_token, uid: @company.uid, amount: amount_to_charge.cents,  fee: app_fee.cents)
-					if result.successful?
-						@payment = Payment.create(company_id: @company.id, amount: amount_to_charge.cents, invoice_number: params[:payment][:invoice_number], customer_id: @customer.id, stripe_charge_id: result.response.id, last_4: result.response.source.last4, app_fee: app_fee.cents, invoice_id: params[:payment][:invoice_id])
-						if @coupon.present?
-							@payment.coupon_id = @coupon.id
-							@payment.save
-						end
+        card_brand = Stripe::Token.retrieve(params[:stripeToken])[:card][:brand]
+        invoice = Invoice.find_by_invoice_number_and_company_id(params[:payment][:invoice_number], @company.id)
 
-						if invoice.present?
-							payments_total = @company.payments.where(invoice_id: invoice.id).map { |t| t.amount }.sum
-							left_to_pay = invoice.total - payments_total
-							if left_to_pay == 0
-								invoice.update_attribute(:status, "paid")
-								invoice.update_attribute(:payment_date, Date.today)
-							else
-								invoice.update_attribute(:status, "partial")
-							end
-						end
+          if @coupon.present?
+            count = @coupon.redeemed_count
+            @coupon.redeemed_count = count + 1
+            @coupon.save
+            money_percent = @money * @coupon.percent_off.to_f / 100
+            money_off = @coupon.percent_off.nil? ? Money.new((@coupon.amount_off.to_s.to_f * 100).to_i, "USD") : Money.new((money_percent.to_s.to_f * 100).to_i, "USD")
+            amount_to_charge = @money - money_off
+          else
+            amount_to_charge = @money
+          end
+          app_fee = card_brand == "American Express" ? Money.new((0).to_i, "USD") : amount_to_charge  * (@company.application_fee / 100)
 
-						track_cio
-						add_payment_to_quickbooks unless @company.quickbooks_token.nil?
-					    flash[:success] = @coupon.present? ? "Your Payment of #{Money.new(@payment.amount, "USD").format} Was Successful! #{@coupon.name} was applied to your payment!" : "Your Payment of #{Money.new(@payment.amount, "USD").format} Was Successful!"
-					    redirect_to payment_path(@payment)
-				    else
-				      flash[:danger] = result.error_message
-				      render :new
-			    	end
-				else
-					flash[:danger] = result.error_message
-					render :new
-				end
-			else
+        @payment = Payment.new(amount: amount_to_charge.cents, company_id: @company.id, invoice_number: params[:payment][:invoice_number])	
+        if @payment.valid?	
+          if @customer.nil?
+            stripe_customer = StripeWrapper::Customer.create(source: params[:stripeToken], customer_email: params[:payment][:payment_customer][:customer_email], uid: @company.uid)
+            if stripe_customer.successful?
+                @customer = Customer.create(customer_email: params[:payment][:payment_customer][:customer_email], customer_name: params[:payment][:payment_customer][:customer_name], company_id: @company.id, stripe_token: stripe_customer.response.id, address_one: params[:payment][:payment_customer][:address_one], address_two: params[:payment][:payment_customer][:address_two], city: params[:payment][:payment_customer][:city], postcode: params[:payment][:payment_customer][:postcode], state: params[:payment][:payment_customer][:state], phone: params[:payment][:payment_customer][:phone])	
+                add_cio
+                add_customer_to_quickbooks unless @company.quickbooks_token.nil?
+              result = StripeWrapper::Charge.create(customer: @customer.stripe_token, uid: @company.uid, amount: amount_to_charge.cents,  fee: app_fee.cents)
+              if result.successful?
+                @payment = Payment.create(company_id: @company.id, amount: amount_to_charge.cents, invoice_number: params[:payment][:invoice_number], customer_id: @customer.id, stripe_charge_id: result.response.id, last_4: result.response.source.last4, app_fee: app_fee.cents, invoice_id: params[:payment][:invoice_id])
+                if @coupon.present?
+                  @payment.coupon_id = @coupon.id
+                  @payment.save
+                end
 
-		        if @customer.quickbooks_customer_id.nil?
-		          add_customer_to_quickbooks unless @company.quickbooks_token.nil?
-		        end
+                if invoice.present?
+                  payments_total = @company.payments.where(invoice_id: invoice.id).map { |t| t.amount }.sum
+                  left_to_pay = invoice.total - payments_total
+                  if left_to_pay == 0
+                    invoice.update_attribute(:status, "paid")
+                    invoice.update_attribute(:payment_date, Date.today)
+                  else
+                    invoice.update_attribute(:status, "partial")
+                  end
+                end
 
-				if Stripe::Customer.retrieve(@customer.stripe_token)[:default_source] != Stripe::Token.retrieve(params[:stripeToken])[:card][:id]
-					stripe_customer = Stripe::Customer.retrieve(@customer.stripe_token)
-					stripe_customer.source = params[:stripeToken]
-					stripe_customer.save
-				end
+                track_cio
+                add_payment_to_quickbooks unless @company.quickbooks_token.nil?
+                  flash[:success] = @coupon.present? ? "Your Payment of #{Money.new(@payment.amount, "USD").format} Was Successful! #{@coupon.name} was applied to your payment!" : "Your Payment of #{Money.new(@payment.amount, "USD").format} Was Successful!"
+                  redirect_to payment_path(@payment)
+                else
+                  flash[:danger] = result.error_message
+                  render :new
+                end
+            else
+              flash[:danger] = result.error_message
+              render :new
+            end
+          else
 
-				result = StripeWrapper::Charge.create(customer: @customer.stripe_token, uid: @company.uid, amount: amount_to_charge.cents,  fee: app_fee.cents)
-				if result.successful?
-					@payment = Payment.create(company_id: @company.id, amount: amount_to_charge.cents, invoice_number: params[:payment][:invoice_number], customer_id: @customer.id, stripe_charge_id: result.response.id, last_4: result.response.source.last4, app_fee: app_fee.cents, invoice_id: params[:payment][:invoice_id])
-					
-					if @coupon.present?
-						@payment.coupon_id = @coupon.id
-						@payment.save
-					end
+                if @customer.quickbooks_customer_id.nil?
+                  add_customer_to_quickbooks unless @company.quickbooks_token.nil?
+                end
 
-					if invoice.present?
-						payments_total = @company.payments.where(invoice_id: invoice.id).map { |t| t.amount }.sum
-						left_to_pay = invoice.total - payments_total
-						if left_to_pay == 0
-							invoice.update_attribute(:status, "paid")
-							invoice.update_attribute(:payment_date, Date.today)
-						else
-							invoice.update_attribute(:status, "partial")
-						end
-					end
+            if Stripe::Customer.retrieve(@customer.stripe_token)[:default_source] != Stripe::Token.retrieve(params[:stripeToken])[:card][:id]
+              stripe_customer = Stripe::Customer.retrieve(@customer.stripe_token)
+              stripe_customer.source = params[:stripeToken]
+              stripe_customer.save
+            end
 
-					track_cio
-					
-					add_payment_to_quickbooks unless @company.quickbooks_token.nil?
-				    
-				    flash[:success] = @coupon.present? ? "Your Payment of #{Money.new(@payment.amount, "USD").format} Was Successful! #{@coupon.name} was applied to your payment!" : "Your Payment of #{Money.new(@payment.amount, "USD").format} Was Successful!"
-				    
-				    redirect_to payment_path(@payment)
-			    else
-			        flash[:danger] = result.error_message
-			        render :new
-		    	end
-			end
-		else
-		  flash[:danger] = "There was a problem with your payment. #{@payment.errors.full_messages.to_sentence}"
-		  render :new
-		end
+            result = StripeWrapper::Charge.create(customer: @customer.stripe_token, uid: @company.uid, amount: amount_to_charge.cents,  fee: app_fee.cents)
+            if result.successful?
+              @payment = Payment.create(company_id: @company.id, amount: amount_to_charge.cents, invoice_number: params[:payment][:invoice_number], customer_id: @customer.id, stripe_charge_id: result.response.id, last_4: result.response.source.last4, app_fee: app_fee.cents, invoice_id: params[:payment][:invoice_id])
+
+              if @coupon.present?
+                @payment.coupon_id = @coupon.id
+                @payment.save
+              end
+
+              if invoice.present?
+                payments_total = @company.payments.where(invoice_id: invoice.id).map { |t| t.amount }.sum
+                left_to_pay = invoice.total - payments_total
+                if left_to_pay == 0
+                  invoice.update_attribute(:status, "paid")
+                  invoice.update_attribute(:payment_date, Date.today)
+                else
+                  invoice.update_attribute(:status, "partial")
+                end
+              end
+
+              track_cio
+
+              add_payment_to_quickbooks unless @company.quickbooks_token.nil?
+
+                flash[:success] = @coupon.present? ? "Your Payment of #{Money.new(@payment.amount, "USD").format} Was Successful! #{@coupon.name} was applied to your payment!" : "Your Payment of #{Money.new(@payment.amount, "USD").format} Was Successful!"
+
+                redirect_to payment_path(@payment)
+              else
+                  flash[:danger] = result.error_message
+                  render :new
+              end
+          end
+        else
+          flash[:danger] = "There was a problem with your payment. #{@payment.errors.full_messages.to_sentence}"
+          render :new
+        end
+    else
+      invoice = Invoice.find(params[:payment][:invoice_id])
+      company = invoice.company
+      customer = invoice.customer
+      params[:payment][:amount] = Money.new((params[:payment][:amount].to_f * 100).to_i, "USD").cents
+      params[:payment][:payment_date] = Date.strptime(params[:payment][:payment_date], "%m/%d/%Y")
+      params[:payment][:company_id] = company.id
+      params[:payment][:customer_id] = customer.id
+      params[:payment][:invoice_id] = invoice.id
+      params[:payment][:invoice_number] = invoice.invoice_number
+      @payment = Payment.new(payment_params)
+      if @payment.save
+        payments_total = @company.payments.where(invoice_id: invoice.id).map { |t| t.amount }.sum
+        left_to_pay = invoice.total - payments_total
+        if left_to_pay == 0
+          invoice.update_attribute(:status, "paid")
+          invoice.update_attribute(:payment_date, Date.today)
+        else
+          invoice.update_attribute(:status, "partial")
+        end
+        flash[:success] = "Payment successfully created."
+        redirect_to invoice 
+      else
+        flash[:danger] = @payment.errors.full_messages.to_sentence
+         redirect_to :back
+      end
+    end
 	end
 
 	def show
@@ -140,7 +170,7 @@ class PaymentsController < ApplicationController
   private
 
 	def payment_params
-	    params.require(:payment).permit(:company_id, :amount, :refunded, :invoice_number, :subscription, :plan_id, :coupon_id, :customer_id, :stripe_charge_id, :invoice_id, customer_attributes: [:customer_email, :customer_name, :address_one, :address_two, :city, :state, :postcode, :phone])
+	    params.require(:payment).permit(:company_id, :amount, :refunded, :invoice_number, :subscription, :plan_id, :coupon_id, :customer_id, :stripe_charge_id, :invoice_id, :method, :payment_date, :notes, customer_attributes: [:customer_email, :customer_name, :address_one, :address_two, :city, :state, :postcode, :phone])
 	end
 
 	def add_cio
@@ -239,16 +269,23 @@ class PaymentsController < ApplicationController
 	end
 
  	def set_qb_service
- 	  @company = Company.find(params[:payment][:company_id])
-      oauth_client = OAuth::AccessToken.new($qb_oauth_consumer, @company.quickbooks_token, @company.quickbooks_secret)
-      @qb_customer = Quickbooks::Service::Customer.new
-      @qb_customer.access_token = oauth_client
-      @qb_customer.company_id = @company.quickbooks_realm_id
-      @qb_payment = Quickbooks::Service::Payment.new
-      @qb_payment.access_token = oauth_client
-      @qb_payment.company_id = @company.quickbooks_realm_id
-      @qb_invoice = Quickbooks::Service::Invoice.new
-      @qb_invoice.access_token = oauth_client
-      @qb_invoice.company_id = @company.quickbooks_realm_id
+    if params[:manual].present?
+      invoice = Invoice.find(params[:payment][:invoice_id])
+      @company = invoice.company
+    else
+ 	    @company = Company.find(params[:payment][:company_id])
+    end
+    oauth_client = OAuth::AccessToken.new($qb_oauth_consumer, @company.quickbooks_token, @company.quickbooks_secret)
+    @qb_customer = Quickbooks::Service::Customer.new
+    @qb_customer.access_token = oauth_client
+    @qb_customer.company_id = @company.quickbooks_realm_id
+    @qb_payment = Quickbooks::Service::Payment.new
+    @qb_payment.access_token = oauth_client
+    @qb_payment.company_id = @company.quickbooks_realm_id
+    @qb_invoice = Quickbooks::Service::Invoice.new
+    @qb_invoice.access_token = oauth_client
+    @qb_invoice.company_id = @company.quickbooks_realm_id
   end
+  
+
 end

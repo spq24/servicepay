@@ -8,6 +8,7 @@ class Invoice < ActiveRecord::Base
 	has_many   :invoice_items, dependent: :destroy
 
   accepts_nested_attributes_for :invoice_items, allow_destroy: true
+  accepts_nested_attributes_for :payments
 
   validate :non_zero_or_negative, on: :update
 

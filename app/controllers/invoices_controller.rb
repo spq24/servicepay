@@ -4,7 +4,7 @@ class InvoicesController < ApplicationController
 	before_action :authenticate_user!, except: [:customer_show]
 	before_filter :allowed_user, only: [:show, :edit, :update, :destroy]
 	before_action :set_qb_service, only: [:index, :edit, :update, :create, :destroy]
-
+  before_action :not_allowed_to_edit, only: [:edit, :update]
 	skip_before_action :verify_authenticity_token, only: [:update]
 
 	def new
@@ -23,12 +23,14 @@ class InvoicesController < ApplicationController
 		@company = @user.company
 		payments = @company.payments
 		@payments_total = payments.where(invoice_id: @invoice.id).map { |t| t.amount }.sum
-		@left_to_pay = (@invoice.total - @payments_total) / 100
+    @left_to_pay = @invoice.total - @payments_total
     @invoice_items = InvoiceItem.where(invoice_id: @invoice.id)
+    @payment = Payment.new
+    @not_paid = @left_to_pay != 0
 		respond_to do |format|
 	      format.html
 	      format.pdf do
-          pdf = InvoicePdf.new(@invoice, @company, @user, @customer, @left_to_pay, @invoice_items, view_context)
+          pdf = InvoicePdf.new(@invoice, @company, @user, @customer, @left_to_pay, @payments_total, @invoice_items, view_context)
 	        send_data pdf.render, filename: "invoice_#{@invoice.created_at.strftime("%d/%m/%Y")}.pdf", type: "application/pdf"
 	      end
 	    end
@@ -47,7 +49,8 @@ class InvoicesController < ApplicationController
 		@company = @user.company
 		@items = @company.items
 		@contacts = @customer.contacts
-    @amount_paid = Payment.find_by_invoice_id(@invoice.id).present? ? Payment.find_by_invoice_id(@invoice.id).map { |p| p.amount } : nil
+    @amount_paid = Payment.where(invoice_id: @invoice.id).map { |p| p.amount }.sum
+    puts "testing"
 	end
 
 	def update
@@ -58,13 +61,12 @@ class InvoicesController < ApplicationController
     contacts << customer.customer_email
     payment_url = "#{root_url}companies/#{company.id}/payment?invoice_number=#{invoice.invoice_number}&amount=#{invoice.total}&email=#{customer.customer_email}&name=#{customer.customer_name.titleize}&address_one=#{customer.address_one}&address_two=#{customer.address_two}&city=#{customer.city.titleize}&state=#{customer.state}&post=#{customer.postcode}&phone=#{customer.phone}"
     pdf_url = "#{root_url}invoices/#{invoice.id}/customer-invoice.pdf"
-    binding.pry
     params[:invoice][:total] = params[:invoice][:total].to_i
     params[:invoice][:status] = "sent"
     params[:invoice][:issue_date] = Date.strptime(params[:invoice][:issue_date], "%m/%d/%Y")
     if invoice.update(invoice_params)
       
-      $customerio.track(customer.id,"invoice updated", customer_name: customer.customer_name.titleize, invoice_number: invoice.invoice_number, invoice_total: invoice.total, company_name: company.company_name.titleize, company_user_email: current_user.email, company_logo: company.logo, facebook_url: company.facebook, google_url: company.google, yelp_url: company.yelp, contacts_emails: contacts, payment_url: payment_url, status: invoice.status.titleize, pdf_url: pdf_url)
+      $customerio.track(customer.id,"invoice updated", customer_name: customer.customer_name.titleize, invoice_number: invoice.invoice_number, invoice_total: Money.new(invoice.total, "USD").format, company_name: company.company_name.titleize, company_user_email: current_user.email, company_logo: company.logo, facebook_url: company.facebook, google_url: company.google, yelp_url: company.yelp, contacts_emails: contacts, payment_url: payment_url, status: invoice.status.titleize, pdf_url: pdf_url)
         
       if invoice.send_by_post == true
         send_letter
@@ -110,12 +112,12 @@ class InvoicesController < ApplicationController
 		@company = @invoice.company
 		payments = @company.payments
 		@payments_total = payments.where(invoice_id: @invoice.id).map { |t| t.amount }.sum
-		@left_to_pay = (@invoice.total - @payments_total) / 100
+    @left_to_pay = @invoice.total - @payments_total
     @invoice_items = InvoiceItem.where(invoice_id: @invoice.id)
 		respond_to do |format|
 	      format.html
 	      format.pdf do
-          pdf = InvoicePdf.new(@invoice, @company, @user, @customer, @left_to_pay, @invoice_items, view_context)
+          pdf = InvoicePdf.new(@invoice, @company, @user, @customer, @left_to_pay, @payments_total, @invoice_items, view_context)
 	        send_data pdf.render, filename: "invoice_#{@invoice.created_at.strftime("%d/%m/%Y")}.pdf", type: "application/pdf"
 	      end
 	    end
@@ -124,7 +126,7 @@ class InvoicesController < ApplicationController
 	private
 
 	def invoice_params
-		params.require(:invoice).permit(:customer_id, :user_id, :company_id, :invoice_number, :issue_date, :private_notes, :customer_notes, :payment_terms, :draft, :status, :discount, :po_number, :recurring, :interval, :recurring_send_date, :auto_paid, :contact_type, :total, :send_by_email, :send_by_post, :send_by_text, :pdf, :number_of_invoices, :invoice_interval_number, invoice_items_attributes: [:id, :quantity, :unit_cost, :description, :price, :total, :name, :_destroy])
+		params.require(:invoice).permit(:customer_id, :user_id, :company_id, :invoice_number, :issue_date, :private_notes, :customer_notes, :payment_terms, :draft, :status, :discount, :po_number, :recurring, :interval, :recurring_send_date, :auto_paid, :contact_type, :total, :send_by_email, :send_by_post, :send_by_text, :pdf, :number_of_invoices, :invoice_interval_number, invoice_items_attributes: [:id, :quantity, :unit_cost, :description, :price, :total, :name, :_destroy], payments_attributes: [:id, :amount, :method, :payment_date, :notes, :customer_id, :invoice_id, :company_id])
 	end
 
 	def allowed_user
@@ -179,4 +181,14 @@ class InvoicesController < ApplicationController
             end
   end
 
+
+  def not_allowed_to_edit
+    invoice = Invoice.find(params[:id])
+    invoice_total = invoice.total
+    payments_total = Payment.where(invoice_id: invoice.id).map { |t| t.amount }.sum
+    if invoice_total == payments_total
+      flash[:danger] = "You can not edit this invoice as it has been fully paid already."
+      redirect_to invoice_path(invoice.id)
+    end
+  end
 end

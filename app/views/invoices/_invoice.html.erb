@@ -108,7 +108,7 @@
 			</tr>
 			<tr>
 				<th class="invoice_th"><span>Balance Due</span></th>
-				<td class="invoice_td balance_due"><span data-prefix>$</span><span>0.00</span></td>
+				<td class="invoice_td balance_due"></td>
 			</tr>
 		</table>
 	</article>
@@ -118,7 +118,7 @@
 	<div class="col-sm-4">
 		<aside>
 			<h1><span>Private Notes</span></h1>
-			<div contenteditable>
+			<div>
 				<%= f.text_area :private_notes, cols: 20, rows: 4, placeholder: "Notes Only For You and Your Team", class: "form-control" %>
 			</div>
 		</aside>
@@ -126,7 +126,7 @@
 	<div class="col-sm-4">
 		<aside>
 			<h1><span>Notes For Clients</span></h1>
-			<div contenteditable>
+			<div>
 				<%= f.text_area :customer_notes, cols: 20, rows: 4, placeholder: "Notes/Message that will be on the copy of the invoice your customer sees", class: "form-control" %>
 			</div>
 		</aside>
@@ -134,7 +134,7 @@
 	<div class="col-sm-4">
 		<aside>
 			<h1><span>Payment Terms</span></h1>
-			<div contenteditable>
+			<div>
 				<%= f.text_area :payment_terms, cols: 20, rows: 4, placeholder: @company.default_invoice_terms.present? ? nil : "Payment Terms For Your Customer", value: @company.default_invoice_terms.present? ? @company.default_invoice_terms : nil, class: "form-control" %>
 			</div>
 			<%= link_to "Edit Default Terms", edit_company_path(@company) %>
@@ -142,6 +142,7 @@
 	</div>
 	<div class="col-md-12 submit">
 		<%= f.submit "Update Invoice", class: "btn btn-success pull-right submit-btn" %>
+    <%= link_to "Cancel", invoice_path(@invoice), class: "btn btn-default pull-right", style: "margin-right: 20px;" %>
 		<div class="form-group">
 			<div class="checkbox-nice pull-right" style="margin-right:1%;">
 				<%= f.check_box :draft %>
