@@ -33,7 +33,7 @@
                     <%= f.hidden_field :invoice_id, value: params[:invoice_id] %>
                   <div class="col-sm-6">
                     <h2>Your Info</h2>
-                    <%= f.fields_for :payment_customer do |c| %>
+                    <%= f.fields_for :customers do |c| %>
                     <div class="input-group">
                       <span class="input-group-addon"><i class="fa fa-user"></i></span>
                       <%= c.text_field :customer_email, placeholder: "Your Email (For Receipt)", value: params[:email], required: true, autofocus: true, class: "form-control" %>
@@ -55,8 +55,9 @@
                       <%= c.text_field :city, placeholder: "City", value: params[:city], required: true, class: "form-control" %>
                     </div>
                     <div class="input-group">
-                      <%= c.select :state, options_for_select(us_states, selected: params[:state]), {}, class: "form-control", required: true %>
                       <span class="input-group-addon"><i class="fa fa-user"></i></span>
+                      <%= c.select :state, options_for_select(us_states, selected: params[:state]), {}, class: "form-control", required: true %>
+                      
                       
                     </div>
                     <div class="input-group">
