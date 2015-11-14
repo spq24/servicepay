@@ -1,4 +1,5 @@
 <%= render 'shared/nav_top' %>
+
 	<div class="row">
 		<%= render 'shared/left_nav' %>
 		<div id="content-wrapper">
@@ -9,9 +10,12 @@
 						<div class="col-lg-12">									
 							<div class="clearfix">
 								<h1 class="pull-left">Recurring Invoice Profiles</h1>
+                <%= link_to "Create A New Recurring Invoice Profile", new_recurringinvoice_path, class: "btn btn-success pull-right" %>
 							</div>
 						</div>
 					</div>
+          
+      
 					
 					<div class="row">
 						<div class="col-lg-12">
@@ -22,9 +26,10 @@
 											<thead>
 												<tr>
 													<th class="text-center"><span>Customer</span></th>
-													<th class="text-center"><span>Amount</span></th>
-													<th class="text-center"><span>Invoice Date</span></th>
-													<th class="text-center"><span>Status</span></th>
+													<th class="text-center"><span>Last Invoice</span></th>
+                          <th class="text-center"><span>Last Invoice Status</span></th>
+													<th class="text-center"><span>First Invoice Date</span></th>
+                          <th class="text-center"><span>Next Invoice Date</span></th>
 													<th>&nbsp;</th>
 												</tr>
 											</thead>
@@ -32,16 +37,19 @@
                         <% @recurringinvoices.each do |i| %>
 												<tr>
 													<td class="text-center">
-						                                <%= link_to i.customer.customer_name, i.customer, class: "user-link" unless i.customer.blank? %>
+						                <%= link_to i.customer.customer_name, i.customer, class: "user-link" unless i.customer.blank? %>
 													</td>
 													<td class="text-center">
-														<%= number_to_currency(i.total.to_f / 100) %>
+                            <%= link_to Invoice.find(i.last_invoice_id).invoice_number, invoice_path(i.last_invoice_id) unless i.last_invoice_id.nil? %>
 													</td>
 													<td class="text-center">
-                            							<%= i.issue_date.strftime("%m/%d/%Y") unless i.issue_date.blank? %>
+                            <%= link_to Invoice.find(i.last_invoice_id).status, invoice_path(i.last_invoice_id) unless i.last_invoice_id.nil? %>
 													</td>
 													<td class="text-center">
-														<%= i.status %>
+                            <%= i.original_issue_date.strftime("%m/%d/%Y") unless i.original_issue_date.nil? %>
+													</td>
+													<td class="text-center">
+                            <%= i.next_send_date.strftime("%m/%d/%Y") unless i.next_send_date.nil? %>
 													</td>
 													<td style="width: 20%;">
 														<%= link_to i, class: "table-link" do %>
@@ -50,24 +58,27 @@
 																<i class="fa fa-search-plus fa-stack-1x fa-inverse"></i>
 															</span>
 														<% end %>
-														<%= link_to edit_invoice_path(i), class: "table-link" do %>
-															<span class="fa-stack">
-																<i class="fa fa-square fa-stack-2x"></i>
-																<i class="fa fa-pencil fa-stack-1x fa-inverse"></i>
-															</span>
-														<% end %>
-														<%= link_to customer_invoice_path(i), target: "_blank", class: "table-link" do %>
+                            <% if i.active? %>
+                              <%= link_to edit_recurringinvoice_path(i), class: "table-link" do %>
+                                <span class="fa-stack">
+                                  <i class="fa fa-square fa-stack-2x"></i>
+                                  <i class="fa fa-pencil fa-stack-1x fa-inverse"></i>
+                                </span>
+                              <% end %>
+                            <% else %>
+                              <%= link_to '#', class: "table-link" do %>
+                                 <span class="fa-stack">
+                                    <i class="fa fa-square fa-stack-2x"></i>
+                                    <i class="fa fa-pencil fa-stack-1x fa-inverse" style="background-color:#000"></i>
+                                  </span>
+                              <% end %>
+                            <% end %>
+                            <%= link_to customer_path(i.customer), target: "_blank", class: "table-link" do %>
 															<span class="fa-stack">
 																<i class="fa fa-user fa-stack-2x"></i>
 																<i class="fa fa-user fa-stack-1x fa-inverse"></i>
 															</span>
 														<% end %>																
-														<%= link_to i, method: :delete, data: {confirm: "Are you sure?"}, class: "table-link danger" do %>
-															<span class="fa-stack">
-																<i class="fa fa-square fa-stack-2x"></i>
-																<i class="fa fa-trash-o fa-stack-1x fa-inverse"></i>
-															</span>
-														<% end %>
 													</td>
 												</tr>
 											  <% end %>
@@ -86,3 +97,13 @@
 	</div>
 </div>
 </div>
+
+<script type="text/javascript">
+	//datepicker
+	$('#datepickerDate').datepicker({
+	  format: 'mm/dd/yyyy'
+	});
+
+	$('#sel2').select2();
+
+</script>

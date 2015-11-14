@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151027023544) do
+ActiveRecord::Schema.define(version: 20151114003951) do
 
   create_table "active_admin_comments", force: true do |t|
     t.string   "namespace"
@@ -200,6 +200,7 @@ ActiveRecord::Schema.define(version: 20151027023544) do
     t.integer  "recurringinvoice_id"
     t.string   "pdf_url"
     t.string   "pdf"
+    t.boolean  "fully_paid",                 default: false
   end
 
   create_table "items", force: true do |t|
@@ -255,6 +256,18 @@ ActiveRecord::Schema.define(version: 20151027023544) do
     t.boolean  "subscription_cancel"
   end
 
+  create_table "recurringinvoice_items", force: true do |t|
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.string   "name"
+    t.integer  "unit_cost"
+    t.integer  "quantity"
+    t.integer  "price"
+    t.integer  "recurringinvoice_id"
+    t.string   "description"
+    t.integer  "total"
+  end
+
   create_table "recurringinvoices", force: true do |t|
     t.integer  "customer_id"
     t.integer  "company_id"
@@ -278,6 +291,12 @@ ActiveRecord::Schema.define(version: 20151027023544) do
     t.integer  "number_sent"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "last_invoice_id"
+    t.integer  "original_invoice_id"
+    t.datetime "original_issue_date"
+    t.datetime "discontinued_date"
+    t.integer  "discontinued_user_id"
+    t.integer  "user_id"
   end
 
   create_table "refunds", force: true do |t|

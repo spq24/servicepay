@@ -43,6 +43,7 @@ gem 'sinatra', require: false
 gem 'slim'
 gem 'httparty'
 gem 'nokogiri'
+gem 'whenever'
 
 group :development do
 	gem 'sqlite3'

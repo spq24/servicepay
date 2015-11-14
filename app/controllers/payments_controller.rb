@@ -18,7 +18,6 @@ class PaymentsController < ApplicationController
         card_brand = Stripe::Token.retrieve(params[:stripeToken])[:card][:brand]
         invoice = Invoice.find_by_invoice_number_and_company_id(params[:payment][:invoice_number], @company.id)
 
-        
         @customer = Customer.find_or_create_by(customer_email: params[:payment][:customers][:customer_email], company_id: @company.id) do |c|
           
           stripe_customer = StripeWrapper::Customer.create(source: params[:stripeToken], customer_email: params[:payment][:customers][:customer_email], uid: @company.uid)
@@ -81,8 +80,7 @@ class PaymentsController < ApplicationController
               payments_total = @company.payments.where(invoice_id: invoice.id).map { |t| t.amount }.sum
               left_to_pay = invoice.total - payments_total
               if left_to_pay == 0
-                invoice.update_attribute(:status, "paid")
-                invoice.update_attribute(:payment_date, Date.today)
+                invoice.update_attributes(status: "paid", payment_date: Date.today, fully_paid: true)
               else
                 invoice.update_attribute(:status, "partial")
               end              
@@ -124,6 +122,15 @@ class PaymentsController < ApplicationController
         else
           invoice.update_attribute(:status, "partial")
         end
+        
+        binding.pry
+        
+        track_cio
+        
+        add_customer_to_quickbooks unless @company.quickbooks_token.nil?
+        
+        add_payment_to_quickbooks unless @company.quickbooks_token.nil?
+        
         flash[:success] = "Payment successfully created."
         redirect_to invoice 
       else
@@ -177,6 +184,7 @@ class PaymentsController < ApplicationController
 	end
 
 	def add_customer_to_quickbooks
+    binding.pry
     if @customer.quickbooks_customer_id.nil?
       customer = Quickbooks::Model::Customer.new
       customer_name_in_db = Customer.where(customer_name: @customer.customer_name, company_id: @company.id).to_a
@@ -209,7 +217,6 @@ class PaymentsController < ApplicationController
 	end
 
 	def add_payment_to_quickbooks
-    binding.pry
     amount_to_charge = Money.new(@payment.amount, "USD").format.delete('$').delete(',')
     invoice = Quickbooks::Model::Invoice.new
     invoice.customer_id = @payment.customer.quickbooks_customer_id

@@ -12,5 +12,6 @@ class User < ActiveRecord::Base
   has_many :invoices
   has_many :items
   has_many :companyplans
+  has_many :recurringinvoices
   
 end

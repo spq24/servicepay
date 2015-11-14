@@ -39,7 +39,7 @@ class InvoicesController < ApplicationController
 	def index
 		@user = current_user
 		@company = @user.company
-		@invoices = @company.invoices
+    @invoices = @company.invoices.reverse
 	end
 
 	def edit
@@ -72,16 +72,11 @@ class InvoicesController < ApplicationController
         send_letter
       end
 
-        if invoice.send_by_text == true
-          invoice_url = "#{root_url}/invoices/#{invoice.id}/customer-invoice"
-          to_number = customer.phone.gsub(/\s+/, "").gsub(/[^0-9A-Za-z]/, '')
-          client = Twilio::REST::Client.new ENV["twilio_account_sid"], ENV["twilio_auth"]
-          message = client.messages.create(from: '+12158834983', to: '+1' + to_number, body: "Thank you for using Service Pay #{customer.customer_name.titleize}. A Link to your invoice from #{company.company_name} is below: #{invoice_url}")
-        end
-      
-      if invoice.recurring == true
-        next_send_date = invoice.invoice_interval_number.send(invoice.interval).from_now
-        Recurringinvoice.create(customer_id: customer.id, company_id: company.id, invoice_number: invoice.invoice_number, private_notes: invoice.private_notes, customer_notes: invoice.customer_notes, payment_terms: invoice.payment_terms, status: "unpaid", discount: invoice.discount, po_number: invoice.po_number, interval: invoice.interval, invoice_interval_number: invoice.invoice_interval_number, send_by_post: invoice.send_by_post, send_by_text: invoice.send_by_text, send_by_email: invoice.send_by_email, total: invoice.total, number_of_invoices: invoice.number_of_invoices, next_send_date: next_send_date)
+      if invoice.send_by_text == true
+        invoice_url = "#{root_url}/invoices/#{invoice.id}/customer-invoice"
+        to_number = customer.phone.gsub(/\s+/, "").gsub(/[^0-9A-Za-z]/, '')
+        client = Twilio::REST::Client.new ENV["twilio_account_sid"], ENV["twilio_auth"]
+        message = client.messages.create(from: '+12158834983', to: '+1' + to_number, body: "Thank you for using Service Pay #{customer.customer_name.titleize}. A Link to your invoice from #{company.company_name} is below: #{invoice_url}")
       end
       
           flash[:success] = "Successfully updated invoice #{invoice.invoice_number} for #{invoice.customer.customer_name} #{invoice.send_by_post? ? 'It has been sent in the mail with an expected delivery date of' + invoice.lob_expected_delivery_date.to_date.strftime('%m/%d/%Y') : nil}"
@@ -126,7 +121,7 @@ class InvoicesController < ApplicationController
 	private
 
 	def invoice_params
-		params.require(:invoice).permit(:customer_id, :user_id, :company_id, :invoice_number, :issue_date, :private_notes, :customer_notes, :payment_terms, :draft, :status, :discount, :po_number, :recurring, :interval, :recurring_send_date, :auto_paid, :contact_type, :total, :send_by_email, :send_by_post, :send_by_text, :pdf, :number_of_invoices, :invoice_interval_number, invoice_items_attributes: [:id, :quantity, :unit_cost, :description, :price, :total, :name, :_destroy], payments_attributes: [:id, :amount, :method, :payment_date, :notes, :customer_id, :invoice_id, :company_id])
+		params.require(:invoice).permit(:customer_id, :user_id, :company_id, :invoice_number, :issue_date, :private_notes, :customer_notes, :payment_terms, :draft, :status, :discount, :po_number, :recurring, :interval, :recurring_send_date, :auto_paid, :contact_type, :total, :send_by_email, :send_by_post, :send_by_text, :pdf, :number_of_invoices, :invoice_interval_number, :fully_paid, invoice_items_attributes: [:id, :quantity, :unit_cost, :description, :price, :total, :name, :_destroy], payments_attributes: [:id, :amount, :method, :payment_date, :notes, :customer_id, :invoice_id, :company_id])
 	end
 
 	def allowed_user

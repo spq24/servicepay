@@ -7,7 +7,157 @@
 					<%= render 'shared/messages' %>
 					
 					<div class="invoice">
-            <%= render 'invoices/invoice_show' %>
+            <%= render 'shared/invoice_css' %>
+
+            <div class="col-lg-10 bg-white invoice-inside">
+              <header>
+                <h1>Recurring Invoice Profile #<%= @recurringinvoice.id %></h1>
+                
+                <center>
+                  
+                  <% if @recurringinvoice.discontinued? %>
+                   <h2 class="alert alert-danger">This Recurring Profile Was Discontinued by <%= @discontinued_user_name %> on <%= @discontinued_date.strftime("%m/%d/%Y") %></h2>
+                  <% end %>
+                  
+                  <% if @recurringinvoice.invoices_done? %>
+                   <h2 class="alert alert-danger">All the invoices that were scheduled to be sent for this invoice have been sent. You can edit this recurring profile still.</h2>
+                  <% end %>                  
+                  
+                  <div class="row">
+                    <div class="col-md-4">
+                      <div class="col-md-6">
+                        <h3>Last Invoice Sent: <br /> <%= link_to @last_invoice.invoice_number, invoice_path(@recurringinvoice.last_invoice_id) %></h3>
+                      </div>
+                      <div class="col-md-6">
+                        <h3>Last Invoice Status: <%= link_to @last_invoice.status, invoice_path(@recurringinvoice.last_invoice_id) %></h3>
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="col-md-6">
+                        <h3>Total Invoiced:<br /> <%= Money.new(@total_invoiced, "USD").format %></h3>
+                      </div>
+                      <div class="col-md-6">
+                        <h3>Total Collected:<br /> <%= Money.new(@total_collected, "USD").format %></h3>
+                      </div>                       
+                    </div>                
+                    <div class="col-md-4">
+                      <div class="col-md-6">
+                        <h3>Number Sent:<br /> <%= @recurringinvoice.number_sent %></h3>
+                      </div>
+                      <div class="col-md-6">
+                        <h3>Total To Be Sent:<br /> <%= @recurringinvoice.number_of_invoices.present? ? @recurringinvoice.number_of_invoices : "&infin;".html_safe %></h3>
+                      </div>
+                    </div>                    
+                  </div>
+                
+                </center>
+                <span class="logo"><%= image_tag @company.logo %></span>
+                <address>
+                  <h4>Customer Info:</h4>
+                  <p><%= @customer.customer_name.titleize %></p>
+                  <p><%= @customer.address_one %><%= @customer.address_two.present? ? "<br />".html_safe + @customer.address_two : nil %><br><%= @customer.city.titleize %>, <%= @customer.state %> <%= @customer.postcode %></p>
+                  <p><%= number_to_phone(@customer.phone, area_code: true) %></p>
+                </address>
+              </header>
+              <article>
+                <div class="form-group">
+                  <div class="col-sm-8">
+                    <div class="col-sm-4">
+                      <label>How Will This Invoice Be Sent?</label><br />
+                      <% if @recurringinvoice.send_by_email? %>
+                        Sent by Email <br /><br />
+                      <% end %>
+
+                      <% if @recurringinvoice.send_by_post? %>
+                        Sent By Snail Mail
+                      <% end %>
+
+                      <% if @recurringinvoice.send_by_text? %>
+                        Sent By Text Message
+                      <% end %>
+                    </div>
+                  </div>
+                </div>
+              </article>
+              <article>
+                <table class="meta">
+                  <tr>
+                    <th class="invoice_th"><span>PO/Work Order #</span></th>
+                    <td class="invoice_td"><span><%= @recurringinvoice.po_number %></span></td>
+                  </tr>
+                  <tr>
+                    <th class="invoice_th"><span>Invoice Date</span></th>
+                    <td class="invoice_td"><span><%= @recurringinvoice.original_issue_date.strftime("%m/%d/%Y") %></span></td>
+                  </tr>
+                  <tr>
+                    <th class="invoice_th"><span>Total Invoice</span></th>
+                    <td class="invoice_td"><%= Money.new(@recurringinvoice.total, "USD").format %></td>
+                  </tr>
+                </table>
+                <table class="inventory">
+                  <thead>
+                    <tr>
+                      <th class="invoice_th"><span>Item</span></th>
+                      <th class="invoice_th"><span>Description</span></th>
+                      <th class="invoice_th"><span>Unit Cost</span></th>
+                      <th class="invoice_th"><span>Quantity</span></th>
+                      <th class="invoice_th"><span>Price</span></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% @recurringinvoice_items.each do |i| %>
+                      <tr>
+                        <td class="invoice_td"><%= i.name %></td>
+                        <td class="invoice_td"><%= i.description %></td>
+                        <td class="invoice_td"><%= Money.new(i.unit_cost, "USD").format %></td>
+                        <td class="invoice_td"><%= i.quantity %></td>
+                        <td class="invoice_td"><%= Money.new(i.total, "USD").format %></td>
+                      </tr>
+                    <% end %>
+                  </tbody>
+                </table>
+                <table class="balance">
+                  <tr>
+                    <th class="invoice_th"><span>Total Invoice</span></th>
+                    <td class="invoice_td"><%= Money.new(@recurringinvoice.total, "USD").format %></td>
+                  </tr>
+                </table>
+              </article>
+
+
+
+              <div class="col-sm-4">
+                <aside>
+                  <h1><span>Private Notes</span></h1>
+                  <div>
+                    <%= @recurringinvoice.private_notes %>
+                  </div>
+                </aside>
+              </div>
+              <div class="col-sm-4">
+                <aside>
+                  <h1><span>Notes For Clients</span></h1>
+                  <div>
+                    <%= @recurringinvoice.customer_notes %>
+                  </div>
+                </aside>
+              </div>
+              <div class="col-sm-4">
+                <aside>
+                  <h1><span>Payment Terms</span></h1>
+                  <div>
+                    <%= @recurringinvoice.payment_terms %>
+                  </div>
+                </aside>
+              </div>
+              <div class="col-md-12 submit">
+                <% if @recurringinvoice.active? %>
+                  <%= link_to "Edit Recurring Invoice Profile", edit_recurringinvoice_path(@recurringinvoice), class: "btn btn-info pull-right" %>
+                <% end %>
+              </div>
+            </div>
+
+            <div class="md-overlay"></div><!-- the overlay element -->
 					</div>
 
 				</div>

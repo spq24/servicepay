@@ -1,0 +1,196 @@
+<%= render 'shared/invoice_css' %>
+<%= render 'shared/nav_top' %>
+  <div class="row">
+    <%= render 'shared/left_nav' %>
+    <div id="content-wrapper">
+      <div class="row">
+        <div class="col-lg-12">
+          <%= render 'shared/messages' %>
+          <div class="row">
+            <div class="col-lg-12">   
+                <br /><br />
+              <h1>Edit Recurring Invoice #<%= @recurringinvoice.id %></h1>
+            </div>
+          </div>
+          
+          <div class="invoice">
+              <div class="col-lg-10 bg-white invoice-inside">
+                <%= form_for @recurringinvoice, html: {id: "invoice-form"} do |f| %>
+                <%= f.hidden_field :total, class: "total" %>
+                <header>
+                  
+                  <center>                  
+                    <% if @recurringinvoice.invoices_done? %>
+                       <h2 class="alert alert-danger">All the invoices that were scheduled to be sent for this invoice have been sent. You can edit this recurring profile still.</h2>
+                    <% end %>
+                  </center>
+                  <span><%= image_tag @company.logo %></span>
+                </header>
+                <article>
+                  <div class="row">
+                    <div class="col-md-12">
+                       <div class="col-md-3">
+                         <div class="form-group">
+                           <h3>Choose Customer & Start Date</h3>
+                           <%= f.text_field :customer_id, value: @customer.customer_name, class: "form-control", disabled: true %><br />
+                           <%= f.label :original_issue_date, "Start Date" %>
+                           <% if @invoices.nil? %>
+                             <%= f.text_field :original_issue_date, id: "datepickerDate", class: "form-control" %>
+                           <% else %>
+                           <%= f.text_field :original_issue_date, value: @recurringinvoice.original_issue_date.strftime("%m/%d/%Y"), class: "form-control", disabled: true %>
+                           <small>An invoice has already been sent so the start date can't be edited</small>
+                           <% end %>
+                         </div>
+                        </div>
+                        <div class="col-md-3">
+                          <div class="form-group">
+                           <h3>Send This Invoice Every:</h3>
+                           <%= f.number_field :invoice_interval_number, placeholder: "Interval Frequency", class: "form-control" %><br />
+                            <%= f.label :interval, "" %>
+                           <%= f.select :interval, options_for_select([["Years(s)", "year"], ["Month(s)", "month"], ["Week(s)", "week"], ["Day(s)", "day"]]), {}, prompt: "Select Interval", class: "form-control" %>
+                          </div>
+                        </div>
+                        <div class="col-md-3">
+                          <div class="form-group">
+                             <h3>Number of invoices to send:</h3> 
+                             <%= f.number_field :number_of_invoices, placeholder: "Leave blank if you want to send infinite", class: "form-control" %><br />
+                           </div>
+                        </div>
+                        <div class="col-md-3">
+                          <div class="form-group">
+                            <h3>How Do You Want To Send It?</h3>
+                            <div class="checkbox-nice">
+                              <%= f.check_box :send_by_email, checked: true %>
+                              <%= f.label :send_by_email, "Send By Email" %>
+                            </div><br />
+
+                            <div class="checkbox-nice">
+                              <%= f.check_box :send_by_post %>
+                              <%= f.label :send_by_post, "Send By Mail ($2.00 extra)" %>
+                            </div><br />
+
+                            <div class="checkbox-nice">
+                              <%= f.check_box :send_by_text %>
+                              <%= f.label :send_by_text, "Send By text" %>
+                            </div>
+                          </div>
+                        </div>
+
+                    </div>
+                  </div>
+                </article>
+                <article>
+                  <table class="meta">
+                    <tr>
+                      <th class="invoice_th"><span>PO/Work Order #</span></th>
+                      <td class="invoice_td"><span><%= f.text_field :po_number, class: "form-control" %></span></td>
+                    </tr>
+                  </table>
+
+                  <table class="inventory">
+                    <thead>
+                      <tr>
+                        <th class="invoice_th"><span>Item <br /><%= link_to "Create New Item", new_item_path, target: "_blank" %></span></th>
+                        <th class="invoice_th"><span>Description</span></th>
+                        <th class="invoice_th"><span>Unit Cost</span></th>
+                        <th class="invoice_th"><span>Quantity</span></th>
+                        <th class="invoice_th"><span>Price</span></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <%= f.fields_for :recurringinvoice_items do |builder| %>
+                      <%= render 'shared/recurringinvoice_item_fields', f: builder %>
+                      <% end %>
+                    </tbody>
+                  </table>
+                  <%= link_to_add_fields " + Add Another Item", f, :recurringinvoice_items %>
+                  <table class="balance">
+                    <tr>
+                      <th class="invoice_th"><span>Total</span></th>
+                          <td class="invoice_td shown_total"></td>
+                    </tr>
+                    <tr>
+                      <th class="invoice_th"><span>Balance Due</span></th>
+                      <td class="invoice_td balance_due"></td>
+                    </tr>
+                  </table>
+                </article>
+
+                <div class="col-sm-4">
+                  <aside>
+                    <h1><span>Private Notes</span></h1>
+                    <div>
+                      <%= f.text_area :private_notes, cols: 20, rows: 4, placeholder: "Notes Only For You and Your Team", class: "form-control" %>
+                    </div>
+                  </aside>
+                </div>
+                <div class="col-sm-4">
+                  <aside>
+                    <h1><span>Notes For Clients</span></h1>
+                    <div>
+                      <%= f.text_area :customer_notes, cols: 20, rows: 4, placeholder: "Notes/Message that will be on the copy of the invoice your customer sees", class: "form-control" %>
+                    </div>
+                  </aside>
+                </div>
+                <div class="col-sm-4">
+                  <aside>
+                    <h1><span>Payment Terms</span></h1>
+                    <div>
+                      <%= f.text_area :payment_terms, cols: 20, rows: 4, placeholder: @company.default_invoice_terms.present? ? nil : "Payment Terms For Your Customer", value: @company.default_invoice_terms.present? ? @company.default_invoice_terms : nil, class: "form-control" %>
+                    </div>
+                    <%= link_to "Edit Default Terms", edit_company_path(@company) %>
+                  </aside>
+                </div>
+                <div class="col-md-12 submit">
+                  <div class="btn-group" data-toggle="buttons">
+<label class="btn btn-danger">
+  <%= f.check_box :discontinue, class: "discontinue" %> Discontinue Recurring Profile
+</label>
+</div>
+                  <%= f.submit "Update Recurring Invoice Profile ##{@recurringinvoice.id}", class: "btn btn-success pull-right submit-btn" %>
+                  <%= link_to "Cancel", recurringinvoices_path, class: "btn btn-default pull-right", style: "margin-right: 20px;" %>
+                </div>
+                <% end %>
+              </div>
+
+              <div class="items" style="display:none;">
+                  <% @items.each do |i| %>
+                     <ul>
+                      <li id="<%= i.name %>"><b><%= i.name %></b></li>
+                        <ul>
+                          <li id="<%= i.name.gsub(/\s+/, '').downcase %>_description"><%= i.description %></li>
+                          <li id="<%= i.name.gsub(/\s+/, '').downcase %>_quantity"><%= i.quantity %>
+                          <li id="<%= i.name.gsub(/\s+/, '').downcase %>_unit_cost"><%= Money.new(i.unit_cost, "USD").cents %></li>
+                        </ul>
+                     </ul>
+                  <% end %>
+              </div>
+          </div>
+
+        </div>
+      </div>
+      <%= render 'shared/footer' %>
+    </div>
+  </div>
+</div>
+</div>
+<%= render 'shared/empty_morris_div' %>
+
+<script type="text/javascript">
+  //datepicker
+  $('#datepickerDate').datepicker({
+    format: 'mm/dd/yyyy',
+    startDate: '0d'
+  });
+
+  $('#sel2').select2();
+  
+  $('#customer_select').select2();
+ 
+  $(function(){
+    $('.discontinue').on('change',function(){
+      $('#invoice-form').submit();
+    });
+  });
+
+</script>

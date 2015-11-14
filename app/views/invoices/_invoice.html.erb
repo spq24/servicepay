@@ -1,4 +1,4 @@
-<%= render 'invoice_css' %>
+<%= render 'shared/invoice_css' %>
 
 <div class="col-lg-10 bg-white invoice-inside">
 	<%= form_for @invoice do |f| %>
@@ -91,7 +91,7 @@
 			</thead>
 			<tbody>
 				<%= f.fields_for :invoice_items do |builder| %>
-          <%= render 'invoice_item_fields', f: builder %>
+        <%= render 'shared/invoice_item_fields', f: builder %>
         
 				<% end %>
 			</tbody>

@@ -1,4 +1,4 @@
-<%= render 'invoice_css' %>
+<%= render 'shared/invoice_css' %>
 
 <div class="col-xs-12 bg-white invoice-inside">
 	<center><h1>Status: <%= @invoice.status.titleize %>  <%= @invoice.status == "partial" ? " - #{number_to_currency(@payments_total / 100)} of #{number_to_currency(@invoice.total / 100)} paid so far" : "" %> <%= @invoice.status == "paid" ? " | Payment Date: #{@invoice.payment_date.strftime("%m/%d/%Y")}" : "" %></h1></center>
