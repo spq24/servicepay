@@ -66,7 +66,7 @@ class InvoicesController < ApplicationController
     params[:invoice][:issue_date] = Date.strptime(params[:invoice][:issue_date], "%m/%d/%Y")
     if invoice.update(invoice_params)
       
-      $customerio.track(customer.id,"invoice updated", customer_name: customer.customer_name.titleize, invoice_number: invoice.invoice_number, invoice_total: Money.new(invoice.total, "USD").format, company_name: company.company_name.titleize, company_user_email: current_user.email, company_logo: company.logo, facebook_url: company.facebook, google_url: company.google, yelp_url: company.yelp, contacts_emails: contacts, payment_url: payment_url, status: invoice.status.titleize, pdf_url: pdf_url)
+      $customerio.track(customer.id,"invoice updated", customer_name: customer.customer_name.titleize, invoice_number: invoice.invoice_number, invoice_total: Money.new(invoice.total, "USD").format, company_name: company.company_name.titleize, company_user_email: current_user.email, company_logo: company.logo, facebook_url: company.facebook, google_url: company.google, yelp_url: company.yelp, contacts_emails: contacts, payment_url: @invoice.allow_credit_card? ? payment_url : nil, status: invoice.status.titleize, pdf_url: pdf_url)
         
       if invoice.send_by_post == true
         send_letter
@@ -121,7 +121,7 @@ class InvoicesController < ApplicationController
 	private
 
 	def invoice_params
-		params.require(:invoice).permit(:customer_id, :user_id, :company_id, :invoice_number, :issue_date, :private_notes, :customer_notes, :payment_terms, :draft, :status, :discount, :po_number, :recurring, :interval, :recurring_send_date, :auto_paid, :contact_type, :total, :send_by_email, :send_by_post, :send_by_text, :pdf, :number_of_invoices, :invoice_interval_number, :fully_paid, invoice_items_attributes: [:id, :quantity, :unit_cost, :description, :price, :total, :name, :_destroy], payments_attributes: [:id, :amount, :method, :payment_date, :notes, :customer_id, :invoice_id, :company_id])
+		params.require(:invoice).permit(:customer_id, :user_id, :company_id, :invoice_number, :issue_date, :private_notes, :customer_notes, :payment_terms, :draft, :status, :discount, :po_number, :recurring, :interval, :recurring_send_date, :auto_paid, :contact_type, :total, :send_by_email, :send_by_post, :send_by_text, :pdf, :number_of_invoices, :invoice_interval_number, :fully_paid, :allow_credit_card, invoice_items_attributes: [:id, :quantity, :unit_cost, :description, :price, :total, :name, :_destroy], payments_attributes: [:id, :amount, :method, :payment_date, :notes, :customer_id, :invoice_id, :company_id])
 	end
 
 	def allowed_user

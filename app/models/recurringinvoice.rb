@@ -7,6 +7,16 @@ class Recurringinvoice < ActiveRecord::Base
   
   accepts_nested_attributes_for :recurringinvoice_items, allow_destroy: true
   
+  validates_presence_of :customer_id, :user_id, :company_id, :invoice_interval_number
+  
+  validate :non_zero_or_negative
+  
+  def non_zero_or_negative
+		if total <= 0
+      errors.add(:recurringinvoice_id, "total must be greater than zero.")
+		end
+	end
+  
   def active?
     discontinue == nil || discontinue ==  false
   end

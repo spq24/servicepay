@@ -9,7 +9,6 @@ class CompaniesController < ApplicationController
   def create
     @company = Company.create(company_params)
     if @company
-
       flash[:success] = "Thank you for signing up! Tell Us Some Info About Your Company So We Can Better Serve You"
       redirect_to company_company_steps_path(@company)
     else

@@ -56,7 +56,7 @@
 	</header>
 	<article>
 		<div class="form-group">
-			<div class="col-sm-8">
+			<div class="col-sm-12">
 				<div class="col-sm-4">
 					<label>How Was This Invoice Sent?</label><br />
 					<% if @invoice.send_by_email? %>
@@ -75,6 +75,11 @@
 					<label>Is This A Recurring Invoice?</label><br />
 					<%= @invoice.recurring? ? "Yes, this is a recurring invoice" : "No, this is not a recurring invoice" %>
 				</div>
+        
+        <div class="col-sm-4">
+          <label>Can this invoice be paid by credit card?</label><br />
+          <%= @invoice.allow_credit_card? ? "You allow payment by credit card" : "You do NOT allow payment by credit card" %>
+        </div>
 			</div>
 		</div>
 	</article>

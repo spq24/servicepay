@@ -1,6 +1,6 @@
 class Contact < ActiveRecord::Base
 
-	has_many :contacts
+  belongs_to :customers
 
 
 	validates_presence_of :name, :email, :number, :customer_id

@@ -26,10 +26,22 @@
                   <div class="row">
                     <div class="col-md-4">
                       <div class="col-md-6">
-                        <h3>Last Invoice Sent: <br /> <%= link_to @last_invoice.invoice_number, invoice_path(@recurringinvoice.last_invoice_id) %></h3>
+                        <h3>
+                          <% if @recurringinvoice.original_issue_date > Date.today %>
+                              Scheduled to go out: <%= @recurringinvoice.original_issue_date.strftime("%m/%d/%Y") %>
+                          <% else %>
+                              Last Invoice Sent: <br /> <%= link_to @last_invoice.invoice_number, invoice_path(@recurringinvoice.last_invoice_id) %>
+                          <% end %>
+                        </h3>
                       </div>
                       <div class="col-md-6">
-                        <h3>Last Invoice Status: <%= link_to @last_invoice.status, invoice_path(@recurringinvoice.last_invoice_id) %></h3>
+                        <h3>
+                          <% if @recurringinvoice.original_issue_date > Date.today %>
+                              Scheduled to go out: <%= @recurringinvoice.original_issue_date.strftime("%m/%d/%Y") %>
+                          <% else %>                          
+                              Last Invoice Status: <%= link_to @last_invoice.status, invoice_path(@recurringinvoice.last_invoice_id) %>
+                          <% end %>
+                        </h3>
                       </div>
                     </div>
                     <div class="col-md-4">
@@ -74,6 +86,14 @@
 
                       <% if @recurringinvoice.send_by_text? %>
                         Sent By Text Message
+                      <% end %>
+                    </div>
+                    <div class="col-sm-4">
+                      <label>Allow these invoices to be paid by credit card?</label><br />
+                      <% if @recurringinvoice.allow_credit_card? %>
+                        Yes
+                      <% else %>
+                        No
                       <% end %>
                     </div>
                   </div>

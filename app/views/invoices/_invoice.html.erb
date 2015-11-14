@@ -15,7 +15,7 @@
 	<article>
     <div class="row">
     <div class="col-md-12">
-      <div  class="col-md-6">
+      <div  class="col-md-4">
       <div class="form-group">
         <label>How Do You Want To Send This Invoice?</label>
         <div class="checkbox-nice">
@@ -31,35 +31,33 @@
         <div class="checkbox-nice">
           <%= f.check_box :send_by_text %>
           <%= f.label :send_by_text, "Send By text" %>
-        </div><br />
-        <% if @customer.contacts.any? %>
-          <label>Who do you want to send this invoice to?</label><br />
-          <label>(This will automatically be sent to the main customer email)</label>
-          <div class="checkbox-nice">
-            <%= collection_check_boxes(:customer, :contact_ids, @contacts, :id, :name) %>
-          </div>
-        <% end %>
+        </div>
         </div>
       </div>
 
-      <div class="col-md-6">
-      <div class="form-group">
-        <label>Do You Want To Make This a Recurring Invoice?</label>
-        <div class="checkbox-nice">
-          <%= f.check_box :recurring, class: "recurring-check" %>
-          <%= f.label :recurring, "Make This A Recurring Invoice" %>
-        </div><br /><br />
-        <div class="col-sm-6" id="recurring-fields">
+      <% if @customer.contacts.any? %>
+        <div class="col-md-4">
           <div class="form-group">
-            <%= f.label :interval, "Send this invoice every:" %><br />
-            <%= f.number_field :invoice_interval_number, value: '1', min: 1, class: "form-control" %><br />
-            <%= f.select :interval, options_for_select([["Year(s)", "year"], ["Month(s)", "month"], ["Day(s)", "day"]]), {}, class: "form-control" %><br />
-            <%= f.label :number_of_invoices, "How Many Should We Send? (Leave blank to send an infinite #)" %><br />
-            <%= f.number_field :number_of_invoices, min: 0, class: "form-control" %>
+            
+            <label>(This will automatically be sent to the main customer email)</label>
+            <div class="checkbox-nice">
+              <%= collection_check_boxes(:customer, :contact_ids, @contacts, :id, :name) %>
+            </div>
+
+          </div>
+        </div>
+      <% end %>
+      
+      <div class="col-md-4">
+        <div class="form-group">
+          <label>Do You Want To Allow credit Card Payments For This Invoice?</label><br />
+          <div class="checkbox-nice">
+            <%= f.check_box :allow_credit_card %>
+            <%= f.label :allow_credit_card, "Allow Payment By Credit Card" %>
           </div>
         </div>
       </div>
-      </div>
+      
     </div>
     </div>
 	</article>

@@ -32,7 +32,7 @@ class RecurringinvoicesController < InheritedResources::Base
       redirect_to recurringinvoice_path(@recurringinvoice)
     else
       flash[:danger] = @recurringinvoice.errors.full_messages.to_sentence
-      render :new
+      redirect_to new_recurringinvoice_path
     end
   end
   
@@ -104,14 +104,15 @@ class RecurringinvoicesController < InheritedResources::Base
     end
   end
   
-  def create_new_recurring_invoice(company, recurringinvoice)
+  def create_new_recurring_invoice(company, recurringinvoice, root)
     @recurringinvoice = recurringinvoice
     @company = company
+    path_to_home = root
     invoices = @company.invoices
     invoice_number = invoices.last == nil ? 1 : invoices.last.invoice_number.to_i + 1
 
 
-    @invoice =  Invoice.new(company_id: @company.id, customer_id: @recurringinvoice.customer.id, invoice_number: invoice_number, user_id: @user.id, total: @recurringinvoice.total, status: "sent", issue_date: @recurringinvoice.original_issue_date, private_notes: @recurringinvoice.private_notes, customer_notes: @recurringinvoice.customer_notes, payment_terms: @recurringinvoice.payment_terms, po_number: @recurringinvoice.po_number, recurring: true, send_by_email: @recurringinvoice.send_by_email, send_by_text: @recurringinvoice.send_by_text, send_by_post: @recurringinvoice.send_by_post)
+    @invoice =  Invoice.new(company_id: @company.id, customer_id: @recurringinvoice.customer.id, invoice_number: invoice_number, user_id: @recurringinvoice.user.id, total: @recurringinvoice.total, status: "sent", issue_date: @recurringinvoice.original_issue_date, private_notes: @recurringinvoice.private_notes, customer_notes: @recurringinvoice.customer_notes, payment_terms: @recurringinvoice.payment_terms, po_number: @recurringinvoice.po_number, recurring: true, send_by_email: @recurringinvoice.send_by_email, send_by_text: @recurringinvoice.send_by_text, send_by_post: @recurringinvoice.send_by_post, allow_credit_card: @recurringinvoice.allow_credit_card)
 
     if @invoice.save
 
@@ -121,20 +122,20 @@ class RecurringinvoicesController < InheritedResources::Base
         invoice_item = InvoiceItem.create(quantity: i.quantity, unit_cost: i.unit_cost, description: i.description, price: i.price, total: i.total, name: i.name, invoice_id: @invoice.id)
       end
 
-     payment_url = "#{root_url}companies/#{@company.id}/payment?invoice_number=#{@invoice.invoice_number}&amount=#{@invoice.total}&email=#{@recurringinvoice.customer.customer_email}&name=#{@recurringinvoice.customer.customer_name.titleize}&address_one=#{@recurringinvoice.customer.address_one}&address_two=#{@recurringinvoice.customer.address_two}&city=#{@recurringinvoice.customer.city.titleize}&state=#{@recurringinvoice.customer.state}&post=#{@recurringinvoice.customer.postcode}&phone=#{@recurringinvoice.customer.phone}"
+     payment_url = "#{path_to_home}companies/#{@company.id}/payment?invoice_number=#{@invoice.invoice_number}&amount=#{@invoice.total}&email=#{@recurringinvoice.customer.customer_email}&name=#{@recurringinvoice.customer.customer_name.titleize}&address_one=#{@recurringinvoice.customer.address_one}&address_two=#{@recurringinvoice.customer.address_two}&city=#{@recurringinvoice.customer.city.titleize}&state=#{@recurringinvoice.customer.state}&post=#{@recurringinvoice.customer.postcode}&phone=#{@recurringinvoice.customer.phone}"
 
 
-      pdf_url = "#{root_url}invoices/#{@invoice.id}/customer-invoice.pdf"
+      pdf_url = "#{path_to_home}invoices/#{@invoice.id}/customer-invoice.pdf"
 
 
-      $customerio.track(@recurringinvoice.customer.id,"invoice updated", customer_name: @invoice.customer.customer_name.titleize, invoice_number: @invoice.invoice_number, invoice_total: Money.new(@invoice.total, "USD").format, company_name: @company.company_name.titleize, company_user_email: current_user.email, company_logo: @company.logo, facebook_url: @company.facebook, google_url: @company.google, yelp_url: @company.yelp, contacts_emails: @contacts, payment_url: payment_url, status: @invoice.status.titleize, pdf_url: pdf_url)
+      $customerio.track(@recurringinvoice.customer.id,"invoice updated", customer_name: @invoice.customer.customer_name.titleize, invoice_number: @invoice.invoice_number, invoice_total: Money.new(@invoice.total, "USD").format, company_name: @company.company_name.titleize, company_user_email: current_user.email, company_logo: @company.logo, facebook_url: @company.facebook, google_url: @company.google, yelp_url: @company.yelp, contacts_emails: @contacts, payment_url: @recurringinvoice.allow_credit_card? ? payment_url : nil, status: @invoice.status.titleize, pdf_url: pdf_url)
 
       if @invoice.send_by_post == true
         send_letter
       end
 
      if @invoice.send_by_text == true
-        invoice_url = "#{root_url}/invoices/#{@invoice.id}/customer-invoice"
+        invoice_url = "#{path_to_home}/invoices/#{@invoice.id}/customer-invoice"
         to_number = @invoice.customer.phone.gsub(/\s+/, "").gsub(/[^0-9A-Za-z]/, '')
         client = Twilio::REST::Client.new ENV["twilio_account_sid"], ENV["twilio_auth"]
         message = client.messages.create(from: '+12158834983', to: '+1' + to_number, body: "Thank you for using Service Pay #{@invoice.customer.customer_name.titleize}. A Link to your invoice from #{@company.company_name} is below: #{invoice_url}")
@@ -149,7 +150,7 @@ class RecurringinvoicesController < InheritedResources::Base
   private
 
     def recurringinvoice_params
-      params.require(:recurringinvoice).permit(:customer_id, :user_id, :company_id, :invoice_number, :original_issue_date, :private_notes, :customer_notes, :payment_terms, :discount, :po_number, :interval, :auto_paid, :total, :send_by_email, :send_by_post, :send_by_text, :number_of_invoices, :invoice_interval_number, :next_send_date, :number_sent, :discontinue, :discontinued_user_id, :discontinued_date, recurringinvoice_items_attributes: [:id, :quantity, :unit_cost, :description, :price, :total, :name, :_destroy])
+      params.require(:recurringinvoice).permit(:customer_id, :user_id, :company_id, :invoice_number, :original_issue_date, :private_notes, :customer_notes, :payment_terms, :discount, :po_number, :interval, :auto_paid, :total, :send_by_email, :send_by_post, :send_by_text, :number_of_invoices, :invoice_interval_number, :next_send_date, :number_sent, :discontinue, :discontinued_user_id, :discontinued_date, :allow_credit_card, recurringinvoice_items_attributes: [:id, :quantity, :unit_cost, :description, :price, :total, :name, :_destroy])
     end
 
 	def allowed_user

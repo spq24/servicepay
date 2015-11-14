@@ -94,7 +94,7 @@
 	</div>
 	<div class="col-sm-12 submit">
 		<div class="col-sm-6">
-			<% if @invoice.status != 'paid' %>
+      <% if @invoice.status != 'paid' && @invoice.allow_credit_card != false %>
 				<%= link_to "#{root_url}companies/#{@company.id}/payment?invoice_number=#{@invoice.invoice_number}&amount=#{@left_to_pay}&email=#{@customer.customer_email}&name=#{@customer.customer_name.titleize}&address_one=#{@customer.address_one}&address_two=#{@customer.address_two}&city=#{@customer.city.titleize}&state=#{@customer.state}&post=#{@customer.postcode}&phone=#{@customer.phone}&invoice_id=#{@invoice.id}", class: "btn btn-success pull-right", target: "_blank" do %>
 					Pay Invoice&nbsp;&nbsp; <i class="fa fa-usd"></i>			
 				<% end %>

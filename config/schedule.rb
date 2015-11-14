@@ -22,3 +22,7 @@
 every 1.day, :at => '5:30 am' do
   rake "recurringinvoices:check"
 end
+
+every 1.day, :at => '1:00 am' do
+  
+end

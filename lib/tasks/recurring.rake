@@ -1,5 +1,3 @@
-
-
 namespace :recurringinvoices do
   desc "Check recurring profiles and create invoice if necessary"
   task check: :environment do
