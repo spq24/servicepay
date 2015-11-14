@@ -24,5 +24,5 @@ every 1.day, :at => '5:30 am' do
 end
 
 every 1.day, :at => '1:00 am' do
-  
+  rake "quickbooks:renew_tokens"
 end
